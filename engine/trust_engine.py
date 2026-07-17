@@ -5,124 +5,183 @@ z-score anomaly detection, environment tracking, and sequential analysis.
 """
 
 import xml.etree.ElementTree as ET
-import sqlite3
+import psycopg2
+import psycopg2.extras
+import psycopg2.pool
 import json
 import hashlib
 import time
 import math
 import os
+import logging
+import bcrypt
 from datetime import datetime, timezone
 from collections import Counter, defaultdict
+from contextlib import contextmanager
 from typing import Optional
 
+logger = logging.getLogger("poly.engine")
 
-DB_PATH = os.environ.get("POLY_DB_PATH", os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "backend", "poly.db"))
+DATABASE_URL = os.environ.get("DATABASE_URL", os.environ.get("SUPABASE_DATABASE_URL", ""))
+
+_pool = None
 
 
+def _get_pool():
+    global _pool
+    if _pool is None and DATABASE_URL:
+        _pool = psycopg2.pool.SimpleConnectionPool(
+            minconn=1, maxconn=10, dsn=DATABASE_URL
+        )
+        logger.info("Created PostgreSQL connection pool")
+    return _pool
+
+
+@contextmanager
 def _get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+    """Context manager for DB connections with dict cursor support."""
+    pool = _get_pool()
+    if pool is None:
+        raise RuntimeError("Database not configured. Set DATABASE_URL env var.")
+    conn = pool.getconn()
+    try:
+        yield conn
+    finally:
+        pool.putconn(conn)
+
+
+_db_initialized = False
+
+
+def ensure_initialized():
+    """Initialize DB tables (safe to call multiple times)."""
+    global _db_initialized
+    if not _db_initialized:
+        _init_db()
+        _db_initialized = True
 
 
 def _init_db():
-    conn = _get_db()
-    c = conn.cursor()
-    c.executescript("""
-        CREATE TABLE IF NOT EXISTS repositories (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE,
-            created_at TEXT DEFAULT (datetime('now'))
-        );
-        CREATE TABLE IF NOT EXISTS test_results (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            repo_id INTEGER NOT NULL,
-            test_name TEXT NOT NULL,
-            status TEXT NOT NULL,
-            duration REAL,
-            error_message TEXT,
-            error_type TEXT,
-            flaky_category TEXT,
-            run_id TEXT NOT NULL,
-            run_timestamp TEXT NOT NULL,
-            trust_score REAL DEFAULT 100,
-            score_confidence REAL DEFAULT 0,
-            environment TEXT,
-            FOREIGN KEY (repo_id) REFERENCES repositories(id)
-        );
-        CREATE TABLE IF NOT EXISTS ci_runs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            repo_id INTEGER NOT NULL,
-            run_id TEXT NOT NULL UNIQUE,
-            branch TEXT DEFAULT 'main',
-            commit_sha TEXT,
-            total_tests INTEGER DEFAULT 0,
-            passed INTEGER DEFAULT 0,
-            failed INTEGER DEFAULT 0,
-            skipped INTEGER DEFAULT 0,
-            avg_trust_score REAL DEFAULT 100,
-            timestamp TEXT NOT NULL,
-            environment TEXT,
-            FOREIGN KEY (repo_id) REFERENCES repositories(id)
-        );
-        CREATE TABLE IF NOT EXISTS alerts_config (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            repo_id INTEGER NOT NULL UNIQUE,
-            webhook_url TEXT,
-            channel_type TEXT DEFAULT 'discord',
-            min_trust_drop REAL DEFAULT 20,
-            alert_on_flaky BOOLEAN DEFAULT 1,
-            alert_on_quarantine BOOLEAN DEFAULT 1,
-            FOREIGN KEY (repo_id) REFERENCES repositories(id)
-        );
-        CREATE INDEX IF NOT EXISTS idx_test_results_repo ON test_results(repo_id);
-        CREATE INDEX IF NOT EXISTS idx_test_results_name ON test_results(test_name);
-        CREATE INDEX IF NOT EXISTS idx_test_results_run ON test_results(run_id);
-        CREATE INDEX IF NOT EXISTS idx_ci_runs_repo ON ci_runs(repo_id);
+    with _get_db() as conn:
+        try:
+            with conn.cursor() as c:
+                c.execute("""
+                    CREATE TABLE IF NOT EXISTS repositories (
+                        id SERIAL PRIMARY KEY,
+                        name TEXT NOT NULL UNIQUE,
+                        created_at TIMESTAMPTZ DEFAULT NOW()
+                    );
+                """)
+                c.execute("""
+                    CREATE TABLE IF NOT EXISTS test_results (
+                        id SERIAL PRIMARY KEY,
+                        repo_id INTEGER NOT NULL,
+                        test_name TEXT NOT NULL,
+                        status TEXT NOT NULL,
+                        duration REAL,
+                        error_message TEXT,
+                        error_type TEXT,
+                        flaky_category TEXT,
+                        run_id TEXT NOT NULL,
+                        run_timestamp TIMESTAMPTZ NOT NULL,
+                        trust_score REAL DEFAULT 100,
+                        score_confidence REAL DEFAULT 0,
+                        environment TEXT,
+                        FOREIGN KEY (repo_id) REFERENCES repositories(id)
+                    );
+                """)
+                c.execute("""
+                    CREATE TABLE IF NOT EXISTS ci_runs (
+                        id SERIAL PRIMARY KEY,
+                        repo_id INTEGER NOT NULL,
+                        run_id TEXT NOT NULL UNIQUE,
+                        branch TEXT DEFAULT 'main',
+                        commit_sha TEXT,
+                        total_tests INTEGER DEFAULT 0,
+                        passed INTEGER DEFAULT 0,
+                        failed INTEGER DEFAULT 0,
+                        skipped INTEGER DEFAULT 0,
+                        avg_trust_score REAL DEFAULT 100,
+                        timestamp TIMESTAMPTZ NOT NULL,
+                        environment TEXT,
+                        FOREIGN KEY (repo_id) REFERENCES repositories(id)
+                    );
+                """)
+                c.execute("""
+                    CREATE TABLE IF NOT EXISTS alerts_config (
+                        id SERIAL PRIMARY KEY,
+                        repo_id INTEGER NOT NULL UNIQUE,
+                        webhook_url TEXT,
+                        channel_type TEXT DEFAULT 'discord',
+                        min_trust_drop REAL DEFAULT 20,
+                        alert_on_flaky BOOLEAN DEFAULT TRUE,
+                        alert_on_quarantine BOOLEAN DEFAULT TRUE,
+                        FOREIGN KEY (repo_id) REFERENCES repositories(id)
+                    );
+                """)
+                c.execute("CREATE INDEX IF NOT EXISTS idx_test_results_repo ON test_results(repo_id)")
+                c.execute("CREATE INDEX IF NOT EXISTS idx_test_results_name ON test_results(test_name)")
+                c.execute("CREATE INDEX IF NOT EXISTS idx_test_results_run ON test_results(run_id)")
+                c.execute("CREATE INDEX IF NOT EXISTS idx_ci_runs_repo ON ci_runs(repo_id)")
 
-        -- Admin / Users
-        CREATE TABLE IF NOT EXISTS admin_users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL UNIQUE,
-            password_hash TEXT NOT NULL,
-            role TEXT DEFAULT 'admin',
-            created_at TEXT DEFAULT (datetime('now'))
-        );
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            email TEXT UNIQUE,
-            github_username TEXT,
-            api_key TEXT UNIQUE,
-            plan TEXT DEFAULT 'free',
-            referrer TEXT,
-            signup_source TEXT,
-            ip_address TEXT,
-            is_active INTEGER DEFAULT 1,
-            last_activity TEXT,
-            created_at TEXT DEFAULT (datetime('now')),
-            notes TEXT
-        );
-        CREATE TABLE IF NOT EXISTS user_activity (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            action TEXT NOT NULL,
-            detail TEXT,
-            ip_address TEXT,
-            created_at TEXT DEFAULT (datetime('now')),
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        );
-        CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-        CREATE INDEX IF NOT EXISTS idx_users_activity ON user_activity(user_id);
-    """)
-    # Seed default admin if empty
-    c.execute("SELECT COUNT(*) as cnt FROM admin_users")
-    if c.fetchone()["cnt"] == 0:
-        import hashlib
-        c.execute("INSERT INTO admin_users (username, password_hash, role) VALUES (?,?,?)",
-                   ("admin", hashlib.sha256("admin123".encode()).hexdigest(), "superadmin"))
-    conn.commit()
-    conn.close()
+                # Admin / Users
+                c.execute("""
+                    CREATE TABLE IF NOT EXISTS admin_users (
+                        id SERIAL PRIMARY KEY,
+                        username TEXT NOT NULL UNIQUE,
+                        password_hash TEXT NOT NULL,
+                        role TEXT DEFAULT 'admin',
+                        created_at TIMESTAMPTZ DEFAULT NOW()
+                    );
+                """)
+                c.execute("""
+                    CREATE TABLE IF NOT EXISTS users (
+                        id SERIAL PRIMARY KEY,
+                        name TEXT,
+                        email TEXT UNIQUE,
+                        github_username TEXT,
+                        api_key TEXT UNIQUE,
+                        plan TEXT DEFAULT 'free',
+                        referrer TEXT,
+                        signup_source TEXT,
+                        ip_address TEXT,
+                        is_active BOOLEAN DEFAULT TRUE,
+                        last_activity TIMESTAMPTZ,
+                        created_at TIMESTAMPTZ DEFAULT NOW(),
+                        notes TEXT
+                    );
+                """)
+                c.execute("""
+                    CREATE TABLE IF NOT EXISTS user_activity (
+                        id SERIAL PRIMARY KEY,
+                        user_id INTEGER,
+                        action TEXT NOT NULL,
+                        detail TEXT,
+                        ip_address TEXT,
+                        created_at TIMESTAMPTZ DEFAULT NOW(),
+                        FOREIGN KEY (user_id) REFERENCES users(id)
+                    );
+                """)
+                c.execute("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)")
+                c.execute("CREATE INDEX IF NOT EXISTS idx_users_activity ON user_activity(user_id)")
+
+            # Seed default admin if empty
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+                c.execute("SELECT COUNT(*) as cnt FROM admin_users")
+                if c.fetchone()["cnt"] == 0:
+                    default_pw = os.environ.get("POLY_ADMIN_PASSWORD", "admin123")
+                    pw_hash = bcrypt.hashpw(default_pw.encode(), bcrypt.gensalt()).decode()
+                    c.execute(
+                        "INSERT INTO admin_users (username, password_hash, role) VALUES (%s,%s,%s) ON CONFLICT DO NOTHING",
+                        ("admin", pw_hash, "superadmin")
+                    )
+
+            conn.commit()
+            logger.info("Database tables initialized successfully")
+        except Exception:
+            conn.rollback()
+            logger.error("Failed to initialize database tables", exc_info=True)
+            raise
 
 
 def _test_hash(test_name, repo_name):
@@ -188,15 +247,14 @@ def parse_junit_xml(xml_content: str) -> dict:
 
 
 def _get_test_history(conn, repo_id, test_name, limit=50):
-    c = conn.cursor()
-    c.execute(
-        "SELECT status, duration, error_message, run_timestamp, trust_score, environment "
-        "FROM test_results WHERE repo_id=? AND test_name=? "
-        "ORDER BY run_timestamp DESC LIMIT ?",
-        (repo_id, test_name, limit)
-    )
-    return c.fetchall()
-
+    with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+        c.execute(
+            "SELECT status, duration, error_message, run_timestamp, trust_score, environment "
+            "FROM test_results WHERE repo_id=%s AND test_name=%s "
+            "ORDER BY run_timestamp DESC LIMIT %s",
+            (repo_id, test_name, limit)
+        )
+        return c.fetchall()
 
 # ─────────────────────────────────────────────
 # Bayesian Pass Rate (Beta Distribution)
@@ -853,66 +911,74 @@ def calculate_flaky_probability(history):
 # ─────────────────────────────────────────────
 
 def _ensure_repo(conn, repo_name):
-    c = conn.cursor()
-    c.execute("INSERT OR IGNORE INTO repositories (name) VALUES (?)", (repo_name,))
-    conn.commit()
-    c.execute("SELECT id FROM repositories WHERE name=?", (repo_name,))
-    return c.fetchone()["id"]
+    with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+        c.execute("INSERT INTO repositories (name) VALUES (%s) ON CONFLICT (name) DO NOTHING", (repo_name,))
+        conn.commit()
+        c.execute("SELECT id FROM repositories WHERE name=%s", (repo_name,))
+        return c.fetchone()["id"]
 
 
 def process_test_run(xml_content: str, repo_name: str, run_id: str = None,
                      branch: str = "main", commit_sha: str = None,
                      environment: str = None) -> dict:
     """Main entry point: parse XML, calculate scores, store results."""
-    _init_db()
-    conn = _get_db()
+    ensure_initialized()
+    logger.info("Processing test run for repo=%s run_id=%s", repo_name, run_id)
 
-    repo_id = _ensure_repo(conn, repo_name)
-    parsed = parse_junit_xml(xml_content)
+    with _get_db() as conn:
+        try:
+            repo_id = _ensure_repo(conn, repo_name)
+            parsed = parse_junit_xml(xml_content)
 
-    if not run_id:
-        run_id = f"run_{int(time.time())}_{hashlib.md5(xml_content.encode()).hexdigest()[:8]}"
+            if not run_id:
+                run_id = f"run_{int(time.time())}_{hashlib.md5(xml_content.encode()).hexdigest()[:8]}"
 
-    timestamp = datetime.now(timezone.utc).isoformat()
-    total_trust = 0
-    test_count = 0
+            timestamp = datetime.now(timezone.utc).isoformat()
+            total_trust = 0
+            test_count = 0
 
-    for test in parsed["tests"]:
-        history_rows = _get_test_history(conn, repo_id, test["name"])
-        history = [dict(h) for h in history_rows]
+            for test in parsed["tests"]:
+                history_rows = _get_test_history(conn, repo_id, test["name"])
+                history = [dict(h) for h in history_rows]
 
-        trust_score = calculate_trust_score(history)
-        confidence = calculate_score_confidence(history)
-        flaky_cat = classify_flaky_category(history, test)
-        flaky_prob = calculate_flaky_probability(history)
+                trust_score = calculate_trust_score(history)
+                confidence = calculate_score_confidence(history)
+                flaky_cat = classify_flaky_category(history, test)
+                flaky_prob = calculate_flaky_probability(history)
 
-        c = conn.cursor()
-        c.execute(
-            "INSERT INTO test_results (repo_id, test_name, status, duration, error_message, "
-            "error_type, flaky_category, run_id, run_timestamp, trust_score, score_confidence, environment) "
-            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
-            (repo_id, test["name"], test["status"], test["duration"],
-             test["error_message"], test["error_type"], flaky_cat,
-             run_id, timestamp, trust_score, confidence, environment)
-        )
-        test["trust_score"] = trust_score
-        test["score_confidence"] = confidence
-        test["flaky_category"] = flaky_cat
-        test["flaky_probability"] = flaky_prob
-        total_trust += trust_score
-        test_count += 1
+                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+                    c.execute(
+                        "INSERT INTO test_results (repo_id, test_name, status, duration, error_message, "
+                        "error_type, flaky_category, run_id, run_timestamp, trust_score, score_confidence, environment) "
+                        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                        (repo_id, test["name"], test["status"], test["duration"],
+                         test["error_message"], test["error_type"], flaky_cat,
+                         run_id, timestamp, trust_score, confidence, environment)
+                    )
+                test["trust_score"] = trust_score
+                test["score_confidence"] = confidence
+                test["flaky_category"] = flaky_cat
+                test["flaky_probability"] = flaky_prob
+                total_trust += trust_score
+                test_count += 1
 
-    avg_trust = total_trust / test_count if test_count > 0 else 100
-    c.execute(
-        "INSERT INTO ci_runs (repo_id, run_id, branch, commit_sha, total_tests, passed, "
-        "failed, skipped, avg_trust_score, timestamp, environment) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-        (repo_id, run_id, branch, commit_sha,
-         parsed["total"], parsed["passed"], parsed["failed"], parsed["skipped"],
-         round(avg_trust, 1), timestamp, environment)
-    )
+            avg_trust = total_trust / test_count if test_count > 0 else 100
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+                c.execute(
+                    "INSERT INTO ci_runs (repo_id, run_id, branch, commit_sha, total_tests, passed, "
+                    "failed, skipped, avg_trust_score, timestamp, environment) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                    (repo_id, run_id, branch, commit_sha,
+                     parsed["total"], parsed["passed"], parsed["failed"], parsed["skipped"],
+                     round(avg_trust, 1), timestamp, environment)
+                )
 
-    conn.commit()
-    conn.close()
+            conn.commit()
+            logger.info("Test run processed successfully: run_id=%s tests=%d avg_trust=%.1f",
+                        run_id, test_count, avg_trust)
+        except Exception:
+            conn.rollback()
+            logger.error("Failed to process test run for repo=%s", repo_name, exc_info=True)
+            raise
 
     parsed["run_id"] = run_id
     parsed["avg_trust_score"] = round(avg_trust, 1)
@@ -926,71 +992,72 @@ def process_test_run(xml_content: str, repo_name: str, run_id: str = None,
 
 def get_dashboard_data(repo_name: str) -> dict:
     """Get aggregated data for the dashboard."""
-    _init_db()
-    conn = _get_db()
+    ensure_initialized()
 
-    c = conn.cursor()
-    c.execute("SELECT id FROM repositories WHERE name=?", (repo_name,))
-    row = c.fetchone()
-    if not row:
-        conn.close()
-        return {"error": "Repository not found"}
+    with _get_db() as conn:
+        try:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+                c.execute("SELECT id FROM repositories WHERE name=%s", (repo_name,))
+                row = c.fetchone()
+                if not row:
+                    return {"error": "Repository not found"}
 
-    repo_id = row["id"]
+                repo_id = row["id"]
 
-    c.execute(
-        "SELECT COUNT(*) as total, "
-        "AVG(CASE WHEN status='passed' THEN 1.0 ELSE 0.0 END) as pass_rate, "
-        "AVG(trust_score) as avg_trust, "
-        "AVG(score_confidence) as avg_confidence, "
-        "COUNT(DISTINCT run_id) as total_runs "
-        "FROM test_results WHERE repo_id=?", (repo_id,)
-    )
-    stats = dict(c.fetchone())
+                c.execute(
+                    "SELECT COUNT(*) as total, "
+                    "AVG(CASE WHEN status='passed' THEN 1.0 ELSE 0.0 END) as pass_rate, "
+                    "AVG(trust_score) as avg_trust, "
+                    "AVG(score_confidence) as avg_confidence, "
+                    "COUNT(DISTINCT run_id) as total_runs "
+                    "FROM test_results WHERE repo_id=%s", (repo_id,)
+                )
+                stats = dict(c.fetchone())
 
-    c.execute(
-        "SELECT test_name, AVG(trust_score) as trust_score, "
-        "AVG(score_confidence) as confidence, "
-        "COUNT(*) as runs, flaky_category, "
-        "AVG(CASE WHEN status='passed' THEN 1.0 ELSE 0.0 END) as pass_rate, "
-        "GROUP_CONCAT(DISTINCT status) as recent_statuses "
-        "FROM test_results WHERE repo_id=? "
-        "GROUP BY test_name HAVING AVG(trust_score) < 80 "
-        "ORDER BY trust_score ASC",
-        (repo_id,)
-    )
-    flaky_tests = [dict(r) for r in c.fetchall()]
+                c.execute(
+                    "SELECT test_name, AVG(trust_score) as trust_score, "
+                    "AVG(score_confidence) as confidence, "
+                    "COUNT(*) as runs, flaky_category, "
+                    "AVG(CASE WHEN status='passed' THEN 1.0 ELSE 0.0 END) as pass_rate, "
+                    "STRING_AGG(DISTINCT status::text, ', ') as recent_statuses "
+                    "FROM test_results WHERE repo_id=%s "
+                    "GROUP BY test_name, flaky_category HAVING AVG(trust_score) < 80 "
+                    "ORDER BY trust_score ASC",
+                    (repo_id,)
+                )
+                flaky_tests = [dict(r) for r in c.fetchall()]
 
-    for ft in flaky_tests:
-        c.execute(
-            "SELECT status, run_timestamp FROM test_results "
-            "WHERE repo_id=? AND test_name=? ORDER BY run_timestamp DESC LIMIT 10",
-            (repo_id, ft["test_name"])
-        )
-        ft["recent_results"] = [dict(r) for r in c.fetchall()][::-1]
+                for ft in flaky_tests:
+                    c.execute(
+                        "SELECT status, run_timestamp FROM test_results "
+                        "WHERE repo_id=%s AND test_name=%s ORDER BY run_timestamp DESC LIMIT 10",
+                        (repo_id, ft["test_name"])
+                    )
+                    ft["recent_results"] = [dict(r) for r in c.fetchall()][::-1]
 
-    c.execute(
-        "SELECT run_id, branch, commit_sha, total_tests, passed, failed, "
-        "avg_trust_score, timestamp FROM ci_runs WHERE repo_id=? "
-        "ORDER BY timestamp DESC LIMIT 20",
-        (repo_id,)
-    )
-    recent_runs = [dict(r) for r in c.fetchall()]
+                c.execute(
+                    "SELECT run_id, branch, commit_sha, total_tests, passed, failed, "
+                    "avg_trust_score, timestamp FROM ci_runs WHERE repo_id=%s "
+                    "ORDER BY timestamp DESC LIMIT 20",
+                    (repo_id,)
+                )
+                recent_runs = [dict(r) for r in c.fetchall()]
 
-    c.execute(
-        "SELECT CASE "
-        "WHEN trust_score >= 90 THEN 'high' "
-        "WHEN trust_score >= 70 THEN 'medium' "
-        "WHEN trust_score >= 50 THEN 'low' "
-        "ELSE 'critical' END as bucket, COUNT(*) as count "
-        "FROM (SELECT test_name, AVG(trust_score) as trust_score "
-        "FROM test_results WHERE repo_id=? GROUP BY test_name) "
-        "GROUP BY bucket",
-        (repo_id,)
-    )
-    distribution = {r["bucket"]: r["count"] for r in c.fetchall()}
-
-    conn.close()
+                c.execute(
+                    "SELECT CASE "
+                    "WHEN trust_score >= 90 THEN 'high' "
+                    "WHEN trust_score >= 70 THEN 'medium' "
+                    "WHEN trust_score >= 50 THEN 'low' "
+                    "ELSE 'critical' END as bucket, COUNT(*) as count "
+                    "FROM (SELECT test_name, AVG(trust_score) as trust_score "
+                    "FROM test_results WHERE repo_id=%s GROUP BY test_name) sub "
+                    "GROUP BY bucket",
+                    (repo_id,)
+                )
+                distribution = {r["bucket"]: r["count"] for r in c.fetchall()}
+        except Exception:
+            logger.error("Failed to get dashboard data for repo=%s", repo_name, exc_info=True)
+            raise
 
     return {
         "stats": stats,
@@ -1002,26 +1069,27 @@ def get_dashboard_data(repo_name: str) -> dict:
 
 def get_test_detail(repo_name: str, test_name: str) -> dict:
     """Get detailed analysis for a single test."""
-    _init_db()
-    conn = _get_db()
+    ensure_initialized()
 
-    c = conn.cursor()
-    c.execute("SELECT id FROM repositories WHERE name=?", (repo_name,))
-    row = c.fetchone()
-    if not row:
-        conn.close()
-        return {"error": "Repository not found"}
+    with _get_db() as conn:
+        try:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+                c.execute("SELECT id FROM repositories WHERE name=%s", (repo_name,))
+                row = c.fetchone()
+                if not row:
+                    return {"error": "Repository not found"}
 
-    repo_id = row["id"]
-    history_rows = _get_test_history(conn, repo_id, test_name, limit=100)
-    history = [dict(h) for h in history_rows]
+                repo_id = row["id"]
+                history_rows = _get_test_history(conn, repo_id, test_name, limit=100)
+                history = [dict(h) for h in history_rows]
+        except Exception:
+            logger.error("Failed to get test detail for repo=%s test=%s", repo_name, test_name, exc_info=True)
+            raise
 
     trust_score = calculate_trust_score(history)
     flaky_cat = classify_flaky_category(history, None)
     flaky_prob = calculate_flaky_probability(history)
     breakdown = calculate_score_breakdown(history)
-
-    conn.close()
 
     return {
         "test_name": test_name,
@@ -1040,29 +1108,32 @@ def get_test_detail(repo_name: str, test_name: str) -> dict:
 
 def get_quarantined_tests(repo_name: str, threshold: float = 30) -> list:
     """Get tests that should be quarantined (trust score below threshold)."""
-    _init_db()
-    conn = _get_db()
+    ensure_initialized()
 
-    c = conn.cursor()
-    c.execute("SELECT id FROM repositories WHERE name=?", (repo_name,))
-    row = c.fetchone()
-    if not row:
-        conn.close()
-        return []
+    with _get_db() as conn:
+        try:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+                c.execute("SELECT id FROM repositories WHERE name=%s", (repo_name,))
+                row = c.fetchone()
+                if not row:
+                    return []
 
-    repo_id = row["id"]
-    c.execute(
-        "SELECT test_name, AVG(trust_score) as trust_score, flaky_category, "
-        "AVG(score_confidence) as confidence, "
-        "COUNT(*) as total_runs, "
-        "AVG(CASE WHEN status='passed' THEN 1.0 ELSE 0.0 END) as pass_rate "
-        "FROM test_results WHERE repo_id=? "
-        "GROUP BY test_name HAVING AVG(trust_score) < ? "
-        "ORDER BY trust_score ASC",
-        (repo_id, threshold)
-    )
-    quarantined = [dict(r) for r in c.fetchall()]
-    conn.close()
+                repo_id = row["id"]
+                c.execute(
+                    "SELECT test_name, AVG(trust_score) as trust_score, flaky_category, "
+                    "AVG(score_confidence) as confidence, "
+                    "COUNT(*) as total_runs, "
+                    "AVG(CASE WHEN status='passed' THEN 1.0 ELSE 0.0 END) as pass_rate "
+                    "FROM test_results WHERE repo_id=%s "
+                    "GROUP BY test_name, flaky_category HAVING AVG(trust_score) < %s "
+                    "ORDER BY trust_score ASC",
+                    (repo_id, threshold)
+                )
+                quarantined = [dict(r) for r in c.fetchall()]
+        except Exception:
+            logger.error("Failed to get quarantined tests for repo=%s", repo_name, exc_info=True)
+            raise
+
     return quarantined
 
 
