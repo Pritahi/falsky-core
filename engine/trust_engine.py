@@ -5,20 +5,45 @@ z-score anomaly detection, environment tracking, and sequential analysis.
 """
 
 import xml.etree.ElementTree as ET
-import psycopg2
-import psycopg2.extras
-import psycopg2.pool
 import json
 import hashlib
 import time
 import math
 import os
 import logging
-import bcrypt
 from datetime import datetime, timezone
 from collections import Counter, defaultdict
 from contextlib import contextmanager
 from typing import Optional
+
+# ─────────────────────────────────────────────
+# Driver Abstraction (Vercel serverless-safe)
+# ─────────────────────────────────────────────
+
+# Try psycopg2 first, fall back to pg8000 (pure Python, always works on serverless)
+_DB_DRIVER = None
+try:
+    import psycopg2
+    import psycopg2.extras
+    import psycopg2.pool
+    _DB_DRIVER = "psycopg2"
+except ImportError:
+    pass
+
+if _DB_DRIVER is None:
+    try:
+        import pg8000
+        _DB_DRIVER = "pg8000"
+    except ImportError:
+        pass
+
+# bcrypt - optional
+try:
+    import bcrypt as _bcrypt
+    _HAS_BCRYPT = True
+except ImportError:
+    _bcrypt = None
+    _HAS_BCRYPT = False
 
 logger = logging.getLogger("poly.engine")
 
@@ -29,37 +54,91 @@ _pool = None
 
 def _get_pool():
     global _pool
-    if _pool is None and DATABASE_URL:
-        _pool = psycopg2.pool.ThreadedConnectionPool(
-            minconn=1, maxconn=5, dsn=DATABASE_URL,
-            connect_timeout=10, options="-c statement_timeout=30000"
-        )
-        logger.info("Created PostgreSQL connection pool (threaded, serverless-safe)")
+    if _pool is None and DATABASE_URL and _DB_DRIVER == "psycopg2":
+        try:
+            _pool = psycopg2.pool.ThreadedConnectionPool(
+                minconn=1, maxconn=5, dsn=DATABASE_URL,
+                connect_timeout=10, options="-c statement_timeout=30000"
+            )
+            logger.info("Created PostgreSQL connection pool (threaded, serverless-safe)")
+        except Exception as e:
+            logger.error(f"Pool creation failed: {e}")
     return _pool
 
 
 @contextmanager
 def _get_db():
-    """Context manager for DB connections with dict cursor support."""
-    pool = _get_pool()
-    if pool is None:
-        raise RuntimeError("Database not configured. Set DATABASE_URL env var.")
-    conn = pool.getconn()
+    """Context manager for DB connections with driver abstraction."""
+    if not DATABASE_URL or not _DB_DRIVER:
+        raise RuntimeError("Database not configured")
+    conn = None
+    from_pool = False
     try:
+        if _DB_DRIVER == "psycopg2":
+            pool = _get_pool()
+            if pool and hasattr(pool, 'getconn'):
+                conn = pool.getconn()
+                from_pool = True
+            else:
+                conn = psycopg2.connect(DATABASE_URL, connect_timeout=10)
+        elif _DB_DRIVER == "pg8000":
+            conn = pg8000.connect(DATABASE_URL)
         yield conn
     finally:
-        pool.putconn(conn)
+        if conn:
+            try:
+                if from_pool:
+                    _get_pool().putconn(conn)
+                else:
+                    conn.close()
+            except Exception:
+                pass
+
+
+def _cursor(conn):
+    """Get a dict-capable cursor."""
+    if _DB_DRIVER == "psycopg2":
+        return conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    return conn.cursor()
+
+
+def _to_dict(cursor):
+    """Fetch one row as dict."""
+    if _DB_DRIVER == "psycopg2":
+        row = cursor.fetchone()
+        return dict(row) if row else None
+    rows = cursor.fetchall()
+    if not rows or not cursor.description:
+        return None
+    cols = [d[0] for d in cursor.description]
+    return dict(zip(cols, rows[0]))
+
+
+def _to_dicts(cursor):
+    """Fetch all rows as list of dicts."""
+    if _DB_DRIVER == "psycopg2":
+        return [dict(r) for r in cursor.fetchall()]
+    if not cursor.description:
+        return []
+    cols = [d[0] for d in cursor.description]
+    return [dict(zip(cols, row)) for row in cursor.fetchall()]
 
 
 _db_initialized = False
 
 
 def ensure_initialized():
-    """Initialize DB tables (safe to call multiple times)."""
+    """Initialize DB tables (safe to call multiple times). Will not crash."""
     global _db_initialized
     if not _db_initialized:
-        _init_db()
-        _db_initialized = True
+        if not DATABASE_URL or not _DB_DRIVER:
+            logger.warning("DB not configured, skipping init")
+            return
+        try:
+            _init_db()
+            _db_initialized = True
+        except Exception as e:
+            logger.error(f"DB init failed: {e}")
 
 
 def _init_db():
@@ -167,11 +246,17 @@ def _init_db():
                 c.execute("CREATE INDEX IF NOT EXISTS idx_users_activity ON user_activity(user_id)")
 
             # Seed default admin if empty
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            with _cursor(conn) as c:
                 c.execute("SELECT COUNT(*) as cnt FROM admin_users")
-                if c.fetchone()["cnt"] == 0:
-                    default_pw = os.environ.get("POLY_ADMIN_PASSWORD", "admin123")
-                    pw_hash = bcrypt.hashpw(default_pw.encode(), bcrypt.gensalt()).decode()
+                row = _to_dict(c)
+                if row and row["cnt"] == 0:
+                    if _HAS_BCRYPT and _bcrypt:
+                        pw = os.environ.get("POLY_ADMIN_PASSWORD", "admin123")
+                        pw_hash = _bcrypt.hashpw(pw.encode(), _bcrypt.gensalt()).decode()
+                    else:
+                        pw_hash = hashlib.sha256(
+                            os.environ.get("POLY_ADMIN_PASSWORD", "admin123").encode()
+                        ).hexdigest()
                     c.execute(
                         "INSERT INTO admin_users (username, password_hash, role) VALUES (%s,%s,%s) ON CONFLICT DO NOTHING",
                         ("admin", pw_hash, "superadmin")
@@ -248,14 +333,14 @@ def parse_junit_xml(xml_content: str) -> dict:
 
 
 def _get_test_history(conn, repo_id, test_name, limit=50):
-    with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+    with _cursor(conn) as c:
         c.execute(
             "SELECT status, duration, error_message, run_timestamp, trust_score, environment "
             "FROM test_results WHERE repo_id=%s AND test_name=%s "
             "ORDER BY run_timestamp DESC LIMIT %s",
             (repo_id, test_name, limit)
         )
-        return c.fetchall()
+        return _to_dicts(c)
 
 # ─────────────────────────────────────────────
 # Bayesian Pass Rate (Beta Distribution)
@@ -912,11 +997,12 @@ def calculate_flaky_probability(history):
 # ─────────────────────────────────────────────
 
 def _ensure_repo(conn, repo_name):
-    with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+    with _cursor(conn) as c:
         c.execute("INSERT INTO repositories (name) VALUES (%s) ON CONFLICT (name) DO NOTHING", (repo_name,))
         conn.commit()
         c.execute("SELECT id FROM repositories WHERE name=%s", (repo_name,))
-        return c.fetchone()["id"]
+        row = _to_dict(c)
+        return row["id"]
 
 
 def process_test_run(xml_content: str, repo_name: str, run_id: str = None,
@@ -947,7 +1033,7 @@ def process_test_run(xml_content: str, repo_name: str, run_id: str = None,
                 flaky_cat = classify_flaky_category(history, test)
                 flaky_prob = calculate_flaky_probability(history)
 
-                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+                with _cursor(conn) as c:
                     c.execute(
                         "INSERT INTO test_results (repo_id, test_name, status, duration, error_message, "
                         "error_type, flaky_category, run_id, run_timestamp, trust_score, score_confidence, environment) "
@@ -964,7 +1050,7 @@ def process_test_run(xml_content: str, repo_name: str, run_id: str = None,
                 test_count += 1
 
             avg_trust = total_trust / test_count if test_count > 0 else 100
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            with _cursor(conn) as c:
                 c.execute(
                     "INSERT INTO ci_runs (repo_id, run_id, branch, commit_sha, total_tests, passed, "
                     "failed, skipped, avg_trust_score, timestamp, environment) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
@@ -997,9 +1083,9 @@ def get_dashboard_data(repo_name: str) -> dict:
 
     with _get_db() as conn:
         try:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            with _cursor(conn) as c:
                 c.execute("SELECT id FROM repositories WHERE name=%s", (repo_name,))
-                row = c.fetchone()
+                row = _to_dict(c)
                 if not row:
                     return {"error": "Repository not found"}
 
@@ -1013,7 +1099,7 @@ def get_dashboard_data(repo_name: str) -> dict:
                     "COUNT(DISTINCT run_id) as total_runs "
                     "FROM test_results WHERE repo_id=%s", (repo_id,)
                 )
-                stats = dict(c.fetchone())
+                stats = _to_dict(c)
 
                 c.execute(
                     "SELECT test_name, AVG(trust_score) as trust_score, "
@@ -1026,7 +1112,7 @@ def get_dashboard_data(repo_name: str) -> dict:
                     "ORDER BY trust_score ASC",
                     (repo_id,)
                 )
-                flaky_tests = [dict(r) for r in c.fetchall()]
+                flaky_tests = _to_dicts(c)
 
                 for ft in flaky_tests:
                     c.execute(
@@ -1034,7 +1120,7 @@ def get_dashboard_data(repo_name: str) -> dict:
                         "WHERE repo_id=%s AND test_name=%s ORDER BY run_timestamp DESC LIMIT 10",
                         (repo_id, ft["test_name"])
                     )
-                    ft["recent_results"] = [dict(r) for r in c.fetchall()][::-1]
+                    ft["recent_results"] = _to_dicts(c)[::-1]
 
                 c.execute(
                     "SELECT run_id, branch, commit_sha, total_tests, passed, failed, "
@@ -1042,7 +1128,7 @@ def get_dashboard_data(repo_name: str) -> dict:
                     "ORDER BY timestamp DESC LIMIT 20",
                     (repo_id,)
                 )
-                recent_runs = [dict(r) for r in c.fetchall()]
+                recent_runs = _to_dicts(c)
 
                 c.execute(
                     "SELECT CASE "
@@ -1055,7 +1141,7 @@ def get_dashboard_data(repo_name: str) -> dict:
                     "GROUP BY bucket",
                     (repo_id,)
                 )
-                distribution = {r["bucket"]: r["count"] for r in c.fetchall()}
+                distribution = {r["bucket"]: r["count"] for r in _to_dicts(c)}
         except Exception:
             logger.error("Failed to get dashboard data for repo=%s", repo_name, exc_info=True)
             raise
@@ -1074,9 +1160,9 @@ def get_test_detail(repo_name: str, test_name: str) -> dict:
 
     with _get_db() as conn:
         try:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            with _cursor(conn) as c:
                 c.execute("SELECT id FROM repositories WHERE name=%s", (repo_name,))
-                row = c.fetchone()
+                row = _to_dict(c)
                 if not row:
                     return {"error": "Repository not found"}
 
@@ -1113,9 +1199,9 @@ def get_quarantined_tests(repo_name: str, threshold: float = 30) -> list:
 
     with _get_db() as conn:
         try:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            with _cursor(conn) as c:
                 c.execute("SELECT id FROM repositories WHERE name=%s", (repo_name,))
-                row = c.fetchone()
+                row = _to_dict(c)
                 if not row:
                     return []
 
@@ -1130,7 +1216,7 @@ def get_quarantined_tests(repo_name: str, threshold: float = 30) -> list:
                     "ORDER BY trust_score ASC",
                     (repo_id, threshold)
                 )
-                quarantined = [dict(r) for r in c.fetchall()]
+                quarantined = _to_dicts(c)
         except Exception:
             logger.error("Failed to get quarantined tests for repo=%s", repo_name, exc_info=True)
             raise

@@ -9,10 +9,22 @@ import secrets
 import time
 import urllib.parse
 
-import bcrypt
-import jwt
-import psycopg2
-import psycopg2.extras
+# Optional imports — won't crash if missing
+try:
+    import bcrypt
+except ImportError:
+    bcrypt = None
+try:
+    import jwt
+except ImportError:
+    jwt = None
+try:
+    import psycopg2
+    import psycopg2.extras
+except ImportError:
+    psycopg2 = None
+    psycopg2.extras = None
+
 from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,7 +34,8 @@ from typing import Optional
 
 from engine.trust_engine import (
     process_test_run, get_dashboard_data, get_test_detail,
-    get_quarantined_tests, send_alert, _get_db,
+    get_quarantined_tests, send_alert, _get_db, _DB_DRIVER,
+    _cursor, _to_dict, _to_dicts,
 )
 
 logger = logging.getLogger("poly.api")
@@ -32,10 +45,13 @@ logger = logging.getLogger("poly.api")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
-    from engine.trust_engine import ensure_initialized
-    ensure_initialized()
-    logger.info("Poly API started")
+    # Startup — graceful, won't crash if DB not configured
+    try:
+        from engine.trust_engine import ensure_initialized
+        ensure_initialized()
+        logger.info("Poly API started")
+    except Exception as e:
+        logger.error(f"Startup init error (non-fatal): {e}")
     yield
     # Shutdown
     logger.info("Poly API shutting down")
@@ -79,7 +95,7 @@ def verify_api_key(x_poly_api_key: Optional[str] = Header(None)):
     if x_poly_api_key:
         try:
             with _get_db() as conn:
-                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+                with _cursor(conn) as c:
                     c.execute("SELECT id FROM users WHERE api_key=%s AND is_active=TRUE", (x_poly_api_key,))
                     if c.fetchone():
                         return x_poly_api_key
@@ -120,10 +136,9 @@ def _get_admin_session(request: Request):
         int(token, 16)
         if len(token) >= 32:
             with _get_db() as conn:
-                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+                with _cursor(conn) as c:
                     c.execute("SELECT username, role FROM admin_users LIMIT 1")
-                    row = c.fetchone()
-            return dict(row) if row else None
+                    return _to_dict(c)
     except Exception:
         pass
     return None
@@ -280,11 +295,22 @@ def root():
 def admin_login(data: AdminLogin, response: Response):
     try:
         with _get_db() as conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            with _cursor(conn) as c:
                 c.execute("SELECT id, username, password_hash, role FROM admin_users WHERE username=%s", (data.username,))
-                row = c.fetchone()
-        if not row or not bcrypt.checkpw(data.password.encode(), row["password_hash"].encode()):
-            logger.warning(f"Failed login attempt for user: {data.username}")
+                row = _to_dict(c)
+        if not row:
+            logger.warning(f"Failed login: user not found: {data.username}")
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+        pw_hash = row["password_hash"]
+        if bcrypt and bcrypt.checkpw(data.password.encode(), pw_hash.encode()):
+            pass  # valid
+        elif not bcrypt:
+            import hashlib
+            if hashlib.sha256(data.password.encode()).hexdigest() != pw_hash:
+                logger.warning(f"Failed login for: {data.username}")
+                raise HTTPException(status_code=401, detail="Invalid credentials")
+        else:
+            logger.warning(f"Failed login for: {data.username}")
             raise HTTPException(status_code=401, detail="Invalid credentials")
 
         # Signed token (not raw user ID)
@@ -332,7 +358,7 @@ def admin_list_users(request: Request, search: str = "", plan: str = "", sort: s
     try:
         require_admin(request)
         with _get_db() as conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            with _cursor(conn) as c:
                 where = []
                 params = []
                 if search:
@@ -346,21 +372,21 @@ def admin_list_users(request: Request, search: str = "", plan: str = "", sort: s
                 offset = (page - 1) * per_page
 
                 c.execute(f"SELECT COUNT(*) as cnt FROM users {where_sql}", params)
-                total = c.fetchone()["cnt"]
+                total = _to_dict(c)["cnt"]
 
                 c.execute(
                     f"SELECT * FROM users {where_sql} ORDER BY created_at {order} LIMIT %s OFFSET %s",
                     params + [per_page, offset]
                 )
-                users = [dict(r) for r in c.fetchall()]
+                users = _to_dicts(c)
 
                 # Signup source breakdown
                 c.execute("SELECT signup_source, COUNT(*) as cnt FROM users GROUP BY signup_source ORDER BY cnt DESC")
-                sources = [dict(r) for r in c.fetchall()]
+                sources = _to_dicts(c)
 
                 # Plan breakdown
                 c.execute("SELECT plan, COUNT(*) as cnt FROM users GROUP BY plan ORDER BY cnt DESC")
-                plans = [dict(r) for r in c.fetchall()]
+                plans = _to_dicts(c)
 
                 # Daily signups (last 30 days)
                 c.execute("""
@@ -368,7 +394,7 @@ def admin_list_users(request: Request, search: str = "", plan: str = "", sort: s
                     WHERE created_at >= NOW() - INTERVAL '30 days'
                     GROUP BY DATE(created_at) ORDER BY day
                 """)
-                daily = [dict(r) for r in c.fetchall()]
+                daily = _to_dicts(c)
 
                 # Recent activity
                 c.execute("""
@@ -376,7 +402,7 @@ def admin_list_users(request: Request, search: str = "", plan: str = "", sort: s
                     FROM user_activity ua LEFT JOIN users u ON ua.user_id = u.id
                     ORDER BY ua.created_at DESC LIMIT 10
                 """)
-                activity = [dict(r) for r in c.fetchall()]
+                activity = _to_dicts(c)
 
         logger.info(f"Admin listed users: page={page}, total={total}")
         return {
@@ -398,12 +424,12 @@ def admin_create_user(data: UserCreate, request: Request):
         require_admin(request)
         api_key = f"poly_{secrets.token_urlsafe(24)}"
         with _get_db() as conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            with _cursor(conn) as c:
                 c.execute(
                     "INSERT INTO users (name, email, github_username, api_key, plan, referrer, signup_source, notes) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                     (data.name, data.email, data.github_username, api_key, data.plan, data.referrer, data.signup_source, data.notes)
                 )
-                user_id = c.fetchone()["id"]
+                user_id = _to_dict(c)["id"]
                 c.execute("INSERT INTO user_activity (user_id, action, detail) VALUES (%s,%s,%s)",
                            (user_id, "signup", f"Created by admin | source: {data.signup_source or 'manual'}"))
             conn.commit()
@@ -421,7 +447,7 @@ def admin_update_user(user_id: int, data: UserUpdate, request: Request):
     try:
         require_admin(request)
         with _get_db() as conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            with _cursor(conn) as c:
                 c.execute("SELECT id FROM users WHERE id=%s", (user_id,))
                 if not c.fetchone():
                     raise HTTPException(status_code=404, detail="User not found")
@@ -452,9 +478,9 @@ def admin_delete_user(user_id: int, request: Request):
     try:
         require_admin(request)
         with _get_db() as conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            with _cursor(conn) as c:
                 c.execute("SELECT name, email FROM users WHERE id=%s", (user_id,))
-                row = c.fetchone()
+                row = _to_dict(c)
                 if not row:
                     raise HTTPException(status_code=404, detail="User not found")
                 c.execute("DELETE FROM user_activity WHERE user_id=%s", (user_id,))
@@ -475,33 +501,33 @@ def admin_stats(request: Request):
         require_admin(request)
         stats = {}
         with _get_db() as conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            with _cursor(conn) as c:
                 c.execute("SELECT COUNT(*) as cnt FROM users")
-                stats["total_users"] = c.fetchone()["cnt"]
+                stats["total_users"] = _to_dict(c)["cnt"]
                 c.execute("SELECT COUNT(*) as cnt FROM users WHERE plan='pro'")
-                stats["pro_users"] = c.fetchone()["cnt"]
+                stats["pro_users"] = _to_dict(c)["cnt"]
                 c.execute("SELECT COUNT(*) as cnt FROM users WHERE plan='enterprise'")
-                stats["enterprise_users"] = c.fetchone()["cnt"]
+                stats["enterprise_users"] = _to_dict(c)["cnt"]
                 c.execute("SELECT COUNT(*) as cnt FROM users WHERE is_active=TRUE")
-                stats["active_users"] = c.fetchone()["cnt"]
+                stats["active_users"] = _to_dict(c)["cnt"]
                 c.execute("SELECT COUNT(*) as cnt FROM users WHERE created_at >= NOW() - INTERVAL '7 days'")
-                stats["new_this_week"] = c.fetchone()["cnt"]
+                stats["new_this_week"] = _to_dict(c)["cnt"]
                 c.execute("SELECT COUNT(*) as cnt FROM users WHERE created_at >= NOW() - INTERVAL '1 day'")
-                stats["new_today"] = c.fetchone()["cnt"]
+                stats["new_today"] = _to_dict(c)["cnt"]
                 c.execute("SELECT COUNT(DISTINCT repo_id) as cnt FROM ci_runs")
-                stats["total_repos"] = c.fetchone()["cnt"]
+                stats["total_repos"] = _to_dict(c)["cnt"]
                 c.execute("SELECT COUNT(*) as cnt FROM ci_runs WHERE timestamp >= NOW() - INTERVAL '24 hours'")
-                stats["runs_today"] = c.fetchone()["cnt"]
+                stats["runs_today"] = _to_dict(c)["cnt"]
                 c.execute("SELECT COUNT(*) as cnt FROM test_results")
-                stats["total_test_results"] = c.fetchone()["cnt"]
+                stats["total_test_results"] = _to_dict(c)["cnt"]
 
                 # Top referrers
                 c.execute("SELECT referrer, COUNT(*) as cnt FROM users WHERE referrer IS NOT NULL GROUP BY referrer ORDER BY cnt DESC LIMIT 5")
-                stats["top_referrers"] = [dict(r) for r in c.fetchall()]
+                stats["top_referrers"] = _to_dicts(c)
 
                 # Top signup sources
                 c.execute("SELECT signup_source, COUNT(*) as cnt FROM users WHERE signup_source IS NOT NULL GROUP BY signup_source ORDER BY cnt DESC LIMIT 5")
-                stats["top_sources"] = [dict(r) for r in c.fetchall()]
+                stats["top_sources"] = _to_dicts(c)
 
         logger.info("Admin fetched stats")
         return stats
@@ -568,9 +594,9 @@ def dashboard(repo_name: str = Query(...)):
 def list_tests(repo_name: str = Query(...)):
     try:
         with _get_db() as conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            with _cursor(conn) as c:
                 c.execute("SELECT id FROM repositories WHERE name=%s", (repo_name,))
-                row = c.fetchone()
+                row = _to_dict(c)
                 if not row:
                     raise HTTPException(status_code=404, detail="Repository not found")
                 repo_id = row["id"]
@@ -580,7 +606,7 @@ def list_tests(repo_name: str = Query(...)):
                     "FROM test_results WHERE repo_id=%s GROUP BY test_name ORDER BY trust_score ASC",
                     (repo_id,)
                 )
-                tests = [dict(r) for r in c.fetchall()]
+                tests = _to_dicts(c)
         logger.info(f"Listed tests: {repo_name}, {len(tests)} tests")
         return {"repo": repo_name, "tests": tests, "total": len(tests)}
     except HTTPException:
@@ -620,9 +646,9 @@ def quarantined(repo_name: str = Query(...), threshold: float = Query(30)):
 def list_runs(repo_name: str = Query(...), limit: int = Query(20, le=100)):
     try:
         with _get_db() as conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            with _cursor(conn) as c:
                 c.execute("SELECT id FROM repositories WHERE name=%s", (repo_name,))
-                row = c.fetchone()
+                row = _to_dict(c)
                 if not row:
                     raise HTTPException(status_code=404, detail="Repository not found")
                 repo_id = row["id"]
@@ -631,7 +657,7 @@ def list_runs(repo_name: str = Query(...), limit: int = Query(20, le=100)):
                     "FROM ci_runs WHERE repo_id=%s ORDER BY timestamp DESC LIMIT %s",
                     (repo_id, limit)
                 )
-                runs = [dict(r) for r in c.fetchall()]
+                runs = _to_dicts(c)
         logger.info(f"Listed runs: {repo_name}, {len(runs)} runs")
         return {"repo": repo_name, "runs": runs}
     except HTTPException:
@@ -645,12 +671,12 @@ def list_runs(repo_name: str = Query(...), limit: int = Query(20, le=100)):
 def list_repos():
     try:
         with _get_db() as conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            with _cursor(conn) as c:
                 c.execute(
                     "SELECT r.name, COUNT(DISTINCT tr.run_id) as total_runs, COUNT(DISTINCT tr.test_name) as total_tests, AVG(tr.trust_score) as avg_trust "
                     "FROM repositories r LEFT JOIN test_results tr ON r.id = tr.repo_id GROUP BY r.name ORDER BY r.name"
                 )
-                repos = [dict(r) for r in c.fetchall()]
+                repos = _to_dicts(c)
         logger.info(f"Listed repos: {len(repos)} repos")
         return {"repos": repos}
     except Exception as e:
@@ -662,23 +688,23 @@ def list_repos():
 def set_alert_config(repo_name: str = Query(...), config: AlertConfig = ...):
     try:
         with _get_db() as conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            with _cursor(conn) as c:
                 # Ensure repo exists
                 c.execute("SELECT id FROM repositories WHERE name=%s", (repo_name,))
-                row = c.fetchone()
-                if row:
-                    repo_id = row["id"]
-                else:
+                row = _to_dict(c)
+                if not row:
                     c.execute("INSERT INTO repositories (name) VALUES (%s) RETURNING id", (repo_name,))
-                    repo_id = c.fetchone()["id"]
-
+                    row = _to_dict(c)
+                if not row:
+                    raise HTTPException(status_code=404, detail="Not found")
+                repo_id = row["id"]
                 c.execute(
                     "INSERT INTO alerts_config (repo_id, webhook_url, channel_type, min_trust_drop, alert_on_flaky, alert_on_quarantine) VALUES (%s,%s,%s,%s,%s,%s) "
                     "ON CONFLICT (repo_id) DO UPDATE SET webhook_url=EXCLUDED.webhook_url, channel_type=EXCLUDED.channel_type, "
                     "min_trust_drop=EXCLUDED.min_trust_drop, alert_on_flaky=EXCLUDED.alert_on_flaky, alert_on_quarantine=EXCLUDED.alert_on_quarantine",
                     (repo_id, config.webhook_url, config.channel_type, config.min_trust_drop, config.alert_on_flaky, config.alert_on_quarantine)
                 )
-            conn.commit()
+                conn.commit()
         logger.info(f"Alert config set: {repo_name}")
         return {"status": "ok", "repo": repo_name}
     except Exception as e:
@@ -690,9 +716,9 @@ def set_alert_config(repo_name: str = Query(...), config: AlertConfig = ...):
 def test_alert(repo_name: str = Query(...)):
     try:
         with _get_db() as conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            with _cursor(conn) as c:
                 c.execute("SELECT * FROM alerts_config WHERE repo_id=(SELECT id FROM repositories WHERE name=%s)", (repo_name,))
-                cfg = c.fetchone()
+                cfg = _to_dict(c)
         if not cfg:
             raise HTTPException(status_code=404, detail="No alert config found")
         ok = send_alert(repo_name=repo_name, webhook_url=cfg["webhook_url"], channel_type=cfg["channel_type"], alert_data={"Test": "Poly connectivity test", "Status": "Alert channel working"})
@@ -709,9 +735,9 @@ def test_alert(repo_name: str = Query(...)):
 def delete_test(test_name: str, repo_name: str = Query(...)):
     try:
         with _get_db() as conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            with _cursor(conn) as c:
                 c.execute("SELECT id FROM repositories WHERE name=%s", (repo_name,))
-                row = c.fetchone()
+                row = _to_dict(c)
                 if not row:
                     raise HTTPException(status_code=404, detail="Repository not found")
                 c.execute("DELETE FROM test_results WHERE repo_id=%s AND test_name=%s", (row["id"], test_name))
@@ -730,13 +756,14 @@ def delete_test(test_name: str, repo_name: str = Query(...)):
 def trust_badge(repo_name: str):
     try:
         with _get_db() as conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            with _cursor(conn) as c:
                 c.execute("SELECT id FROM repositories WHERE name=%s", (repo_name,))
-                row = c.fetchone()
+                row = _to_dict(c)
                 if not row:
                     raise HTTPException(status_code=404, detail="Repository not found")
                 c.execute("SELECT AVG(trust_score) as avg_trust FROM test_results WHERE repo_id=%s", (row["id"],))
-                score = c.fetchone()["avg_trust"] or 100
+                row = _to_dict(c)
+        score = (row or {}).get("avg_trust") or 100
         score = round(score, 0)
         if score >= 90: color = "#22c55e"
         elif score >= 70: color = "#eab308"
