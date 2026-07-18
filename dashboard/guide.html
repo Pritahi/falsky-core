@@ -3,27 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Poly — Setup Guide</title>
+<title>Poly — Court Procedure Manual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,ital,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400;1,6..72,600&family=Fragment+Mono&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #09090b;
-  --surface: #111114;
-  --surface-2: #18181b;
-  --border: #27272a;
-  --text: #fafafa;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
-  --purple: #8b5cf6;
-  --purple-light: #a78bfa;
-  --green: #22c55e;
-  --yellow: #eab308;
-  --orange: #f97316;
-  --red: #ef4444;
-  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-  --radius: 8px;
-  --radius-sm: 6px;
-  --radius-xs: 4px;
+  --wood: #3B2314;
+  --paper: #FFFCF2;
+  --gavel: #121212;
+  --verdict: #8B1A1A;
+  --gold: #C8A95A;
+  --green-court: #2E5A38;
+  --bg: #FFFCF2;
+  --surface: #F5EFE0;
+  --surface-2: #EFE8D1;
+  --border: rgba(59,35,20,0.15);
+  --border-strong: rgba(59,35,20,0.3);
+  --text: #121212;
+  --text-secondary: #5C4A3A;
+  --text-muted: #8B7D6B;
+  --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --mono: 'Fragment Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  --stamp: 'Special Elite', monospace;
+  --radius: 2px;
+  --radius-sm: 2px;
+  --radius-xs: 1px;
   --transition: 0.15s ease;
   --transition-page: 0.3s ease;
   --sidebar-w: 220px;
@@ -40,6 +45,25 @@ body {
   line-height: 1.7;
   min-height: 100vh;
   overflow-x: hidden;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+/* ===== WOOD GRAIN ===== */
+.wood-grain {
+  background: var(--wood);
+  background-image:
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,0.04) 3px),
+    linear-gradient(180deg, #4a2e1c 0%, #3B2314 60%, #2b1a0f 100%);
+}
+
+/* ===== STAMP ===== */
+.stamp {
+  font-family: var(--stamp);
+  border: 2.5px solid currentColor;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  line-height: 0.9;
+  box-shadow: inset 0 0 0 1px currentColor;
 }
 
 /* ===== SIDEBAR ===== */
@@ -48,8 +72,11 @@ body {
   top: 0; left: 0;
   width: var(--sidebar-w);
   height: 100vh;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
+  background: var(--wood);
+  background-image:
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,0.04) 3px),
+    linear-gradient(180deg, #4a2e1c 0%, #3B2314 60%, #2b1a0f 100%);
+  border-right: 3px solid var(--gold);
   display: flex;
   flex-direction: column;
   z-index: 100;
@@ -64,28 +91,28 @@ body {
   gap: 10px;
   padding: 16px;
   height: var(--topbar-h);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(200,169,90,0.2);
   flex-shrink: 0;
 }
 
 .sidebar-logo {
   font-size: 22px;
   font-weight: 800;
-  background: linear-gradient(135deg, var(--purple), var(--purple-light));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-family: var(--font);
+  color: var(--gold);
   white-space: nowrap;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .sidebar-toggle {
   position: absolute;
   top: 16px; right: -14px;
   width: 28px; height: 28px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: var(--wood);
+  border: 1px solid var(--gold);
   border-radius: 50%;
-  color: var(--text-secondary);
+  color: var(--gold);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -95,9 +122,9 @@ body {
   z-index: 101;
 }
 .sidebar-toggle:hover {
-  background: var(--purple);
-  color: var(--text);
-  border-color: var(--purple);
+  background: var(--gold);
+  color: var(--gavel);
+  border-color: var(--gold);
 }
 
 .sidebar-nav {
@@ -114,17 +141,20 @@ body {
   gap: 10px;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
-  color: var(--text-secondary);
+  color: rgba(255,252,242,0.6);
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
   transition: all var(--transition);
   white-space: nowrap;
   overflow: hidden;
 }
-.nav-item:hover { background: rgba(139, 92, 246, 0.08); color: var(--text); }
-.nav-item.active { background: rgba(139, 92, 246, 0.15); color: var(--purple-light); }
-.nav-item svg { width: 20px; height: 20px; flex-shrink: 0; }
+.nav-item:hover { background: rgba(200,169,90,0.12); color: var(--paper); }
+.nav-item.active { background: rgba(200,169,90,0.2); color: var(--gold); }
+.nav-item svg { width: 20px; height: 20px; flex-shrink: 0; stroke: currentColor; }
 .nav-label { transition: opacity var(--transition-page); }
 .sidebar.collapsed .nav-label { opacity: 0; pointer-events: none; }
 .sidebar.collapsed .sidebar-logo span { display: none; }
@@ -140,10 +170,11 @@ body {
 /* ===== TOPBAR ===== */
 .topbar {
   height: var(--topbar-h);
-  background: rgba(9, 9, 11, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
+  background: var(--wood);
+  background-image:
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,0.04) 3px),
+    linear-gradient(180deg, #4a2e1c 0%, #3B2314 60%, #2b1a0f 100%);
+  border-bottom: 3px solid var(--gold);
   display: flex;
   align-items: center;
   padding: 0 24px;
@@ -155,13 +186,18 @@ body {
 .topbar-title {
   font-size: 16px;
   font-weight: 600;
-  color: var(--text);
+  color: var(--paper);
+  font-family: var(--stamp);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 /* ===== CONTENT ===== */
 .content {
   padding: 32px 24px;
   max-width: 860px;
+  /* ruled paper background */
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(59,35,20,0.06) 28px);
 }
 
 /* ===== SECTION ===== */
@@ -177,16 +213,19 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  font-family: var(--font);
 }
 
 .guide-section > h2 .section-num {
   font-size: 13px;
   font-weight: 600;
-  color: var(--purple);
-  background: rgba(139,92,246,0.12);
-  border: 1px solid rgba(139,92,246,0.25);
+  color: var(--gold);
+  background: rgba(200,169,90,0.12);
+  border: 1.5px solid rgba(200,169,90,0.4);
   padding: 2px 10px;
-  border-radius: 12px;
+  font-family: var(--stamp);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .guide-section > p {
@@ -196,40 +235,55 @@ body {
   line-height: 1.8;
 }
 
-/* Step cards */
+/* Step cards — Court Proceedings */
 .step {
   display: flex;
   gap: 16px;
   margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px dashed var(--border);
 }
+
+.step:last-child { border-bottom: none; }
 
 .step-num {
   flex-shrink: 0;
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: rgba(139,92,246,0.12);
-  border: 1px solid rgba(139,92,246,0.3);
-  color: var(--purple-light);
+  width: 36px; height: 36px;
+  border-radius: 0;
+  background: var(--wood);
+  border: 2px solid var(--gold);
+  color: var(--gold);
   font-size: 14px;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-top: 2px;
+  font-family: var(--stamp);
 }
 
 .step-body { flex: 1; }
-.step-body h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
-.step-body p { color: var(--text-secondary); font-size: 14px; margin-bottom: 12px; }
+.step-body h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-family: var(--font);
+}
+.step-body p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 12px;
+}
 
-/* ===== CODE BLOCKS ===== */
+/* ===== CODE BLOCKS — AFFIDAVITS ===== */
 .code-block {
   position: relative;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background: var(--paper);
+  border: 2px solid var(--border-strong);
+  border-radius: 0;
   overflow: hidden;
   margin-bottom: 16px;
+  box-shadow: 4px 4px 0px rgba(59,35,20,0.08);
 }
 
 .code-block-header {
@@ -237,16 +291,17 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 8px 14px;
-  background: rgba(255,255,255,0.02);
-  border-bottom: 1px solid var(--border);
+  background: var(--wood);
+  border-bottom: 2px solid var(--gold);
 }
 
 .code-lang {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--gold);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.14em;
+  font-family: var(--mono);
 }
 
 .copy-btn {
@@ -255,23 +310,25 @@ body {
   gap: 4px;
   padding: 4px 10px;
   background: transparent;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xs);
-  color: var(--text-muted);
-  font-size: 11px;
-  font-family: var(--font);
+  border: 1px solid rgba(200,169,90,0.4);
+  border-radius: 0;
+  color: rgba(255,252,242,0.7);
+  font-size: 10px;
+  font-family: var(--mono);
   cursor: pointer;
   transition: all var(--transition);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 .copy-btn:hover {
-  color: var(--text);
-  border-color: var(--purple);
-  background: rgba(139,92,246,0.08);
+  color: var(--paper);
+  border-color: var(--gold);
+  background: rgba(200,169,90,0.15);
 }
 .copy-btn.copied {
-  color: var(--green);
-  border-color: var(--green);
-  background: rgba(34,197,94,0.08);
+  color: var(--green-court);
+  border-color: var(--green-court);
+  background: rgba(46,90,56,0.1);
 }
 
 .code-block pre {
@@ -282,25 +339,41 @@ body {
   line-height: 1.7;
   color: var(--text-secondary);
   tab-size: 2;
+  /* ruled lines inside code blocks */
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 21px, rgba(59,35,20,0.04) 22px);
 }
 
-.code-block pre .hl-kw { color: #c084fc; }
-.code-block pre .hl-str { color: #86efac; }
-.code-block pre .hl-key { color: #93c5fd; }
-.code-block pre .hl-val { color: #fbbf24; }
-.code-block pre .hl-comment { color: #52525b; font-style: italic; }
-.code-block pre .hl-func { color: #67e8f9; }
-.code-block pre .hl-num { color: #fbbf24; }
+.code-block pre .hl-kw { color: var(--verdict); font-weight: 600; }
+.code-block pre .hl-str { color: var(--green-court); }
+.code-block pre .hl-key { color: var(--wood); }
+.code-block pre .hl-val { color: #b87a2a; }
+.code-block pre .hl-comment { color: var(--text-muted); font-style: italic; }
+.code-block pre .hl-func { color: var(--gold); font-weight: 600; }
+.code-block pre .hl-num { color: #b87a2a; }
+
+/* Affidavit stamp on code blocks */
+.code-block .affidavit-stamp {
+  position: absolute;
+  bottom: 8px;
+  right: 10px;
+  font-family: var(--stamp);
+  font-size: 9px;
+  color: rgba(139,26,26,0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  transform: rotate(-4deg);
+  pointer-events: none;
+}
 
 /* Inline code */
 code {
   font-family: var(--mono);
   font-size: 13px;
-  background: var(--surface-2);
+  background: var(--surface);
   border: 1px solid var(--border);
   padding: 2px 6px;
-  border-radius: var(--radius-xs);
-  color: var(--purple-light);
+  border-radius: 0;
+  color: var(--wood);
 }
 
 /* ===== API TABLE ===== */
@@ -311,39 +384,44 @@ code {
 }
 
 .api-table thead th {
-  background: rgba(255,255,255,0.02);
-  color: var(--text-muted);
+  background: var(--wood);
+  color: var(--gold);
   font-weight: 600;
-  font-size: 11px;
+  font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.14em;
   padding: 10px 14px;
   text-align: left;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--gold);
+  font-family: var(--mono);
 }
 
 .api-table tbody td {
   padding: 10px 14px;
-  border-bottom: 1px solid rgba(39,39,42,0.5);
+  border-bottom: 1px solid var(--border);
   color: var(--text-secondary);
   vertical-align: top;
+  font-family: var(--mono);
+  font-size: 12px;
 }
 
 .api-table tbody tr:last-child td { border-bottom: none; }
-.api-table tbody tr:hover { background: rgba(255,255,255,0.015); }
+.api-table tbody tr:hover { background: #FFFEF9; }
 
 .method-tag {
   display: inline-block;
   padding: 2px 8px;
-  border-radius: var(--radius-xs);
-  font-size: 11px;
+  border-radius: 0;
+  font-size: 10px;
   font-weight: 700;
-  font-family: var(--mono);
+  font-family: var(--stamp);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.method-tag.get { background: rgba(34,197,94,0.1); color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
-.method-tag.post { background: rgba(96,165,250,0.1); color: #60a5fa; border: 1px solid rgba(96,165,250,0.25); }
-.method-tag.delete { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.25); }
+.method-tag.get { background: rgba(46,90,56,0.1); color: var(--green-court); border: 1px solid rgba(46,90,56,0.3); }
+.method-tag.post { background: rgba(59,35,20,0.08); color: var(--wood); border: 1px solid rgba(59,35,20,0.25); }
+.method-tag.delete { background: rgba(139,26,26,0.08); color: var(--verdict); border: 1px solid rgba(139,26,26,0.25); }
 
 .path-cell {
   font-family: var(--mono);
@@ -356,24 +434,43 @@ code {
 .algo-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
+  gap: 3px;
+  background: var(--border-strong);
+  border: 2px solid var(--border-strong);
   margin-bottom: 20px;
 }
 
 .algo-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background: var(--paper);
+  border: none;
+  border-radius: 0;
   padding: 18px;
   transition: all var(--transition);
+  position: relative;
 }
-.algo-card:hover { border-color: rgba(139,92,246,0.3); }
+.algo-card:hover { background: #FFFEF9; }
+
+.algo-card::before {
+  content: attr(data-weight-label);
+  position: absolute;
+  top: 0; right: 0;
+  background: var(--gavel);
+  color: var(--gold);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+}
 
 .algo-card .algo-weight {
   font-size: 12px;
   font-weight: 600;
-  color: var(--purple-light);
+  color: var(--gold);
   margin-bottom: 6px;
+  font-family: var(--stamp);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .algo-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
@@ -384,18 +481,21 @@ code {
   line-height: 1.6;
 }
 
-.algo-card.algo-penalty { grid-column: 1 / -1; border-left: 3px solid var(--red); }
+.algo-card.algo-penalty {
+  grid-column: 1 / -1;
+  border-left: 4px solid var(--verdict);
+}
 
 .algo-bar {
   height: 6px;
-  background: var(--border);
-  border-radius: 3px;
+  background: rgba(59,35,20,0.1);
+  border-radius: 0;
   overflow: hidden;
   margin-top: 10px;
 }
 .algo-bar-fill {
   height: 100%;
-  border-radius: 3px;
+  border-radius: 0;
   transition: width 1s ease;
 }
 
@@ -403,31 +503,34 @@ code {
 .cat-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
+  gap: 3px;
+  background: var(--border-strong);
+  border: 2px solid var(--border-strong);
 }
 
 .cat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background: var(--paper);
+  border: none;
+  border-radius: 0;
   padding: 16px;
   display: flex;
   gap: 12px;
   transition: all var(--transition);
 }
-.cat-card:hover { border-color: rgba(139,92,246,0.3); }
+.cat-card:hover { background: #FFFEF9; }
 
 .cat-icon {
   width: 36px; height: 36px;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
+  border: 1.5px solid var(--border-strong);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
-.cat-icon svg { width: 18px; height: 18px; }
+.cat-icon svg { width: 18px; height: 18px; stroke: currentColor; }
 
-.cat-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.cat-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; font-family: var(--stamp); text-transform: uppercase; letter-spacing: 0.06em; }
 .cat-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
 
 /* ===== BADGE PREVIEW ===== */
@@ -436,20 +539,23 @@ code {
   align-items: center;
   gap: 16px;
   padding: 20px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background: var(--paper);
+  border: 2px solid var(--border-strong);
+  border-radius: 0;
 }
 
 .badge-preview-label {
   font-size: 13px;
   color: var(--text-secondary);
   flex-shrink: 0;
+  font-family: var(--stamp);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .badge-preview img {
   height: 28px;
-  border-radius: var(--radius-xs);
+  border-radius: 0;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -463,6 +569,9 @@ code {
 </style>
 </head>
 <body>
+
+<!-- Wood grain top bar -->
+<div class="wood-grain" style="height:14px;width:100%"></div>
 
 <!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
@@ -493,7 +602,7 @@ code {
       </svg>
       <span class="nav-label">Guide</span>
     </a>
-    <a href="/" style="margin-top:auto;border-top:1px solid var(--border);padding-top:14px" class="nav-item">
+    <a href="/" style="margin-top:auto;border-top:1px solid rgba(200,169,90,0.2);padding-top:14px" class="nav-item">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
       <span class="nav-label">Home</span>
     </a>
@@ -503,33 +612,33 @@ code {
 <!-- Main -->
 <div class="main" id="mainArea">
   <div class="topbar">
-    <div class="topbar-title">Setup Guide</div>
+    <div class="topbar-title">§ Court Procedure Manual</div>
   </div>
 
   <div class="content">
 
     <!-- Section 1: Quick Start -->
     <div class="guide-section" id="quick-start">
-      <h2><span class="section-num">1</span> Quick Start</h2>
+      <h2><span class="section-num">§1</span> Arraignment — Quick Start</h2>
       <p>Get Poly running in your CI pipeline in under 2 minutes. Sign up, add the GitHub Action, and start seeing trust scores.</p>
 
       <div class="step">
         <div class="step-num">1</div>
         <div class="step-body">
-          <h3>Sign up and get your API key</h3>
-          <p>Create an account at your Poly instance. You'll receive an API key to authenticate requests.</p>
+          <h3>File Your Motion — Sign Up &amp; Get API Key</h3>
+          <p>Create an account at your Poly instance. You'll receive an API key to authenticate requests — your credentials to enter the courtroom.</p>
         </div>
       </div>
 
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-body">
-          <h3>Add the GitHub Action to your workflow</h3>
-          <p>Add this step after your test runner. Make sure your tests output JUnit XML format.</p>
+          <h3>Present Your Evidence — Add the GitHub Action</h3>
+          <p>Add this step after your test runner. Make sure your tests output JUnit XML format — the court requires standardized evidence.</p>
 
           <div class="code-block">
             <div class="code-block-header">
-              <span class="code-lang">YAML</span>
+              <span class="code-lang">YAML — Filing Procedure</span>
               <button class="copy-btn" onclick="copyCode(this)">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                 Copy
@@ -549,6 +658,7 @@ code {
         <span class="hl-kw">with</span><span class="hl-key">:</span>
           <span class="hl-kw">api_key</span><span class="hl-key">:</span> <span class="hl-val">${{ secrets.POLY_API_KEY }}</span>
           <span class="hl-kw">junit_path</span><span class="hl-key">:</span> <span class="hl-str">'test-results/*.xml'</span></pre>
+            <span class="affidavit-stamp">Affidavit Filed Under Oath</span>
           </div>
         </div>
       </div>
@@ -556,23 +666,24 @@ code {
 
     <!-- Section 2: Python SDK -->
     <div class="guide-section" id="python-sdk">
-      <h2><span class="section-num">2</span> Python SDK</h2>
-      <p>Use the Python SDK to ingest test results programmatically, query dashboards, and configure alerts.</p>
+      <h2><span class="section-num">§2</span> Python SDK — Court Filing Interface</h2>
+      <p>Use the Python SDK to ingest test results programmatically, query dashboards, and configure alerts — the official court filing system.</p>
 
       <div class="code-block">
         <div class="code-block-header">
-          <span class="code-lang">Shell</span>
+          <span class="code-lang">Shell — Court Clerk Installation</span>
           <button class="copy-btn" onclick="copyCode(this)">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             Copy
           </button>
         </div>
         <pre>pip install poly-trust</pre>
+        <span class="affidavit-stamp">Sworn &amp; Subscribed</span>
       </div>
 
       <div class="code-block">
         <div class="code-block-header">
-          <span class="code-lang">Python</span>
+          <span class="code-lang">Python — Official Testimony</span>
           <button class="copy-btn" onclick="copyCode(this)">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             Copy
@@ -611,12 +722,13 @@ p.<span class="hl-func">configure_alerts</span>(
 
 <span class="hl-comment"># Get badge URL for your README</span>
 <span class="hl-func">url</span> = p.<span class="hl-func">badge_url</span>(<span class="hl-str">"my-repo"</span>)</pre>
+        <span class="affidavit-stamp">Deposition — Exhibit A</span>
       </div>
 
-      <h3 style="font-size:15px;font-weight:600;margin-top:24px;margin-bottom:12px">Available Methods</h3>
+      <h3 style="font-size:15px;font-weight:600;margin-top:24px;margin-bottom:12px;font-family:var(--stamp);text-transform:uppercase;letter-spacing:0.08em;color:var(--verdict)">Available Motions — API Methods</h3>
       <table class="api-table">
         <thead>
-          <tr><th>Method</th><th>Description</th></tr>
+          <tr><th>Motion</th><th>Description</th></tr>
         </thead>
         <tbody>
           <tr><td><code>ingest_junit(path)</code></td><td>Ingest a JUnit XML file for a repo</td></tr>
@@ -633,8 +745,8 @@ p.<span class="hl-func">configure_alerts</span>(
 
     <!-- Section 3: REST API -->
     <div class="guide-section" id="rest-api">
-      <h2><span class="section-num">3</span> REST API Reference</h2>
-      <p>All endpoints require the <code>X-Poly-API-Key</code> header for write operations. Read operations (GET) are open by default.</p>
+      <h2><span class="section-num">§3</span> REST API — Court Records Reference</h2>
+      <p>All endpoints require the <code>X-Poly-API-Key</code> header for write operations. Read operations (GET) are open by default — public record.</p>
 
       <table class="api-table">
         <thead>
@@ -699,11 +811,11 @@ p.<span class="hl-func">configure_alerts</span>(
         </tbody>
       </table>
 
-      <h3 style="font-size:15px;font-weight:600;margin-top:28px;margin-bottom:12px">Example Requests</h3>
+      <h3 style="font-size:15px;font-weight:600;margin-top:28px;margin-bottom:12px;font-family:var(--stamp);text-transform:uppercase;letter-spacing:0.08em;color:var(--verdict)">Example Filings — Court Requests</h3>
 
       <div class="code-block">
         <div class="code-block-header">
-          <span class="code-lang">cURL — Ingest JUnit</span>
+          <span class="code-lang">cURL — Ingest JUnit Evidence</span>
           <button class="copy-btn" onclick="copyCode(this)">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             Copy
@@ -713,22 +825,24 @@ p.<span class="hl-func">configure_alerts</span>(
   -H <span class="hl-str">"Content-Type: application/json"</span> \
   -H <span class="hl-str">"X-Poly-API-Key: your-key"</span> \
   -d <span class="hl-str">'{"xml_content": "...", "repo_name": "my-repo", "branch": "main"}'</span></pre>
+        <span class="affidavit-stamp">Filed Under Oath</span>
       </div>
 
       <div class="code-block">
         <div class="code-block-header">
-          <span class="code-lang">cURL — Get Dashboard</span>
+          <span class="code-lang">cURL — Request Court Records</span>
           <button class="copy-btn" onclick="copyCode(this)">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             Copy
           </button>
         </div>
         <pre>curl https://your-poly-instance.com/api/dashboard?repo_name=my-repo</pre>
+        <span class="affidavit-stamp">Public Record</span>
       </div>
 
       <div class="code-block">
         <div class="code-block-header">
-          <span class="code-lang">cURL — Configure Alerts</span>
+          <span class="code-lang">cURL — Configure Court Alerts</span>
           <button class="copy-btn" onclick="copyCode(this)">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             Copy
@@ -738,87 +852,88 @@ p.<span class="hl-func">configure_alerts</span>(
   -H <span class="hl-str">"Content-Type: application/json"</span> \
   -H <span class="hl-str">"X-Poly-API-Key: your-key"</span> \
   -d <span class="hl-str">'{"webhook_url": "https://discord.com/...", "channel_type": "discord"}'</span></pre>
+        <span class="affidavit-stamp">Confidential Filing</span>
       </div>
     </div>
 
     <!-- Section 4: Trust Score Algorithm -->
     <div class="guide-section" id="algorithm">
-      <h2><span class="section-num">4</span> Trust Score Algorithm</h2>
-      <p>Each test receives a trust score from 0 to 100. The score is calculated from four weighted components plus an optional flaky penalty.</p>
+      <h2><span class="section-num">§4</span> Trust Score — Sentencing Guidelines</h2>
+      <p>Each test receives a trust score from 0 to 100. The score is calculated from four weighted components plus an optional flaky penalty — the court's sentencing matrix.</p>
 
       <div class="algo-grid">
-        <div class="algo-card">
-          <div class="algo-weight">60% weight</div>
+        <div class="algo-card" data-weight-label="60% Weight">
+          <div class="algo-weight">Exhibit A — 60% weight</div>
           <h3>Pass Rate</h3>
-          <p>The percentage of recent runs that passed. A consistently passing test earns close to the full 60 points.</p>
-          <div class="algo-bar"><div class="algo-bar-fill" style="width:60%;background:var(--green)"></div></div>
+          <p>The percentage of recent runs that passed. A consistently passing test earns close to the full 60 points — the primary evidence of reliability.</p>
+          <div class="algo-bar"><div class="algo-bar-fill" style="width:60%;background:var(--green-court)"></div></div>
         </div>
-        <div class="algo-card">
-          <div class="algo-weight">20% weight</div>
+        <div class="algo-card" data-weight-label="20% Weight">
+          <div class="algo-weight">Exhibit B — 20% weight</div>
           <h3>Recent Trend</h3>
-          <p>Compares pass rate of the last 5 runs vs. the previous 5. Improving tests get a bonus; degrading tests lose points.</p>
-          <div class="algo-bar"><div class="algo-bar-fill" style="width:20%;background:var(--purple)"></div></div>
+          <p>Compares pass rate of the last 5 runs vs. the previous 5. Improving tests get a bonus; degrading tests lose points — the trajectory of conduct.</p>
+          <div class="algo-bar"><div class="algo-bar-fill" style="width:20%;background:var(--gold)"></div></div>
         </div>
-        <div class="algo-card">
-          <div class="algo-weight">10% weight</div>
+        <div class="algo-card" data-weight-label="10% Weight">
+          <div class="algo-weight">Exhibit C — 10% weight</div>
           <h3>Duration Variance</h3>
-          <p>Measures coefficient of variation in execution time. Consistent durations suggest stability; erratic timing indicates flakiness.</p>
-          <div class="algo-bar"><div class="algo-bar-fill" style="width:10%;background:var(--yellow)"></div></div>
+          <p>Measures coefficient of variation in execution time. Consistent durations suggest stability; erratic timing indicates flakiness — behavioral consistency under oath.</p>
+          <div class="algo-bar"><div class="algo-bar-fill" style="width:10%;background:#b87a2a"></div></div>
         </div>
-        <div class="algo-card">
-          <div class="algo-weight">10% weight</div>
+        <div class="algo-card" data-weight-label="10% Weight">
+          <div class="algo-weight">Exhibit D — 10% weight</div>
           <h3>Error Pattern Consistency</h3>
-          <p>When a test fails, consistent error messages indicate a real bug, while varied errors suggest flakiness.</p>
-          <div class="algo-bar"><div class="algo-bar-fill" style="width:10%;background:var(--orange)"></div></div>
+          <p>When a test fails, consistent error messages indicate a real bug, while varied errors suggest flakiness — credibility of testimony.</p>
+          <div class="algo-bar"><div class="algo-bar-fill" style="width:10%;background:var(--verdict)"></div></div>
         </div>
         <div class="algo-card algo-penalty">
-          <div class="algo-weight" style="color:var(--red)">-5 to -20 penalty</div>
-          <h3 style="color:var(--red)">Flaky Category Penalty</h3>
-          <p>If a test is classified as flaky, an additional penalty is applied based on the category severity:</p>
+          <div class="algo-weight" style="color:var(--verdict)">Penalty: −5 to −20</div>
+          <h3 style="color:var(--verdict)">Flaky Category — Aggravating Circumstances</h3>
+          <p>If a test is classified as flaky, an additional penalty is applied based on the category severity — the court's enhanced sentencing:</p>
           <p style="margin-top:6px">
-            <code style="border-color:rgba(249,115,22,0.3);color:var(--orange)">timing</code> &minus;5 &nbsp;
-            <code style="border-color:rgba(139,92,246,0.3);color:var(--purple-light)">order_dependency</code> &minus;10 &nbsp;
-            <code style="border-color:rgba(239,68,68,0.3);color:var(--red)">shared_state</code> &minus;15 &nbsp;
-            <code style="border-color:rgba(234,179,8,0.3);color:var(--yellow)">non_deterministic_data</code> &minus;20
+            <code style="border-color:rgba(139,26,26,0.3);color:var(--verdict)">timing</code> &minus;5 &nbsp;
+            <code style="border-color:rgba(200,169,90,0.3);color:var(--gold)">order_dependency</code> &minus;10 &nbsp;
+            <code style="border-color:rgba(139,26,26,0.3);color:var(--verdict)">shared_state</code> &minus;15 &nbsp;
+            <code style="border-color:rgba(59,35,20,0.3);color:var(--wood)">non_deterministic_data</code> &minus;20
           </p>
         </div>
       </div>
 
-      <h3 style="font-size:15px;font-weight:600;margin-bottom:14px">Flaky Categories</h3>
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:14px;font-family:var(--stamp);text-transform:uppercase;letter-spacing:0.08em;color:var(--verdict)">Flaky Categories — Criminal Classifications</h3>
       <div class="cat-grid">
         <div class="cat-card">
-          <div class="cat-icon" style="background:rgba(249,115,22,0.12);color:var(--orange)">
+          <div class="cat-icon" style="color:var(--verdict)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
           <div>
-            <h4 style="color:var(--orange)">Timing</h4>
+            <h4 style="color:var(--verdict)">Timing</h4>
             <p>High duration variance. Test execution time is unpredictable, suggesting race conditions or timeout sensitivity.</p>
           </div>
         </div>
         <div class="cat-card">
-          <div class="cat-icon" style="background:rgba(139,92,246,0.12);color:var(--purple-light)">
+          <div class="cat-icon" style="color:var(--gold)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
           </div>
           <div>
-            <h4 style="color:var(--purple-light)">Order Dependency</h4>
+            <h4 style="color:var(--gold)">Order Dependency</h4>
             <p>Test outcome changes based on execution order. Frequent pass/fail transitions indicate isolation issues.</p>
           </div>
         </div>
         <div class="cat-card">
-          <div class="cat-icon" style="background:rgba(239,68,68,0.12);color:var(--red)">
+          <div class="cat-icon" style="color:var(--verdict)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           </div>
           <div>
-            <h4 style="color:var(--red)">Shared State</h4>
+            <h4 style="color:var(--verdict)">Shared State</h4>
             <p>Test shares mutable state with other tests. Fails intermittently with consistent error messages.</p>
           </div>
         </div>
         <div class="cat-card">
-          <div class="cat-icon" style="background:rgba(234,179,8,0.12);color:var(--yellow)">
+          <div class="cat-icon" style="color:#b87a2a">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
           </div>
           <div>
-            <h4 style="color:var(--yellow)">Non-deterministic Data</h4>
+            <h4 style="color:#b87a2a">Non-deterministic Data</h4>
             <p>Test fails due to unpredictable external data, random values, or varying API responses.</p>
           </div>
         </div>
@@ -827,26 +942,27 @@ p.<span class="hl-func">configure_alerts</span>(
 
     <!-- Section 5: Badge -->
     <div class="guide-section" id="badge">
-      <h2><span class="section-num">5</span> Badge for README</h2>
-      <p>Add a live trust score badge to your repository's README. It updates automatically with each CI run.</p>
+      <h2><span class="section-num">§5</span> Badge — Certificate of Trustworthiness</h2>
+      <p>Add a live trust score badge to your repository's README. It updates automatically with each CI run — your public certificate of court approval.</p>
 
       <div class="code-block">
         <div class="code-block-header">
-          <span class="code-lang">Markdown</span>
+          <span class="code-lang">Markdown — Certificate Issuance</span>
           <button class="copy-btn" onclick="copyCode(this)">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             Copy
           </button>
         </div>
         <pre><span class="hl-comment">![Trust Score](https://your-poly-instance.com/badge/your-repo)</span></pre>
+        <span class="affidavit-stamp">Official Seal</span>
       </div>
 
       <div class="badge-preview">
-        <span class="badge-preview-label">Preview:</span>
+        <span class="badge-preview-label">Certificate Preview:</span>
         <img src="/badge/demo-repo" alt="Trust Score Badge" id="badgePreview"
              onerror="this.style.display='none'; document.getElementById('badgePlaceholder').style.display='inline-block';">
         <span id="badgePlaceholder" style="display:none;font-family:var(--mono);font-size:13px;color:var(--text-muted)">
-          Badge will appear here when connected to a Poly instance
+          Certificate will appear here when connected to a Poly instance
         </span>
       </div>
     </div>
@@ -869,7 +985,7 @@ function copyCode(btn) {
   navigator.clipboard.writeText(text).then(() => {
     btn.classList.add('copied');
     const originalHTML = btn.innerHTML;
-    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Filed!';
     setTimeout(() => {
       btn.classList.remove('copied');
       btn.innerHTML = originalHTML;
@@ -885,7 +1001,7 @@ function copyCode(btn) {
     document.execCommand('copy');
     document.body.removeChild(textarea);
     btn.classList.add('copied');
-    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Filed!';
     setTimeout(() => {
       btn.classList.remove('copied');
       btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';

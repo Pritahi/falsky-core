@@ -4,26 +4,36 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Poly — Trust Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,ital,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400;1,6..72,600&family=Fragment+Mono&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #09090b;
-  --surface: #111114;
-  --surface-2: #18181b;
-  --border: #27272a;
-  --text: #fafafa;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
-  --purple: #8b5cf6;
-  --purple-light: #a78bfa;
-  --green: #22c55e;
-  --yellow: #eab308;
-  --orange: #f97316;
-  --red: #ef4444;
-  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-  --radius: 8px;
-  --radius-sm: 6px;
-  --radius-xs: 4px;
+  --bg: #FFFCF2;
+  --surface: #FFFCF2;
+  --surface-2: #FAF6E8;
+  --border: rgba(59,35,20,0.15);
+  --border-heavy: #121212;
+  --text: #121212;
+  --text-secondary: rgba(18,18,18,0.7);
+  --text-muted: rgba(18,18,18,0.45);
+  --purple: #8B1A1A;
+  --purple-light: #a52a2a;
+  --green: #2E5A38;
+  --yellow: #C8A95A;
+  --orange: #b8742a;
+  --red: #8B1A1A;
+  --gold: #C8A95A;
+  --verdict: #8B1A1A;
+  --wood: #3B2314;
+  --paper: #FFFCF2;
+  --gavel: #121212;
+  --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --mono: 'Fragment Mono', 'Courier New', monospace;
+  --stamp-font: 'Special Elite', monospace;
+  --radius: 0px;
+  --radius-sm: 0px;
+  --radius-xs: 0px;
   --transition: 0.15s ease;
   --transition-page: 0.3s ease;
   --sidebar-w: 220px;
@@ -40,6 +50,40 @@ body {
   line-height: 1.6;
   min-height: 100vh;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Paper texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Wood grain mixin */
+.wood-grain {
+  background: #3B2314;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,0.04) 3px),
+    linear-gradient(180deg, #4a2e1c 0%, #3B2314 60%, #2b1a0f 100%);
+}
+
+/* Ruled paper lines */
+.ruled {
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(59,35,20,0.06) 28px);
+}
+
+/* Stamp style */
+.stamp {
+  font-family: 'Special Elite';
+  border: 3px solid currentColor;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  line-height: 0.9;
+  box-shadow: inset 0 0 0 1px currentColor;
 }
 
 /* ===== SIDEBAR ===== */
@@ -48,8 +92,11 @@ body {
   top: 0; left: 0;
   width: var(--sidebar-w);
   height: 100vh;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
+  background: #3B2314;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,0.04) 3px),
+    linear-gradient(180deg, #4a2e1c 0%, #3B2314 60%, #2b1a0f 100%);
+  border-right: 3px solid var(--gavel);
   display: flex;
   flex-direction: column;
   z-index: 100;
@@ -65,17 +112,17 @@ body {
   gap: 10px;
   padding: 16px;
   height: var(--topbar-h);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid rgba(200,169,90,0.3);
   flex-shrink: 0;
 }
 
 .sidebar-logo {
+  font-family: var(--font);
   font-size: 22px;
   font-weight: 800;
-  background: linear-gradient(135deg, var(--purple), var(--purple-light));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
   white-space: nowrap;
 }
 
@@ -85,10 +132,10 @@ body {
   right: -14px;
   width: 28px;
   height: 28px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  color: var(--text-secondary);
+  background: #E8E0C9;
+  border: 2px solid var(--gavel);
+  border-radius: 0;
+  color: var(--gavel);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -99,9 +146,9 @@ body {
 }
 
 .sidebar-toggle:hover {
-  background: var(--purple);
-  color: var(--text);
-  border-color: var(--purple);
+  background: var(--gold);
+  color: var(--gavel);
+  border-color: var(--gavel);
 }
 
 .sidebar-nav {
@@ -117,24 +164,27 @@ body {
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
+  border-radius: 0;
+  color: rgba(232,224,201,0.7);
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
   transition: all var(--transition);
   white-space: nowrap;
   overflow: hidden;
+  font-family: var(--mono);
+  letter-spacing: 0.04em;
 }
 
 .nav-item:hover {
-  background: rgba(139, 92, 246, 0.08);
-  color: var(--text);
+  background: rgba(200,169,90,0.15);
+  color: #E8E0C9;
 }
 
 .nav-item.active {
-  background: rgba(139, 92, 246, 0.15);
-  color: var(--purple-light);
+  background: rgba(200,169,90,0.2);
+  color: var(--gold);
+  border-left: 3px solid var(--gold);
 }
 
 .nav-item svg {
@@ -161,10 +211,8 @@ body {
   position: sticky;
   top: 0;
   height: var(--topbar-h);
-  background: rgba(9, 9, 11, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
+  background: #FFFCF2;
+  border-bottom: 2px solid var(--gavel);
   display: flex;
   align-items: center;
   padding: 0 24px;
@@ -174,23 +222,23 @@ body {
 
 .repo-select {
   background: var(--surface-2);
-  border: 1px solid var(--border);
+  border: 1.5px solid rgba(59,35,20,0.25);
   color: var(--text);
   padding: 8px 32px 8px 12px;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   font-size: 13px;
-  font-family: var(--font);
+  font-family: var(--mono);
   outline: none;
   cursor: pointer;
   min-width: 180px;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a1a1aa' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%233B2314' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
   transition: border-color var(--transition);
 }
 
-.repo-select:focus { border-color: var(--purple); }
+.repo-select:focus { border-color: var(--verdict); }
 
 .search-box {
   position: relative;
@@ -201,18 +249,18 @@ body {
 .search-box input {
   width: 100%;
   background: var(--surface-2);
-  border: 1px solid var(--border);
+  border: 1.5px solid rgba(59,35,20,0.25);
   color: var(--text);
   padding: 8px 12px 8px 36px;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   font-size: 13px;
-  font-family: var(--font);
+  font-family: var(--mono);
   outline: none;
   transition: border-color var(--transition);
 }
 
 .search-box input::placeholder { color: var(--text-muted); }
-.search-box input:focus { border-color: var(--purple); }
+.search-box input:focus { border-color: var(--verdict); }
 
 .search-box svg {
   position: absolute;
@@ -229,8 +277,10 @@ body {
   align-items: center;
   gap: 6px;
   font-size: 12px;
+  font-family: var(--mono);
   color: var(--text-muted);
   white-space: nowrap;
+  letter-spacing: 0.06em;
 }
 
 .pulse-dot {
@@ -241,8 +291,8 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
-  50% { opacity: 0.5; box-shadow: 0 0 0 4px rgba(34,197,94,0); }
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(46,90,56,0.4); }
+  50% { opacity: 0.5; box-shadow: 0 0 0 4px rgba(46,90,56,0); }
 }
 
 /* ===== CONTENT ===== */
@@ -250,9 +300,8 @@ body {
 
 /* ===== QUARANTINE BANNER ===== */
 .quarantine-banner {
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.25);
-  border-radius: var(--radius);
+  background: #FFF5F5;
+  border: 2px solid var(--verdict);
   padding: 14px 20px;
   margin-bottom: 24px;
   display: flex;
@@ -260,6 +309,20 @@ body {
   gap: 12px;
   font-size: 14px;
   animation: slideDown 0.3s ease;
+  position: relative;
+}
+
+.quarantine-banner::before {
+  content: 'WARNING';
+  position: absolute;
+  top: -10px;
+  left: 16px;
+  background: var(--verdict);
+  color: var(--paper);
+  font-family: var(--stamp-font);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  padding: 2px 8px;
 }
 
 @keyframes slideDown {
@@ -267,53 +330,54 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-.quarantine-banner svg { color: var(--red); flex-shrink: 0; }
-.quarantine-banner strong { color: var(--red); }
+.quarantine-banner svg { color: var(--verdict); flex-shrink: 0; }
+.quarantine-banner strong { color: var(--verdict); font-family: var(--stamp-font); letter-spacing: 0.08em; }
 .quarantine-banner a {
-  color: var(--red);
+  color: var(--verdict);
   text-decoration: underline;
   margin-left: auto;
   font-weight: 500;
+  font-family: var(--mono);
+  font-size: 12px;
 }
 
 /* ===== STATS ROW ===== */
 .stats-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 0;
   margin-bottom: 24px;
+  border: 2px solid var(--gavel);
+  background: var(--gavel);
 }
 
 .stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background: var(--paper);
   padding: 20px;
   transition: all var(--transition);
   position: relative;
   overflow: hidden;
+  border-right: 1px solid rgba(18,18,18,0.08);
 }
+
+.stat-card:last-child { border-right: none; }
 
 .stat-card:hover {
-  border-color: rgba(139, 92, 246, 0.3);
-  transform: translateY(-1px);
+  background: #FFFEF9;
 }
 
-.stat-card::after {
+.stat-card::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--purple), transparent);
-  opacity: 0;
-  transition: opacity var(--transition);
+  height: 3px;
+  background: var(--gold);
+  opacity: 0.6;
 }
-
-.stat-card:hover::after { opacity: 1; }
 
 .stat-icon {
   width: 36px; height: 36px;
-  border-radius: var(--radius-sm);
+  border: 2px solid var(--gavel);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -322,30 +386,35 @@ body {
 
 .stat-icon svg { width: 18px; height: 18px; }
 
-.stat-icon.purple { background: rgba(139,92,246,0.12); color: var(--purple-light); }
-.stat-icon.green { background: rgba(34,197,94,0.12); color: var(--green); }
-.stat-icon.red { background: rgba(239,68,68,0.12); color: var(--red); }
-.stat-icon.blue { background: rgba(96,165,250,0.12); color: #60a5fa; }
+.stat-icon.purple { color: var(--verdict); }
+.stat-icon.green { color: var(--green); }
+.stat-icon.red { color: var(--verdict); }
+.stat-icon.blue { color: var(--wood); }
 
 .stat-label {
-  font-size: 12px;
+  font-family: var(--mono);
+  font-size: 10px;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.18em;
   font-weight: 500;
   margin-bottom: 6px;
 }
 
 .stat-value {
-  font-size: 28px;
-  font-weight: 700;
-  line-height: 1.2;
+  font-family: var(--font);
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
 }
 
 .stat-sub {
-  font-size: 12px;
+  font-family: var(--mono);
+  font-size: 11px;
   color: var(--text-muted);
   margin-top: 4px;
+  letter-spacing: 0.04em;
 }
 
 /* Circular progress ring */
@@ -359,29 +428,62 @@ body {
 
 /* ===== SECTION CARD ===== */
 .section-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
+  background: var(--paper);
+  border: 2.5px solid var(--gavel);
+  padding: 0;
   margin-bottom: 24px;
+  position: relative;
+}
+
+.section-card::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 8px;
+  background: #3B2314;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,0.04) 3px),
+    linear-gradient(180deg, #4a2e1c 0%, #3B2314 60%, #2b1a0f 100%);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: #E8E0C9;
+  border-bottom: 1.5px solid rgba(59,35,20,0.15);
 }
 
 .section-title {
-  font-size: 14px;
+  font-family: var(--mono);
+  font-size: 11px;
   font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 16px;
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.18em;
+}
+
+.section-stamp {
+  font-family: var(--stamp-font);
+  font-size: 9px;
+  color: var(--verdict);
+  border: 1.5px solid var(--verdict);
+  padding: 2px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.section-body {
+  padding: 20px;
 }
 
 /* ===== TRUST DISTRIBUTION ===== */
 .dist-bar {
-  height: 12px;
-  border-radius: 6px;
+  height: 14px;
   overflow: hidden;
   display: flex;
-  background: var(--border);
+  border: 1.5px solid rgba(59,35,20,0.15);
 }
 
 .dist-bar div {
@@ -400,13 +502,13 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
+  font-family: var(--mono);
+  font-size: 12px;
   color: var(--text-secondary);
 }
 
 .dist-legend-dot {
   width: 10px; height: 10px;
-  border-radius: 3px;
 }
 
 /* ===== TABLES ===== */
@@ -416,15 +518,16 @@ body {
 }
 
 .data-table thead th {
-  background: rgba(255,255,255,0.02);
+  background: #E8E0C9;
   color: var(--text-muted);
+  font-family: var(--mono);
   font-weight: 600;
-  font-size: 11px;
+  font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.15em;
   padding: 10px 14px;
   text-align: left;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1.5px solid rgba(59,35,20,0.2);
   white-space: nowrap;
 }
 
@@ -433,11 +536,11 @@ body {
   transition: background var(--transition);
 }
 
-.data-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+.data-table tbody tr:hover { background: #FAF6E8; }
 
 .data-table tbody td {
   padding: 10px 14px;
-  border-bottom: 1px solid rgba(39,39,42,0.5);
+  border-bottom: 1px solid rgba(59,35,20,0.08);
   font-size: 13px;
   vertical-align: middle;
 }
@@ -464,47 +567,48 @@ body {
 .trust-bar-bg {
   width: 60px;
   height: 6px;
-  background: var(--border);
-  border-radius: 3px;
+  background: rgba(59,35,20,0.1);
   overflow: hidden;
 }
 
-.trust-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s ease; }
+.trust-bar-fill { height: 100%; transition: width 0.3s ease; }
 
-.trust-val { font-weight: 600; font-size: 13px; min-width: 30px; }
+.trust-val { font-weight: 600; font-size: 13px; min-width: 30px; font-family: var(--mono); }
 
-/* Category tags */
+/* Category tags — stamp style */
 .cat-tag {
   display: inline-block;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 11px;
+  padding: 2px 10px;
+  font-family: var(--stamp-font);
+  font-size: 10px;
   font-weight: 500;
   white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: 1.5px solid currentColor;
 }
 
-.cat-tag.timing { background: rgba(249,115,22,0.12); color: var(--orange); }
-.cat-tag.shared_state { background: rgba(239,68,68,0.12); color: var(--red); }
-.cat-tag.order_dependency { background: rgba(139,92,246,0.12); color: var(--purple-light); }
-.cat-tag.non_deterministic_data { background: rgba(234,179,8,0.12); color: var(--yellow); }
+.cat-tag.timing { color: var(--orange); }
+.cat-tag.shared_state { color: var(--verdict); }
+.cat-tag.order_dependency { color: var(--purple-light); }
+.cat-tag.non_deterministic_data { color: var(--gold); }
 
 /* Run dots */
 .run-dots { display: flex; gap: 3px; }
-.run-dot { width: 8px; height: 8px; border-radius: 50%; }
+.run-dot { width: 8px; height: 8px; }
 .run-dot.passed { background: var(--green); }
-.run-dot.failed { background: var(--red); }
+.run-dot.failed { background: var(--verdict); }
 .run-dot.skipped { background: var(--text-muted); }
 
 /* CI run status */
-.run-status-all-pass { color: var(--green); }
-.run-status-has-fail { color: var(--red); font-weight: 500; }
+.run-status-all-pass { color: var(--green); font-family: var(--stamp-font); font-size: 11px; letter-spacing: 0.08em; }
+.run-status-has-fail { color: var(--verdict); font-weight: 600; font-family: var(--stamp-font); font-size: 11px; letter-spacing: 0.08em; }
 
 .branch-tag {
   display: inline-block;
   padding: 2px 8px;
   background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xs);
+  border: 1px solid rgba(59,35,20,0.15);
   font-family: var(--mono);
   font-size: 12px;
   color: var(--text-secondary);
@@ -516,26 +620,27 @@ body {
   color: var(--text-muted);
 }
 
-.time-cell { color: var(--text-muted); font-size: 12px; white-space: nowrap; }
+.time-cell { color: var(--text-muted); font-size: 12px; white-space: nowrap; font-family: var(--mono); }
 
 /* View button */
 .view-btn {
-  padding: 4px 12px;
-  background: rgba(139,92,246,0.1);
-  border: 1px solid rgba(139,92,246,0.25);
-  color: var(--purple-light);
-  border-radius: var(--radius-sm);
-  font-size: 12px;
+  padding: 4px 14px;
+  background: var(--gavel);
+  border: none;
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: 10px;
   font-weight: 500;
   cursor: pointer;
   transition: all var(--transition);
   text-decoration: none;
   white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
 }
 
 .view-btn:hover {
-  background: rgba(139,92,246,0.2);
-  border-color: var(--purple);
+  background: var(--wood);
 }
 
 /* Empty state */
@@ -544,6 +649,7 @@ body {
   padding: 48px 24px;
   color: var(--text-muted);
   font-size: 14px;
+  font-family: var(--mono);
 }
 
 /* Loading */
@@ -554,12 +660,13 @@ body {
   padding: 48px;
   color: var(--text-muted);
   gap: 8px;
+  font-family: var(--mono);
 }
 
 .spinner {
   width: 16px; height: 16px;
-  border: 2px solid var(--border);
-  border-top-color: var(--purple);
+  border: 2px solid rgba(59,35,20,0.15);
+  border-top-color: var(--verdict);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
@@ -578,8 +685,29 @@ body {
 }
 
 .no-repo svg { color: var(--text-muted); margin-bottom: 8px; }
-.no-repo h2 { color: var(--text-secondary); font-size: 18px; }
-.no-repo p { color: var(--text-muted); font-size: 14px; }
+.no-repo h2 { color: var(--text-secondary); font-size: 22px; font-weight: 700; }
+.no-repo p { color: var(--text-muted); font-size: 14px; font-family: var(--mono); }
+
+/* Trust score stamp badge */
+.trust-stamp {
+  display: inline-block;
+  font-family: var(--stamp-font);
+  font-size: 11px;
+  padding: 2px 10px;
+  border: 2px solid currentColor;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  box-shadow: inset 0 0 0 1px currentColor;
+}
+
+/* Wood top bar accent */
+.topbar-wood {
+  height: 4px;
+  background: #3B2314;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,0.04) 3px),
+    linear-gradient(180deg, #4a2e1c 0%, #3B2314 60%, #2b1a0f 100%);
+}
 
 /* Responsive */
 @media (max-width: 900px) {
@@ -587,6 +715,7 @@ body {
   .sidebar .nav-label, .sidebar .sidebar-logo span { display: none; }
   .main { margin-left: var(--sidebar-collapsed) !important; }
   .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .stats-row .stat-card { border-bottom: 1px solid rgba(18,18,18,0.08); }
   .content { padding: 16px; }
 }
 
@@ -628,7 +757,7 @@ body {
       </svg>
       <span class="nav-label">Guide</span>
     </a>
-    <a href="/" class="nav-item" data-page="landing" style="margin-top:auto;border-top:1px solid var(--border);padding-top:14px">
+    <a href="/" class="nav-item" data-page="landing" style="margin-top:auto;border-top:1px solid rgba(200,169,90,0.2);padding-top:14px">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>
       </svg>
@@ -639,6 +768,9 @@ body {
 
 <!-- Main Content -->
 <div class="main" id="mainArea">
+  <!-- Wood accent strip -->
+  <div class="topbar-wood"></div>
+
   <!-- Top Bar -->
   <div class="topbar">
     <select class="repo-select" id="repoSelect">
@@ -659,12 +791,12 @@ body {
   </div>
 
   <!-- Live Ticker Bar -->
-  <div id="liveTicker" style="background:var(--surface);border-bottom:1px solid var(--border);padding:6px 0;overflow:hidden;font-family:var(--mono);font-size:11px;letter-spacing:0.05em;">
+  <div id="liveTicker" style="background:#E8E0C9;border-bottom:1.5px solid rgba(59,35,20,0.15);padding:6px 0;overflow:hidden;font-family:var(--mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;">
     <div id="tickerTrack" style="display:flex;gap:32px;white-space:nowrap;animation:tickerScroll 40s linear infinite;color:var(--text-muted);">
       <span>◆ POLY TRUST LAYER ACTIVE</span>
       <span style="color:var(--green)">● SYSTEMS NOMINAL</span>
       <span>◆ MONITORING ALL GATES</span>
-      <span style="color:var(--purple-light)" id="tickerTests">AWAITING TEST DATA...</span>
+      <span style="color:var(--verdict)" id="tickerTests">AWAITING TEST DATA...</span>
       <span>◆ BAYESIAN SCORING ENGINE v2.0</span>
       <span style="color:var(--green)">● REAL-TIME ANALYSIS</span>
       <span>◆ FLAKY DETECTION: 14 PATTERNS</span>
@@ -686,8 +818,9 @@ body {
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
       </svg>
-      <h2>Select a repository</h2>
-      <p>Choose a repo from the dropdown above to view its trust dashboard.</p>
+      <h2>Select a Repository</h2>
+      <p>Choose a repo from the docket above to view its trust dashboard.</p>
+      <div class="stamp text-[12px] text-[var(--text-muted)] border-[var(--text-muted)] px-3 py-1 mt-2" style="font-size:12px;color:var(--text-muted);border-color:var(--text-muted);padding:4px 12px;margin-top:8px;">AWAITING FILING</div>
     </div>
 
     <!-- Dashboard content (hidden until repo selected) -->
@@ -713,7 +846,7 @@ body {
           </div>
           <div class="stat-label">Total Tests</div>
           <div class="stat-value" id="sTotal">&mdash;</div>
-          <div class="stat-sub">tracked tests</div>
+          <div class="stat-sub">cases on docket</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon green">
@@ -724,15 +857,15 @@ body {
           <div class="stat-label">Avg Trust Score</div>
           <div class="trust-ring-wrap">
             <svg width="44" height="44" viewBox="0 0 44 44" id="trustRingSvg">
-              <circle cx="22" cy="22" r="18" fill="none" stroke="#27272a" stroke-width="4"/>
-              <circle cx="22" cy="22" r="18" fill="none" stroke="#8b5cf6" stroke-width="4"
+              <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(59,35,20,0.1)" stroke-width="4"/>
+              <circle cx="22" cy="22" r="18" fill="none" stroke="#8B1A1A" stroke-width="4"
                 stroke-dasharray="113.1" stroke-dashoffset="113.1" stroke-linecap="round"
                 transform="rotate(-90 22 22)" id="trustRingCircle"/>
               <text x="22" y="22" text-anchor="middle" dominant-baseline="central"
-                fill="#fafafa" font-size="11" font-weight="700" font-family="var(--font)" id="trustRingText">—</text>
+                fill="#121212" font-size="11" font-weight="700" font-family="var(--mono)" id="trustRingText">—</text>
             </svg>
           </div>
-          <div class="stat-sub">across all tests</div>
+          <div class="stat-sub">verdict score</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon red">
@@ -743,7 +876,7 @@ body {
           </div>
           <div class="stat-label">Flaky Tests</div>
           <div class="stat-value" id="sFlaky">&mdash;</div>
-          <div class="stat-sub">trust score &lt; 80</div>
+          <div class="stat-sub">found guilty</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon blue">
@@ -753,74 +886,89 @@ body {
           </div>
           <div class="stat-label">CI Runs</div>
           <div class="stat-value" id="sRuns">&mdash;</div>
-          <div class="stat-sub">total recorded</div>
+          <div class="stat-sub">trials recorded</div>
         </div>
       </div>
 
       <!-- Trust Distribution -->
       <div class="section-card">
-        <div class="section-title">Trust Score Distribution</div>
-        <div class="dist-bar" id="distBar"></div>
-        <div class="dist-legend" id="distLegend">
-          <div class="dist-legend-item">
-            <div class="dist-legend-dot" style="background:var(--green)"></div>
-            <span id="legHigh">High (90+) — 0</span>
-          </div>
-          <div class="dist-legend-item">
-            <div class="dist-legend-dot" style="background:var(--yellow)"></div>
-            <span id="legMed">Medium (70-89) — 0</span>
-          </div>
-          <div class="dist-legend-item">
-            <div class="dist-legend-dot" style="background:var(--orange)"></div>
-            <span id="legLow">Low (50-69) — 0</span>
-          </div>
-          <div class="dist-legend-item">
-            <div class="dist-legend-dot" style="background:var(--red)"></div>
-            <span id="legCrit">Critical (&lt;50) — 0</span>
+        <div class="section-header">
+          <div class="section-title">Trust Score Distribution</div>
+          <div class="section-stamp">Exhibit A</div>
+        </div>
+        <div class="section-body ruled">
+          <div class="dist-bar" id="distBar"></div>
+          <div class="dist-legend" id="distLegend">
+            <div class="dist-legend-item">
+              <div class="dist-legend-dot" style="background:var(--green)"></div>
+              <span id="legHigh">High (90+) — 0</span>
+            </div>
+            <div class="dist-legend-item">
+              <div class="dist-legend-dot" style="background:var(--yellow)"></div>
+              <span id="legMed">Medium (70-89) — 0</span>
+            </div>
+            <div class="dist-legend-item">
+              <div class="dist-legend-dot" style="background:var(--orange)"></div>
+              <span id="legLow">Low (50-69) — 0</span>
+            </div>
+            <div class="dist-legend-item">
+              <div class="dist-legend-dot" style="background:var(--red)"></div>
+              <span id="legCrit">Critical (&lt;50) — 0</span>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Flaky Tests Table -->
       <div class="section-card">
-        <div class="section-title">Flaky Tests</div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Test Name</th>
-              <th>Trust Score</th>
-              <th>Pass Rate</th>
-              <th>Category</th>
-              <th>Last 10 Runs</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="flakyBody"></tbody>
-        </table>
-        <div class="empty-state" id="flakyEmpty" style="display:none">
-          No flaky tests detected — all tests are healthy!
+        <div class="section-header">
+          <div class="section-title">Flaky Tests — Defendants</div>
+          <div class="section-stamp">Docket</div>
+        </div>
+        <div class="section-body" style="padding:0">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Test Name</th>
+                <th>Trust Score</th>
+                <th>Pass Rate</th>
+                <th>Category</th>
+                <th>Last 10 Runs</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="flakyBody"></tbody>
+          </table>
+          <div class="empty-state" id="flakyEmpty" style="display:none">
+            No flaky tests detected — all defendants acquitted.
+          </div>
         </div>
       </div>
 
       <!-- Recent CI Runs Table -->
       <div class="section-card">
-        <div class="section-title">Recent CI Runs</div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Run ID</th>
-              <th>Branch</th>
-              <th>Total</th>
-              <th>Passed</th>
-              <th>Failed</th>
-              <th>Avg Trust</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody id="runsBody"></tbody>
-        </table>
-        <div class="empty-state" id="runsEmpty" style="display:none">
-          No CI runs recorded yet.
+        <div class="section-header">
+          <div class="section-title">Recent CI Runs — Trial Log</div>
+          <div class="section-stamp">Court Record</div>
+        </div>
+        <div class="section-body" style="padding:0">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Run ID</th>
+                <th>Branch</th>
+                <th>Total</th>
+                <th>Passed</th>
+                <th>Failed</th>
+                <th>Avg Trust</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody id="runsBody"></tbody>
+          </table>
+          <div class="empty-state" id="runsEmpty" style="display:none">
+            No CI runs recorded yet — court is in recess.
+          </div>
         </div>
       </div>
 
@@ -959,7 +1107,7 @@ function renderDistribution(dist) {
   const total = h + m + l + c;
 
   if (!total) {
-    $('distBar').innerHTML = '<div style="width:100%;background:var(--border)"></div>';
+    $('distBar').innerHTML = '<div style="width:100%;background:rgba(59,35,20,0.08)"></div>';
     return;
   }
 
@@ -1033,7 +1181,7 @@ function renderFlakyTable() {
       <td>${passRate}</td>
       <td>${cat ? `<span class="cat-tag ${catClass}">${catLabel}</span>` : '—'}</td>
       <td><div class="run-dots">${dots || '<span style="color:var(--text-muted)">—</span>'}</div></td>
-      <td><a href="test-detail.html?repo_name=${encodeURIComponent(currentRepo)}&test_name=${testName}" class="view-btn" onclick="event.stopPropagation()">View</a></td>
+      <td><a href="test-detail.html?repo_name=${encodeURIComponent(currentRepo)}&test_name=${testName}" class="view-btn" onclick="event.stopPropagation()">Review</a></td>
     </tr>`;
   }).join('');
 }
@@ -1064,7 +1212,7 @@ function renderRuns(runs) {
       <td>${r.total_tests || 0}</td>
       <td>${r.passed || 0}</td>
       <td class="${statusClass}">${statusText}</td>
-      <td style="color:${trustColor(avgTrust)};font-weight:600">${avgTrust}%</td>
+      <td style="color:${trustColor(avgTrust)};font-weight:600;font-family:var(--mono)">${avgTrust}%</td>
       <td class="time-cell">${formatTime(r.timestamp)}</td>
     </tr>`;
   }).join('');

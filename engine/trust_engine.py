@@ -245,23 +245,43 @@ def _init_db():
                 c.execute("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)")
                 c.execute("CREATE INDEX IF NOT EXISTS idx_users_activity ON user_activity(user_id)")
 
+                # Admin sessions table (for secure token verification)
+                c.execute("""
+                    CREATE TABLE IF NOT EXISTS admin_sessions (
+                        id SERIAL PRIMARY KEY,
+                        admin_id INTEGER NOT NULL,
+                        token TEXT NOT NULL UNIQUE,
+                        expires_at TIMESTAMPTZ NOT NULL,
+                        created_at TIMESTAMPTZ DEFAULT NOW(),
+                        FOREIGN KEY (admin_id) REFERENCES admin_users(id) ON DELETE CASCADE
+                    );
+                """)
+                c.execute("CREATE INDEX IF NOT EXISTS idx_admin_sessions_token ON admin_sessions(token)")
+                c.execute("CREATE INDEX IF NOT EXISTS idx_admin_sessions_expires ON admin_sessions(expires_at)")
+
             # Seed default admin if empty
             with _cursor(conn) as c:
                 c.execute("SELECT COUNT(*) as cnt FROM admin_users")
                 row = _to_dict(c)
                 if row and row["cnt"] == 0:
+                    pw = os.environ.get("POLY_ADMIN_PASSWORD", "")
+                    if not pw:
+                        pw = "admin123"
+                        logger.warning(
+                            "⚠️  POLY_ADMIN_PASSWORD not set! Using default 'admin123'. "
+                            "SET A STRONG PASSWORD via env var before deploying to production!"
+                        )
                     if _HAS_BCRYPT and _bcrypt:
-                        pw = os.environ.get("POLY_ADMIN_PASSWORD", "admin123")
                         pw_hash = _bcrypt.hashpw(pw.encode(), _bcrypt.gensalt()).decode()
                     else:
-                        pw_hash = hashlib.sha256(
-                            os.environ.get("POLY_ADMIN_PASSWORD", "admin123").encode()
-                        ).hexdigest()
+                        pw_hash = hashlib.sha256(pw.encode()).hexdigest()
                     c.execute(
                         "INSERT INTO admin_users (username, password_hash, role) VALUES (%s,%s,%s) ON CONFLICT DO NOTHING",
                         ("admin", pw_hash, "superadmin")
                     )
 
+            # Clean expired admin sessions on startup
+            c.execute("DELETE FROM admin_sessions WHERE expires_at < NOW()")
             conn.commit()
             logger.info("Database tables initialized successfully")
         except Exception:

@@ -82,7 +82,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -97,6 +97,29 @@ SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY", "")
 SUPABASE_JWT_SECRET = os.environ.get("SUPABASE_JWT_SECRET", "")
 SITE_URL = os.environ.get("SITE_URL", "")
 ALLOWED_ADMIN_EMAILS = os.environ.get("ALLOWED_ADMIN_EMAILS", "").split(",") if os.environ.get("ALLOWED_ADMIN_EMAILS") else []
+CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "https://falsky-test.vercel.app,http://localhost:3000,http://localhost:8000").split(",")
+
+# Rate limiting (in-memory, per-IP)
+_login_attempts = {}  # ip -> (count, first_attempt_time)
+LOGIN_RATE_LIMIT = 5  # max attempts per window
+LOGIN_RATE_WINDOW = 900  # 15 minutes in seconds
+
+
+def _check_rate_limit(ip: str):
+    """Check if IP is rate-limited for login attempts."""
+    now = time.time()
+    if ip in _login_attempts:
+        count, first_time = _login_attempts[ip]
+        if now - first_time > LOGIN_RATE_WINDOW:
+            # Window expired, reset
+            _login_attempts[ip] = (1, now)
+            return
+        if count >= LOGIN_RATE_LIMIT:
+            logger.warning(f"Rate limit hit for IP: {ip}")
+            raise HTTPException(status_code=429, detail="Too many login attempts. Try again in 15 minutes.")
+        _login_attempts[ip] = (count + 1, first_time)
+    else:
+        _login_attempts[ip] = (1, now)
 
 
 # ===================== AUTH HELPERS =====================
@@ -145,16 +168,21 @@ def _get_admin_session(request: Request):
             return None
         except Exception:
             pass
-    # Fallback: legacy hex token verification
-    try:
-        int(token, 16)
-        if len(token) >= 32:
+    # Fallback: legacy session token verification (DB-backed)
+    if len(token) >= 32:
+        try:
             with _get_db() as conn:
                 with _cursor(conn) as c:
-                    c.execute("SELECT username, role FROM admin_users LIMIT 1")
+                    # Verify token against stored session in admin_sessions table
+                    c.execute(
+                        "SELECT u.username, u.role FROM admin_users u "
+                        "JOIN admin_sessions s ON u.id = s.admin_id "
+                        "WHERE s.token = %s AND s.expires_at > NOW()",
+                        (token,)
+                    )
                     return _to_dict(c)
-    except Exception:
-        pass
+        except Exception:
+            pass
     return None
 
 
@@ -214,6 +242,8 @@ class UserUpdate(BaseModel):
     plan: Optional[str] = None
     is_active: Optional[bool] = None
     notes: Optional[str] = None
+    referrer: Optional[str] = None
+    signup_source: Optional[str] = None
 
 
 # ===================== HEALTH =====================
@@ -306,8 +336,11 @@ def root():
 # ===================== ADMIN AUTH =====================
 
 @app.post("/api/admin/login")
-def admin_login(data: AdminLogin, response: Response):
+def admin_login(data: AdminLogin, request: Request, response: Response):
     try:
+        # Rate limit by IP
+        client_ip = request.client.host if request.client else "unknown"
+        _check_rate_limit(client_ip)
         with _get_db() as conn:
             with _cursor(conn) as c:
                 c.execute("SELECT id, username, password_hash, role FROM admin_users WHERE username=%s", (data.username,))
@@ -327,9 +360,18 @@ def admin_login(data: AdminLogin, response: Response):
             logger.warning(f"Failed login for: {data.username}")
             raise HTTPException(status_code=401, detail="Invalid credentials")
 
-        # Signed token (not raw user ID)
+        # Generate secure session token and store in DB
         token = secrets.token_hex(32)
-        # Store token mapping (or verify via session)
+        with _get_db() as conn:
+            with _cursor(conn) as c:
+                # Clean expired sessions
+                c.execute("DELETE FROM admin_sessions WHERE expires_at < NOW()")
+                # Store new session (7 day expiry)
+                c.execute(
+                    "INSERT INTO admin_sessions (admin_id, token, expires_at) VALUES (%s, %s, NOW() + INTERVAL '7 days')",
+                    (row["id"], token)
+                )
+            conn.commit()
         response.set_cookie(key="poly_admin_token", value=token, httponly=True, secure=True, samesite="lax", max_age=86400 * 7)
         logger.info(f"Admin login successful: {data.username}")
         return {"status": "ok", "username": row["username"], "role": row["role"]}
@@ -341,9 +383,18 @@ def admin_login(data: AdminLogin, response: Response):
 
 
 @app.post("/api/admin/logout")
-def admin_logout(response: Response):
+def admin_logout(request: Request, response: Response):
     try:
-        response.delete_cookie("poly_admin_token")
+        token = request.cookies.get("poly_admin_token")
+        if token:
+            try:
+                with _get_db() as conn:
+                    with _cursor(conn) as c:
+                        c.execute("DELETE FROM admin_sessions WHERE token=%s", (token,))
+                    conn.commit()
+            except Exception:
+                pass
+        response.delete_cookie("poly_admin_token", path="/")
         logger.info("Admin logout")
         return {"status": "ok"}
     except Exception as e:

@@ -4,26 +4,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Poly — Test Detail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,ital,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400;1,6..72,600&family=Fragment+Mono&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #09090b;
-  --surface: #111114;
-  --surface-2: #18181b;
-  --border: #27272a;
-  --text: #fafafa;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
-  --purple: #8b5cf6;
-  --purple-light: #a78bfa;
-  --green: #22c55e;
-  --yellow: #eab308;
-  --orange: #f97316;
-  --red: #ef4444;
-  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-  --radius: 8px;
-  --radius-sm: 6px;
-  --radius-xs: 4px;
+  --wood: #3B2314;
+  --paper: #FFFCF2;
+  --gavel: #121212;
+  --verdict: #8B1A1A;
+  --gold: #C8A95A;
+  --green-court: #2E5A38;
+  --bg: #FFFCF2;
+  --surface: #F5EFE0;
+  --surface-2: #EFE8D1;
+  --border: rgba(59,35,20,0.15);
+  --border-strong: rgba(59,35,20,0.3);
+  --text: #121212;
+  --text-secondary: #5C4A3A;
+  --text-muted: #8B7D6B;
+  --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --mono: 'Fragment Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  --stamp: 'Special Elite', monospace;
+  --radius: 2px;
+  --radius-sm: 2px;
   --transition: 0.15s ease;
   --transition-page: 0.3s ease;
   --sidebar-w: 220px;
@@ -40,6 +44,30 @@ body {
   line-height: 1.6;
   min-height: 100vh;
   overflow-x: hidden;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+/* ===== WOOD GRAIN ===== */
+.wood-grain {
+  background: var(--wood);
+  background-image:
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,0.04) 3px),
+    linear-gradient(180deg, #4a2e1c 0%, #3B2314 60%, #2b1a0f 100%);
+}
+
+/* ===== RULED PAPER ===== */
+.ruled {
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(59,35,20,0.06) 28px);
+}
+
+/* ===== STAMP ===== */
+.stamp {
+  font-family: var(--stamp);
+  border: 2.5px solid currentColor;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  line-height: 0.9;
+  box-shadow: inset 0 0 0 1px currentColor;
 }
 
 /* ===== SIDEBAR ===== */
@@ -48,8 +76,11 @@ body {
   top: 0; left: 0;
   width: var(--sidebar-w);
   height: 100vh;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
+  background: var(--wood);
+  background-image:
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,0.04) 3px),
+    linear-gradient(180deg, #4a2e1c 0%, #3B2314 60%, #2b1a0f 100%);
+  border-right: 3px solid var(--gold);
   display: flex;
   flex-direction: column;
   z-index: 100;
@@ -64,28 +95,28 @@ body {
   gap: 10px;
   padding: 16px;
   height: var(--topbar-h);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(200,169,90,0.2);
   flex-shrink: 0;
 }
 
 .sidebar-logo {
   font-size: 22px;
   font-weight: 800;
-  background: linear-gradient(135deg, var(--purple), var(--purple-light));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-family: var(--font);
+  color: var(--gold);
   white-space: nowrap;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .sidebar-toggle {
   position: absolute;
   top: 16px; right: -14px;
   width: 28px; height: 28px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: var(--wood);
+  border: 1px solid var(--gold);
   border-radius: 50%;
-  color: var(--text-secondary);
+  color: var(--gold);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -95,9 +126,9 @@ body {
   z-index: 101;
 }
 .sidebar-toggle:hover {
-  background: var(--purple);
-  color: var(--text);
-  border-color: var(--purple);
+  background: var(--gold);
+  color: var(--gavel);
+  border-color: var(--gold);
 }
 
 .sidebar-nav {
@@ -114,17 +145,20 @@ body {
   gap: 10px;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
-  color: var(--text-secondary);
+  color: rgba(255,252,242,0.6);
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
   transition: all var(--transition);
   white-space: nowrap;
   overflow: hidden;
 }
-.nav-item:hover { background: rgba(139, 92, 246, 0.08); color: var(--text); }
-.nav-item.active { background: rgba(139, 92, 246, 0.15); color: var(--purple-light); }
-.nav-item svg { width: 20px; height: 20px; flex-shrink: 0; }
+.nav-item:hover { background: rgba(200,169,90,0.12); color: var(--paper); }
+.nav-item.active { background: rgba(200,169,90,0.2); color: var(--gold); }
+.nav-item svg { width: 20px; height: 20px; flex-shrink: 0; stroke: currentColor; }
 .nav-label { transition: opacity var(--transition-page); }
 .sidebar.collapsed .nav-label { opacity: 0; pointer-events: none; }
 .sidebar.collapsed .sidebar-logo span { display: none; }
@@ -140,10 +174,11 @@ body {
 /* ===== TOPBAR ===== */
 .topbar {
   height: var(--topbar-h);
-  background: rgba(9, 9, 11, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
+  background: var(--wood);
+  background-image:
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,0.04) 3px),
+    linear-gradient(180deg, #4a2e1c 0%, #3B2314 60%, #2b1a0f 100%);
+  border-bottom: 3px solid var(--gold);
   display: flex;
   align-items: center;
   padding: 0 24px;
@@ -157,32 +192,36 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: var(--text-secondary);
+  color: rgba(255,252,242,0.7);
   text-decoration: none;
   font-size: 13px;
   font-weight: 500;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   padding: 6px 12px;
   border-radius: var(--radius-sm);
   transition: all var(--transition);
   border: 1px solid transparent;
 }
 .back-btn:hover {
-  color: var(--text);
-  background: var(--surface-2);
-  border-color: var(--border);
+  color: var(--gold);
+  background: rgba(200,169,90,0.1);
+  border-color: rgba(200,169,90,0.3);
 }
-.back-btn svg { width: 16px; height: 16px; }
+.back-btn svg { width: 16px; height: 16px; stroke: currentColor; }
 
 .topbar-sep {
   width: 1px;
   height: 24px;
-  background: var(--border);
+  background: rgba(200,169,90,0.3);
 }
 
 .topbar-title {
   font-family: var(--mono);
   font-size: 14px;
-  color: var(--text);
+  color: var(--paper);
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -194,25 +233,32 @@ body {
   align-items: center;
   gap: 8px;
   padding: 4px 14px 4px 6px;
-  border-radius: 20px;
+  border-radius: 0;
   font-size: 14px;
   font-weight: 700;
-  border: 1px solid;
+  font-family: var(--mono);
+  border: 2px solid;
 }
 
 .trust-badge-circle {
   width: 28px; height: 28px;
-  border-radius: 50%;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 12px;
   color: #fff;
   font-weight: 700;
+  font-family: var(--mono);
 }
 
 /* ===== CONTENT ===== */
-.content { padding: 24px; max-width: 1000px; }
+.content {
+  padding: 24px;
+  max-width: 1000px;
+  /* ruled paper background */
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(59,35,20,0.06) 28px);
+}
 
 .loading-state {
   display: flex;
@@ -221,12 +267,14 @@ body {
   min-height: 40vh;
   color: var(--text-muted);
   gap: 10px;
+  font-family: var(--mono);
+  font-size: 13px;
 }
 
 .spinner {
   width: 20px; height: 20px;
   border: 2px solid var(--border);
-  border-top-color: var(--purple);
+  border-top-color: var(--gold);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
@@ -237,42 +285,69 @@ body {
   padding: 64px 24px;
   color: var(--text-muted);
 }
-.error-state h2 { color: var(--text-secondary); margin-bottom: 8px; font-size: 18px; }
+.error-state h2 { color: var(--verdict); margin-bottom: 8px; font-size: 18px; font-family: var(--font); }
 
 /* ===== SECTION CARD ===== */
 .section-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--paper);
+  border: 2px solid var(--border-strong);
   border-radius: var(--radius);
   padding: 20px;
   margin-bottom: 20px;
+  position: relative;
 }
 
 .section-title {
-  font-size: 14px;
+  font-family: var(--stamp);
+  font-size: 13px;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--verdict);
   margin-bottom: 16px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.16em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::before {
+  content: '§';
+  font-family: var(--font);
+  font-weight: 800;
+  color: var(--gold);
 }
 
-/* ===== METRIC GRID ===== */
+/* ===== METRIC GRID — EVIDENCE EXHIBITS ===== */
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 3px;
   margin-bottom: 20px;
+  background: var(--border-strong);
+  border: 2px solid var(--border-strong);
 }
 
 .metric-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background: var(--paper);
+  border: none;
+  border-radius: 0;
   padding: 20px;
   transition: all var(--transition);
+  position: relative;
 }
-.metric-card:hover { border-color: rgba(139,92,246,0.3); }
+.metric-card:hover { background: #FFFEF9; }
+
+.metric-card::before {
+  content: attr(data-exhibit);
+  position: absolute;
+  top: 0; right: 0;
+  background: var(--gavel);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+}
 
 .metric-header {
   display: flex;
@@ -284,16 +359,20 @@ body {
 .metric-label {
   font-size: 13px;
   color: var(--text-secondary);
-  font-weight: 500;
+  font-weight: 600;
+  font-family: var(--stamp);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 .metric-weight {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-muted);
-  background: var(--surface-2);
+  background: var(--surface);
   padding: 2px 8px;
-  border-radius: 10px;
   border: 1px solid var(--border);
+  font-family: var(--mono);
+  letter-spacing: 0.05em;
 }
 
 .metric-value-row {
@@ -307,21 +386,22 @@ body {
   font-size: 26px;
   font-weight: 700;
   line-height: 1.2;
+  font-family: var(--font);
 }
 
-.metric-unit { font-size: 14px; color: var(--text-muted); }
+.metric-unit { font-size: 14px; color: var(--text-muted); font-family: var(--mono); font-size: 12px; }
 
 .metric-bar-bg {
   height: 6px;
-  background: var(--border);
-  border-radius: 3px;
+  background: rgba(59,35,20,0.1);
+  border-radius: 0;
   overflow: hidden;
   margin-top: 8px;
 }
 
 .metric-bar-fill {
   height: 100%;
-  border-radius: 3px;
+  border-radius: 0;
   transition: width 0.8s ease;
 }
 
@@ -329,24 +409,28 @@ body {
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 6px;
+  font-family: var(--mono);
 }
-.metric-contrib span { color: var(--purple-light); font-weight: 600; }
+.metric-contrib span { color: var(--gold); font-weight: 700; }
 
 .metric-arrow { font-size: 16px; margin-left: 4px; }
-.metric-arrow.up { color: var(--green); }
-.metric-arrow.down { color: var(--red); }
+.metric-arrow.up { color: var(--green-court); }
+.metric-arrow.down { color: var(--verdict); }
 .metric-arrow.flat { color: var(--text-muted); }
 
 /* ===== FLAKY CATEGORY CARD ===== */
 .flaky-card {
-  border-left: 3px solid var(--orange);
+  border-left: 4px solid var(--verdict);
   padding-left: 20px;
 }
 .flaky-card .flaky-cat-name {
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 6px;
-  color: var(--orange);
+  color: var(--verdict);
+  font-family: var(--stamp);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 .flaky-card .flaky-desc {
   font-size: 14px;
@@ -358,9 +442,11 @@ body {
   font-size: 13px;
   color: var(--text-muted);
   padding: 10px 14px;
-  background: var(--surface-2);
+  background: var(--surface);
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 12px;
 }
 .flaky-card .flaky-rec strong { color: var(--text-secondary); }
 
@@ -369,47 +455,67 @@ body {
   position: relative;
   width: 100%;
   height: 280px;
+  background: var(--paper);
+  border: 1px solid var(--border);
 }
 
 .chart-container canvas {
   width: 100% !important;
   height: 100% !important;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
 }
 
-/* ===== RUN HISTORY TABLE ===== */
+/* ===== DOCKET ENTRIES TABLE ===== */
 .data-table { width: 100%; border-collapse: collapse; }
 .data-table thead th {
-  background: rgba(255,255,255,0.02);
-  color: var(--text-muted);
+  background: var(--wood);
+  color: var(--gold);
   font-weight: 600;
-  font-size: 11px;
+  font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.14em;
   padding: 10px 14px;
   text-align: left;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--gold);
   white-space: nowrap;
+  font-family: var(--mono);
 }
 .data-table tbody td {
   padding: 10px 14px;
-  border-bottom: 1px solid rgba(39,39,42,0.5);
+  border-bottom: 1px solid var(--border);
   font-size: 13px;
   vertical-align: middle;
+  font-family: var(--mono);
+  font-size: 12px;
 }
 .data-table tbody tr:last-child td { border-bottom: none; }
-.data-table tbody tr:hover { background: rgba(255,255,255,0.015); }
+.data-table tbody tr:hover { background: #FFFEF9; }
 
 .status-dot {
   display: inline-block;
   width: 8px; height: 8px;
-  border-radius: 50%;
+  border-radius: 0;
   margin-right: 6px;
   vertical-align: middle;
 }
-.status-dot.passed { background: var(--green); }
-.status-dot.failed { background: var(--red); }
+.status-dot.passed { background: var(--green-court); }
+.status-dot.failed { background: var(--verdict); }
 .status-dot.skipped { background: var(--text-muted); }
+
+/* Stamp-style status badges */
+.stamp-badge {
+  display: inline-block;
+  font-family: var(--stamp);
+  font-size: 10px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: 1.5px solid currentColor;
+  box-shadow: inset 0 0 0 0.5px currentColor;
+}
+.stamp-badge.passed { color: var(--green-court); }
+.stamp-badge.failed { color: var(--verdict); }
+.stamp-badge.skipped { color: var(--text-muted); }
 
 .mono-cell { font-family: var(--mono); font-size: 12px; }
 
@@ -432,8 +538,8 @@ body {
   bottom: calc(100% + 8px);
   left: 0;
   right: 0;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: var(--paper);
+  border: 2px solid var(--border-strong);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
   font-size: 12px;
@@ -443,27 +549,30 @@ body {
   z-index: 20;
   max-height: 200px;
   overflow-y: auto;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  box-shadow: 4px 4px 0px var(--gavel);
+  font-family: var(--mono);
 }
 .error-msg:hover .error-tooltip { display: block; }
 
 /* ===== ERROR PATTERN CARDS ===== */
 .error-patterns-grid {
   display: grid;
-  gap: 12px;
+  gap: 3px;
+  background: var(--border-strong);
+  border: 2px solid var(--border-strong);
 }
 
 .error-pattern-card {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  background: var(--paper);
+  border: none;
+  border-radius: 0;
   padding: 14px 16px;
   display: flex;
   align-items: flex-start;
   gap: 12px;
   transition: all var(--transition);
 }
-.error-pattern-card:hover { border-color: rgba(139,92,246,0.3); }
+.error-pattern-card:hover { background: #FFFEF9; }
 
 .error-pattern-text {
   flex: 1;
@@ -481,13 +590,13 @@ body {
 .error-pattern-count {
   font-size: 12px;
   font-weight: 700;
-  color: var(--red);
-  background: rgba(239,68,68,0.1);
+  color: var(--verdict);
+  background: rgba(139,26,26,0.08);
   padding: 2px 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(239,68,68,0.2);
+  border: 1px solid rgba(139,26,26,0.2);
   white-space: nowrap;
   flex-shrink: 0;
+  font-family: var(--mono);
 }
 
 /* Responsive */
@@ -506,6 +615,9 @@ body {
 </style>
 </head>
 <body>
+
+<!-- Wood grain top bar -->
+<div class="wood-grain" style="height:14px;width:100%"></div>
 
 <!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
@@ -536,7 +648,7 @@ body {
       </svg>
       <span class="nav-label">Guide</span>
     </a>
-    <a href="/" style="margin-top:auto;border-top:1px solid var(--border);padding-top:14px" class="nav-item">
+    <a href="/" style="margin-top:auto;border-top:1px solid rgba(200,169,90,0.2);padding-top:14px" class="nav-item">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
       <span class="nav-label">Home</span>
     </a>
@@ -551,10 +663,10 @@ body {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
       </svg>
-      <span>Back to Dashboard</span>
+      <span>Back to Docket</span>
     </a>
     <div class="topbar-sep"></div>
-    <div class="topbar-title" id="topbarTitle">Loading...</div>
+    <div class="topbar-title" id="topbarTitle">Loading case file...</div>
     <div class="trust-badge" id="trustBadge" style="display:none">
       <div class="trust-badge-circle" id="badgeCircle">—</div>
       <span id="badgeValue">—</span>
@@ -565,44 +677,44 @@ body {
   <div class="content" id="content">
     <div class="loading-state" id="loadingState">
       <div class="spinner"></div>
-      <span>Loading test details...</span>
+      <span>Opening case file...</span>
     </div>
     <div class="error-state" id="errorState" style="display:none">
-      <h2>Test not found</h2>
-      <p>Could not load details for this test.</p>
+      <h2>Case File Not Found</h2>
+      <p>Could not load evidence for this test.</p>
     </div>
     <div id="detailContent" style="display:none">
 
-      <!-- Score Breakdown -->
-      <div class="section-title" style="margin-bottom:16px">Score Breakdown</div>
+      <!-- Score Breakdown — Evidence Exhibits -->
+      <div class="section-title" style="margin-bottom:16px">Evidence Exhibits — Score Breakdown</div>
       <div class="metrics-grid" id="metricsGrid"></div>
 
       <!-- Flaky Category -->
       <div class="section-card" id="flakyCard" style="display:none">
-        <div class="section-title">Flaky Classification</div>
+        <div class="section-title">Flaky Classification — Expert Testimony</div>
         <div class="flaky-card" id="flakyContent"></div>
       </div>
 
       <!-- Trust Score History Chart -->
       <div class="section-card">
-        <div class="section-title">Trust Score History</div>
+        <div class="section-title">Trust Score History — Court Record</div>
         <div class="chart-container">
           <canvas id="historyChart"></canvas>
         </div>
       </div>
 
-      <!-- Run History -->
+      <!-- Run History — Docket Entries -->
       <div class="section-card">
-        <div class="section-title">Run History</div>
+        <div class="section-title">Docket Entries — Run History</div>
         <table class="data-table">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Status</th>
+              <th>Case #</th>
+              <th>Verdict</th>
               <th>Duration</th>
-              <th>Error Message</th>
+              <th>Error Testimony</th>
               <th>Trust Score</th>
-              <th>Time</th>
+              <th>Date Filed</th>
             </tr>
           </thead>
           <tbody id="historyBody"></tbody>
@@ -611,7 +723,7 @@ body {
 
       <!-- Error Pattern Analysis -->
       <div class="section-card" id="errorPatternsSection" style="display:none">
-        <div class="section-title">Error Pattern Analysis</div>
+        <div class="section-title">Error Pattern Analysis — Repeated Offenses</div>
         <div class="error-patterns-grid" id="errorPatternsGrid"></div>
       </div>
 
@@ -636,17 +748,17 @@ $('backBtn').href = '/dashboard/' + (repoName ? '?repo=' + encodeURIComponent(re
 
 // Trust color
 function trustColor(score) {
-  if (score >= 90) return 'var(--green)';
-  if (score >= 70) return 'var(--yellow)';
-  if (score >= 50) return 'var(--orange)';
-  return 'var(--red)';
+  if (score >= 90) return 'var(--green-court)';
+  if (score >= 70) return 'var(--gold)';
+  if (score >= 50) return '#b87a2a';
+  return 'var(--verdict)';
 }
 
 function trustColorHex(score) {
-  if (score >= 90) return '#22c55e';
-  if (score >= 70) return '#eab308';
-  if (score >= 50) return '#f97316';
-  return '#ef4444';
+  if (score >= 90) return '#2E5A38';
+  if (score >= 70) return '#C8A95A';
+  if (score >= 50) return '#b87a2a';
+  return '#8B1A1A';
 }
 
 // Category descriptions and recommendations
@@ -708,7 +820,7 @@ function renderHeader(data) {
   document.title = `Poly — ${data.test_name || testName}`;
 
   $('trustBadge').style.display = 'flex';
-  $('trustBadge').style.borderColor = color + '44';
+  $('trustBadge').style.borderColor = color;
   $('trustBadge').style.background = color + '11';
   $('badgeCircle').textContent = score;
   $('badgeCircle').style.background = color;
@@ -735,7 +847,7 @@ function renderMetrics(data) {
   const stability = durVar < 15 ? 'Stable' : durVar < 40 ? 'Moderate' : 'Unstable';
 
   $('metricsGrid').innerHTML = `
-    <div class="metric-card">
+    <div class="metric-card" data-exhibit="Exhibit A">
       <div class="metric-header">
         <span class="metric-label">Pass Rate</span>
         <span class="metric-weight">60% weight</span>
@@ -749,52 +861,52 @@ function renderMetrics(data) {
       </div>
       <div class="metric-contrib">Contributes <span>${passPoints}</span> points</div>
     </div>
-    <div class="metric-card">
+    <div class="metric-card" data-exhibit="Exhibit B">
       <div class="metric-header">
         <span class="metric-label">Recent Trend</span>
         <span class="metric-weight">20% weight</span>
       </div>
       <div class="metric-value-row">
-        <span class="metric-value" style="color:${trend >= 0 ? 'var(--green)' : 'var(--red)'}">
+        <span class="metric-value" style="color:${trend >= 0 ? 'var(--green-court)' : 'var(--verdict)'}">
           ${trend >= 0 ? '+' : ''}${trend.toFixed(1)}%
         </span>
         <span class="metric-arrow ${trendArrow}">${trendArrowChar}</span>
         <span class="metric-unit">recent vs older</span>
       </div>
       <div class="metric-bar-bg">
-        <div class="metric-bar-fill" style="width:${Math.max(0, Math.min(100, (50 + trend)))}%;background:${trend >= 0 ? 'var(--green)' : 'var(--red)'}"></div>
+        <div class="metric-bar-fill" style="width:${Math.max(0, Math.min(100, (50 + trend)))}%;background:${trend >= 0 ? 'var(--green-court)' : 'var(--verdict)'}"></div>
       </div>
       <div class="metric-contrib">Contributes <span>${trendPoints}</span> points</div>
     </div>
-    <div class="metric-card">
+    <div class="metric-card" data-exhibit="Exhibit C">
       <div class="metric-header">
         <span class="metric-label">Duration Stability</span>
         <span class="metric-weight">10% weight</span>
       </div>
       <div class="metric-value-row">
-        <span class="metric-value" style="color:${durVar < 30 ? 'var(--green)' : durVar < 60 ? 'var(--yellow)' : 'var(--red)'}">
+        <span class="metric-value" style="color:${durVar < 30 ? 'var(--green-court)' : durVar < 60 ? 'var(--gold)' : 'var(--verdict)'}">
           ${durVar.toFixed(1)}%
         </span>
         <span class="metric-unit">variance (${stability})</span>
       </div>
       <div class="metric-bar-bg">
-        <div class="metric-bar-fill" style="width:${100 - durVar}%;background:${durVar < 30 ? 'var(--green)' : durVar < 60 ? 'var(--yellow)' : 'var(--red)'}"></div>
+        <div class="metric-bar-fill" style="width:${100 - durVar}%;background:${durVar < 30 ? 'var(--green-court)' : durVar < 60 ? 'var(--gold)' : 'var(--verdict)'}"></div>
       </div>
       <div class="metric-contrib">Contributes <span>${durPoints}</span> points</div>
     </div>
-    <div class="metric-card">
+    <div class="metric-card" data-exhibit="Exhibit D">
       <div class="metric-header">
         <span class="metric-label">Error Consistency</span>
         <span class="metric-weight">10% weight</span>
       </div>
       <div class="metric-value-row">
-        <span class="metric-value" style="color:${errCons > 60 ? 'var(--green)' : errCons > 30 ? 'var(--yellow)' : 'var(--red)'}">
+        <span class="metric-value" style="color:${errCons > 60 ? 'var(--green-court)' : errCons > 30 ? 'var(--gold)' : 'var(--verdict)'}">
           ${errCons.toFixed(1)}%
         </span>
         <span class="metric-unit">pattern consistency</span>
       </div>
       <div class="metric-bar-bg">
-        <div class="metric-bar-fill" style="width:${errCons}%;background:${errCons > 60 ? 'var(--green)' : errCons > 30 ? 'var(--yellow)' : 'var(--red)'}"></div>
+        <div class="metric-bar-fill" style="width:${errCons}%;background:${errCons > 60 ? 'var(--green-court)' : errCons > 30 ? 'var(--gold)' : 'var(--verdict)'}"></div>
       </div>
       <div class="metric-contrib">Contributes <span>${errPoints}</span> points</div>
     </div>
@@ -836,11 +948,11 @@ function renderChart(history) {
   // Clear
   ctx.clearRect(0, 0, W, H);
 
-  // Background zones
+  // Background zones — courtroom colors
   const zoneRanges = [
-    { from: 80, to: 100, color: 'rgba(34,197,94,0.06)' },
-    { from: 50, to: 80, color: 'rgba(234,179,8,0.06)' },
-    { from: 0, to: 50, color: 'rgba(239,68,68,0.06)' }
+    { from: 80, to: 100, color: 'rgba(46,90,56,0.08)' },
+    { from: 50, to: 80, color: 'rgba(200,169,90,0.08)' },
+    { from: 0, to: 50, color: 'rgba(139,26,26,0.06)' }
   ];
 
   zoneRanges.forEach(z => {
@@ -851,7 +963,7 @@ function renderChart(history) {
   });
 
   // Grid lines
-  ctx.strokeStyle = 'rgba(39,39,42,0.6)';
+  ctx.strokeStyle = 'rgba(59,35,20,0.12)';
   ctx.lineWidth = 1;
   for (let v = 0; v <= 100; v += 20) {
     const y = pad.top + plotH - (v / 100) * plotH;
@@ -864,8 +976,8 @@ function renderChart(history) {
   }
 
   // Y-axis labels
-  ctx.fillStyle = '#71717a';
-  ctx.font = '11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  ctx.fillStyle = '#8B7D6B';
+  ctx.font = '11px Fragment Mono, monospace';
   ctx.textAlign = 'right';
   ctx.textBaseline = 'middle';
   for (let v = 0; v <= 100; v += 20) {
@@ -874,9 +986,9 @@ function renderChart(history) {
   }
 
   if (!history.length) {
-    ctx.fillStyle = '#71717a';
+    ctx.fillStyle = '#8B7D6B';
     ctx.textAlign = 'center';
-    ctx.font = '13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.font = '13px Fragment Mono, monospace';
     ctx.fillText('No history data', W / 2, H / 2);
     return;
   }
@@ -886,10 +998,10 @@ function renderChart(history) {
   const n = pts.length;
 
   // X-axis labels
-  ctx.fillStyle = '#71717a';
+  ctx.fillStyle = '#8B7D6B';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
-  ctx.font = '10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  ctx.font = '10px Fragment Mono, monospace';
 
   const xStep = n > 1 ? plotW / (n - 1) : 0;
 
@@ -902,8 +1014,8 @@ function renderChart(history) {
   });
 
   // X-axis title
-  ctx.fillStyle = '#71717a';
-  ctx.font = '11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  ctx.fillStyle = '#8B7D6B';
+  ctx.font = '11px Fragment Mono, monospace';
   ctx.fillText('Run #', W / 2, H - 6);
 
   // Y-axis title
@@ -921,7 +1033,7 @@ function renderChart(history) {
     return { x, y, score };
   });
 
-  // Area fill
+  // Area fill — gold tint
   if (coords.length > 1) {
     ctx.beginPath();
     ctx.moveTo(coords[0].x, pad.top + plotH);
@@ -929,15 +1041,15 @@ function renderChart(history) {
     ctx.lineTo(coords[coords.length - 1].x, pad.top + plotH);
     ctx.closePath();
     const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + plotH);
-    grad.addColorStop(0, 'rgba(139,92,246,0.15)');
-    grad.addColorStop(1, 'rgba(139,92,246,0.0)');
+    grad.addColorStop(0, 'rgba(200,169,90,0.18)');
+    grad.addColorStop(1, 'rgba(200,169,90,0.0)');
     ctx.fillStyle = grad;
     ctx.fill();
   }
 
-  // Line
+  // Line — wood brown
   ctx.beginPath();
-  ctx.strokeStyle = '#8b5cf6';
+  ctx.strokeStyle = '#3B2314';
   ctx.lineWidth = 2;
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
@@ -953,7 +1065,7 @@ function renderChart(history) {
     ctx.arc(c.x, c.y, 4, 0, Math.PI * 2);
     ctx.fillStyle = trustColorHex(c.score);
     ctx.fill();
-    ctx.strokeStyle = '#09090b';
+    ctx.strokeStyle = '#FFFCF2';
     ctx.lineWidth = 2;
     ctx.stroke();
   });
@@ -980,9 +1092,11 @@ function renderHistory(history) {
       month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
     }) : '—';
 
+    const stampRotate = (i % 2 === 0) ? '-4deg' : '3deg';
+
     return `<tr>
-      <td style="color:var(--text-muted);font-size:12px">${num}</td>
-      <td><span class="status-dot ${status}"></span>${status.charAt(0).toUpperCase() + status.slice(1)}</td>
+      <td style="color:var(--text-muted);font-size:12px">#${num}</td>
+      <td><span class="stamp-badge ${status}" style="transform:rotate(${stampRotate})">${status.charAt(0).toUpperCase() + status.slice(1)}</span></td>
       <td class="mono-cell">${duration}</td>
       <td class="error-msg" title="Hover to expand">
         ${error ? escapeHtml(error) : '<span style="color:var(--text-muted)">—</span>'}
