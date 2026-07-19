@@ -441,15 +441,15 @@ tr:hover td{background:rgba(200,169,90,0.06)}
     </div>
   </div>
   <nav>
-    <a href="#stats-section" class="active" onclick="showTab('stats')">
+    <a href="#stats-section" class="active" onclick="showTab('stats', event)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span>Docket</span>
     </a>
-    <a href="#users-section" onclick="showTab('users')">
+    <a href="#users-section" onclick="showTab('users', event)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
       <span>Defendants</span>
     </a>
-    <a href="#activity-section" onclick="showTab('activity')">
+    <a href="#activity-section" onclick="showTab('activity', event)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       <span>Court Log</span>
     </a>
@@ -609,17 +609,13 @@ function googleSignIn() {
 let pwVisible = true;
 function toggleLogin() {
   pwVisible = !pwVisible;
-  const pwSection = document.querySelectorAll('#login-user, #login-pass, .login-body > button, #toggle-link');
-  const googleSection = document.getElementById('google-section');
-  if (pwVisible) {
-    pwSection.forEach(el => el.style.display = '');
-    googleSection.style.display = '';
-    document.getElementById('toggle-link').textContent = 'Hide password login';
-  } else {
-    pwSection.forEach(el => el.style.display = 'none');
-    googleSection.style.display = '';
-    document.getElementById('toggle-link').textContent = 'Show password login';
-  }
+  const pwFields = document.querySelectorAll('#login-user, #login-pass, #login-user + input, .login-body > button:not(.google-btn):not(.toggle-link)');
+  const toggleLink = document.getElementById('toggle-link');
+  // Target only the password-login button (the one that calls doLogin)
+  const loginBtn = document.querySelector('.login-body button[onclick="doLogin()"]');
+  pwFields.forEach(el => { if (el !== toggleLink) el.style.display = pwVisible ? '' : 'none'; });
+  if (loginBtn) loginBtn.style.display = pwVisible ? '' : 'none';
+  toggleLink.textContent = pwVisible ? 'Hide password login' : 'Show password login';
 }
 
 // Check URL for OAuth errors
@@ -659,11 +655,11 @@ async function doLogin() {
 })();
 
 // Tabs
-function showTab(tab) {
+function showTab(tab, evt) {
   document.querySelectorAll('[id$="-tab"]').forEach(el => el.classList.add('hidden'));
   document.getElementById(tab + '-tab').classList.remove('hidden');
   document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
-  event.currentTarget.classList.add('active');
+  if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
 }
 
 // Load all data
@@ -744,6 +740,7 @@ function renderBars(containerId, data, keyField, colorMap) {
 }
 
 // Users
+const usersById = {};
 async function loadUsers() {
   const search = document.getElementById('search-input').value;
   const plan = document.getElementById('plan-filter').value;
@@ -751,7 +748,10 @@ async function loadUsers() {
   const res = await fetch(`${API}/api/admin/users?search=${encodeURIComponent(search)}&plan=${plan}&sort=${sort}&page=${currentPage}&per_page=15`);
   const data = await res.json();
 
-  document.getElementById('users-tbody').innerHTML = data.users.length ? data.users.map(u => `
+  usersById = {};
+  document.getElementById('users-tbody').innerHTML = data.users.length ? data.users.map(u => {
+    usersById[u.id] = u;
+    return `
     <tr>
       <td>
         <div style="font-weight:600">${esc(u.name || '-')}</div>
@@ -761,17 +761,26 @@ async function loadUsers() {
       <td>${u.signup_source ? '<span class="tag tag-source">'+esc(u.signup_source)+'</span>' : '<span style="color:var(--muted)">-</span>'}</td>
       <td style="color:var(--muted);font-size:12px;font-family:Fragment Mono,monospace">${esc(u.referrer || '-')}</td>
       <td>
-        <code style="font-size:11px;font-family:Fragment Mono,monospace;background:var(--surface);padding:3px 6px;border:1px solid var(--border)">${u.api_key ? u.api_key.slice(0,16)+'...' : '-'}</code>
-        ${u.api_key ? `<button class="copy-btn" onclick="copyKey('${u.api_key}')">copy</button>` : ''}
+        <code style="font-size:11px;font-family:Fragment Mono,monospace;background:var(--surface);padding:3px 6px;border:1px solid var(--border)">${u.api_key ? esc(u.api_key.slice(0,16))+'...' : '-'}</code>
+        ${u.api_key ? `<button class="copy-btn" data-key="${esc(u.api_key)}">copy</button>` : ''}
       </td>
       <td><span class="tag tag-${u.is_active ? 'active' : 'inactive'}">${u.is_active ? 'Active' : 'Inactive'}</span></td>
       <td style="color:var(--muted);font-size:12px;white-space:nowrap;font-family:Fragment Mono,monospace">${formatDate(u.created_at)}</td>
       <td>
-        <button class="btn btn-sm" onclick="editUser(${u.id},'${esc(u.name)}','${esc(u.email||'')}','${esc(u.github_username||'')}','${u.plan}','${esc(u.signup_source||'')}','${esc(u.referrer||'')}','${esc(u.notes||'')}')">Edit</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteUser(${u.id},'${esc(u.name)}')">Del</button>
+        <button class="btn btn-sm" data-edit="${u.id}">Edit</button>
+        <button class="btn btn-sm btn-danger" data-del="${u.id}" data-name="${esc(u.name)}">Del</button>
       </td>
-    </tr>
-  `).join('') : '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:32px;font-family:Fragment Mono,monospace;font-size:12px">No defendants found on docket</td></tr>';
+    </tr>`;
+  }).join('') : '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:32px;font-family:Fragment Mono,monospace;font-size:12px">No defendants found on docket</td></tr>';
+
+  // Bind row actions (avoids injecting user data into inline onclick handlers)
+  document.querySelectorAll('#users-tbody [data-edit]').forEach(btn =>
+    btn.addEventListener('click', () => editUser(Number(btn.dataset.edit))));
+  document.querySelectorAll('#users-tbody [data-del]').forEach(btn =>
+    btn.addEventListener('click', () => deleteUser(Number(btn.dataset.del), btn.dataset.name)));
+  document.querySelectorAll('#users-tbody [data-key]').forEach(btn =>
+    btn.addEventListener('click', () => copyKey(btn.dataset.key)));
+
 
   // Pagination
   const pages = data.total_pages || 1;
@@ -804,16 +813,18 @@ function openAddUser() {
   document.getElementById('user-modal').classList.add('show');
 }
 
-function editUser(id, name, email, github, plan, source, referrer, notes) {
+function editUser(id) {
+  const u = usersById[id];
+  if (!u) return;
   document.getElementById('modal-title').textContent = 'Amend Case Record';
-  document.getElementById('edit-user-id').value = id;
-  document.getElementById('form-name').value = name;
-  document.getElementById('form-email').value = email;
-  document.getElementById('form-github').value = github;
-  document.getElementById('form-plan').value = plan;
-  document.getElementById('form-source').value = source;
-  document.getElementById('form-referrer').value = referrer;
-  document.getElementById('form-notes').value = notes;
+  document.getElementById('edit-user-id').value = u.id;
+  document.getElementById('form-name').value = u.name || '';
+  document.getElementById('form-email').value = u.email || '';
+  document.getElementById('form-github').value = u.github_username || '';
+  document.getElementById('form-plan').value = u.plan || 'free';
+  document.getElementById('form-source').value = u.signup_source || '';
+  document.getElementById('form-referrer').value = u.referrer || '';
+  document.getElementById('form-notes').value = u.notes || '';
   document.getElementById('user-modal').classList.add('show');
 }
 
