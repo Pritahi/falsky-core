@@ -266,8 +266,18 @@ def google_login(request: Request):
             status_code=501,
             detail="Google Sign-In not configured. Set SITE_URL env var to the public base URL (e.g. https://your-app.vercel.app).",
         )
-    # Build the absolute callback URL from the request so it always matches the origin the user is on.
     base = SITE_URL.rstrip("/")
+    # Guard against misconfiguration that sends users to localhost after Google login.
+    if base.startswith("http://localhost") or base.startswith("http://127.0.0.1") or base.startswith("http://0.0.0.0"):
+        raise HTTPException(
+            status_code=501,
+            detail=(
+                "SITE_URL is set to a localhost URL — Supabase will redirect users back to "
+                f"{base}/api/auth/callback after Google login, which fails with ERR_CONNECTION_REFUSED. "
+                "Set SITE_URL to your public app URL (e.g. https://poly-core-vercel.vercel.app) and add "
+                f"that URL + '/api/auth/callback' as an authorized redirect URI in Supabase → Auth → Providers → Google."
+            ),
+        )
     redirect_to = urllib.parse.quote(f"{base}/api/auth/callback")
     auth_url = f"{SUPABASE_URL}/auth/v1/authorize?provider=google&redirect_to={redirect_to}"
     logger.info("Redirecting to Google OAuth")
@@ -303,19 +313,6 @@ def auth_callback(request: Request):
             "</script></body></html>"
         )
         return HTMLResponse(content=bridge)
-
-    # Verify the JWT before setting cookie
-    if SUPABASE_JWT_SECRET:
-        try:
-            payload = jwt.decode(access_token, SUPABASE_JWT_SECRET, algorithms=["HS256"], audience="authenticated")
-            email = payload.get("email", "")
-            if ALLOWED_ADMIN_EMAILS and email not in ALLOWED_ADMIN_EMAILS:
-                logger.warning(f"Google auth rejected (not in allowed list): {email}")
-                return RedirectResponse(url="/admin/?error=unauthorized")
-            logger.info(f"Google auth success: {email}")
-        except Exception as e:
-            logger.error(f"JWT verification failed: {e}")
-            return RedirectResponse(url="/admin/?error=invalid_token")
 
     # Verify the JWT before setting cookie
     if SUPABASE_JWT_SECRET:
