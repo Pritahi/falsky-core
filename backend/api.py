@@ -117,12 +117,15 @@ def verify_api_key(x_poly_api_key: Optional[str] = Header(None)):
     raise HTTPException(status_code=401, detail="Invalid API key")
 
 
+POLY_ADMIN_SECRET = os.environ.get("POLY_ADMIN_SECRET", "poly-admin-secret-key-change-in-production")
+
+
 def _get_admin_session(request: Request):
-    """Verify admin session — supports both JWT (Google) and legacy tokens."""
+    """Verify admin session — supports JWT (Google) and legacy JWT tokens."""
     token = request.cookies.get("poly_admin_token")
     if not token:
         return None
-    # Try JWT verification (Supabase Google Auth)
+    # Try Google OAuth JWT first
     if SUPABASE_JWT_SECRET and token.count(".") == 2:
         try:
             payload = jwt.decode(token, SUPABASE_JWT_SECRET, algorithms=["HS256"], audience="authenticated")
@@ -143,23 +146,19 @@ def _get_admin_session(request: Request):
             return None
         except Exception:
             pass
-    # Fallback: legacy session token verification
-    if len(token) >= 32:
-        session = select_one("admin_sessions", "admin_id, expires_at", {"token": token})
-        if session:
-            # Check expiry
-            from datetime import datetime, timezone
-            expires = session.get("expires_at")
-            if expires:
-                if isinstance(expires, str):
-                    exp = datetime.fromisoformat(expires.replace("Z", "+00:00"))
-                else:
-                    exp = expires
-                if exp > datetime.now(timezone.utc):
-                    admin = select_one("admin_users", "username, role", {"id": session["admin_id"]})
-                    if admin:
-                        return admin
-    return None
+    # Fallback: verify our own admin JWT token
+    try:
+        payload = jwt.decode(token, POLY_ADMIN_SECRET, algorithms=["HS256"], audience="poly-admin")
+        return {
+            "username": payload.get("username", "admin"),
+            "role": payload.get("role", "admin"),
+            "auth_provider": "jwt",
+        }
+    except jwt.ExpiredSignatureError:
+        logger.warning("Admin JWT expired")
+        return None
+    except Exception:
+        return None
 
 
 def require_admin(request: Request):
@@ -300,23 +299,16 @@ def admin_login(data: AdminLogin, request: Request, response: Response):
         else:
             raise HTTPException(status_code=401, detail="Invalid credentials")
 
-        # Generate session token
-        token = secrets.token_hex(32)
-        
-        # Clean expired sessions
+        # Generate JWT session token (no DB needed)
         from datetime import datetime, timezone, timedelta
-        try:
-            now = datetime.now(timezone.utc).isoformat()
-            get_client().table("admin_sessions").delete().lt("expires_at", now).execute()
-        except Exception:
-            pass  # Non-critical
-        
-        # Store new session
-        insert("admin_sessions", {
-            "admin_id": admin["id"],
-            "token": token,
-            "expires_at": (datetime.now(timezone.utc) + timedelta(days=7)).isoformat(),
-        })
+        jwt_payload = {
+            "username": admin["username"],
+            "role": admin["role"],
+            "aud": "poly-admin",
+            "exp": datetime.now(timezone.utc) + timedelta(days=7),
+            "iat": datetime.now(timezone.utc),
+        }
+        token = jwt.encode(jwt_payload, POLY_ADMIN_SECRET, algorithm="HS256")
         
         response.set_cookie(key="poly_admin_token", value=token, httponly=True, secure=True, samesite="lax", max_age=86400 * 7)
         logger.info(f"Admin login successful: {data.username}")
@@ -330,12 +322,6 @@ def admin_login(data: AdminLogin, request: Request, response: Response):
 
 @app.post("/api/admin/logout")
 def admin_logout(request: Request, response: Response):
-    token = request.cookies.get("poly_admin_token")
-    if token:
-        try:
-            delete("admin_sessions", {"token": token})
-        except Exception:
-            pass
     response.delete_cookie("poly_admin_token", path="/")
     return {"status": "ok"}
 
