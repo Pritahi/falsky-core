@@ -260,7 +260,17 @@ def health_check():
 def google_login(request: Request):
     """Redirect to Supabase Google OAuth."""
     if not SUPABASE_URL:
-        raise HTTPException(status_code=501, detail="Google Sign-In not configured. Set SUPABASE_URL env var.")
+        raise HTTPException(
+            status_code=501,
+            detail="Google Sign-In not configured. Missing env var SUPABASE_URL. "
+                   "Set it in your hosting dashboard (e.g. https://xxxx.supabase.co).",
+        )
+    if not SUPABASE_JWT_SECRET:
+        raise HTTPException(
+            status_code=501,
+            detail="Google Sign-In not configured. Missing env var SUPABASE_JWT_SECRET "
+                   "(used to verify the returned token). Set it in your hosting dashboard.",
+        )
     if not SITE_URL:
         raise HTTPException(
             status_code=501,
