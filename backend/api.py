@@ -257,11 +257,18 @@ def health_check():
 # ===================== SUPABASE GOOGLE AUTH =====================
 
 @app.get("/api/auth/google")
-def google_login():
+def google_login(request: Request):
     """Redirect to Supabase Google OAuth."""
     if not SUPABASE_URL:
         raise HTTPException(status_code=501, detail="Google Sign-In not configured. Set SUPABASE_URL env var.")
-    redirect_to = urllib.parse.quote(f"{SITE_URL}/api/auth/callback")
+    if not SITE_URL:
+        raise HTTPException(
+            status_code=501,
+            detail="Google Sign-In not configured. Set SITE_URL env var to the public base URL (e.g. https://your-app.vercel.app).",
+        )
+    # Build the absolute callback URL from the request so it always matches the origin the user is on.
+    base = SITE_URL.rstrip("/")
+    redirect_to = urllib.parse.quote(f"{base}/api/auth/callback")
     auth_url = f"{SUPABASE_URL}/auth/v1/authorize?provider=google&redirect_to={redirect_to}"
     logger.info("Redirecting to Google OAuth")
     return RedirectResponse(url=auth_url)
@@ -270,17 +277,45 @@ def google_login():
 @app.get("/api/auth/callback")
 def auth_callback(request: Request):
     """Handle Supabase OAuth callback — set JWT cookie and redirect to admin."""
-    access_token = request.query_params.get("access_token")
-    refresh_token = request.query_params.get("refresh_token")
-    error = request.query_params.get("error")
+    params = dict(request.query_params)
+
+    # Supabase OAuth (implicit/PKCE) may return tokens in the URL fragment (#access_token=...)
+    # when the callback is loaded as a full-page redirect. The browser does not send the
+    # fragment to the server, so we render a tiny page that forwards the fragment to us as
+    # a query string via a same-origin POST-style redirect.
+    access_token = params.get("access_token")
+    refresh_token = params.get("refresh_token")
+    error = params.get("error")
 
     if error:
         logger.error(f"OAuth error: {error}")
         return RedirectResponse(url=f"/admin/?error={urllib.parse.quote(error)}")
 
     if not access_token:
-        logger.error("OAuth callback missing access_token")
-        return RedirectResponse(url="/admin/?error=no_token")
+        # No token in query string — assume it's in the URL fragment. Serve a bridge page
+        # that re-submits the fragment to this same endpoint as query params.
+        bridge = (
+            "<!doctype html><html><head><meta charset='utf-8'><title>Signing in...</title></head><body>"
+            "<script>"
+            "var h = window.location.hash.substring(1);"
+            "if (h) { window.location.replace(window.location.pathname + '?' + h); }"
+            "else { window.location.replace('/admin/?error=no_token'); }"
+            "</script></body></html>"
+        )
+        return HTMLResponse(content=bridge)
+
+    # Verify the JWT before setting cookie
+    if SUPABASE_JWT_SECRET:
+        try:
+            payload = jwt.decode(access_token, SUPABASE_JWT_SECRET, algorithms=["HS256"], audience="authenticated")
+            email = payload.get("email", "")
+            if ALLOWED_ADMIN_EMAILS and email not in ALLOWED_ADMIN_EMAILS:
+                logger.warning(f"Google auth rejected (not in allowed list): {email}")
+                return RedirectResponse(url="/admin/?error=unauthorized")
+            logger.info(f"Google auth success: {email}")
+        except Exception as e:
+            logger.error(f"JWT verification failed: {e}")
+            return RedirectResponse(url="/admin/?error=invalid_token")
 
     # Verify the JWT before setting cookie
     if SUPABASE_JWT_SECRET:
