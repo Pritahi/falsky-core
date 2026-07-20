@@ -412,7 +412,7 @@ footer{border-top:1px solid var(--line);padding:60px 0 26px;margin-top:40px}
 <!-- ============ INTEGRATIONS ============ -->
 <div class="container">
   <div class="chips-wrap rv" aria-label="Integrations">
-    <div class="chips-track">
+    <div class="chips-track" id="chips">
       <span class="chip"><i></i> GITHUB ACTIONS</span>
       <span class="chip"><i></i> JEST</span>
       <span class="chip"><i></i> PYTEST</span>
@@ -517,104 +517,113 @@ footer{border-top:1px solid var(--line);padding:60px 0 26px;margin-top:40px}
 </footer>
 
 <script>
-// Scroll progress
-window.addEventListener('scroll',()=>{
-  const h=document.documentElement;
-  document.getElementById('progress').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight))*100+'%';
-});
+/* ---------- scroll progress ---------- */
+addEventListener('scroll',()=>{const h=document.documentElement;
+  document.getElementById('progress').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';});
 
-// UTC clock
+/* ---------- UTC clock ---------- */
+function pad(n){return String(n).padStart(2,'0');}
 function updateClock(){
   const now=new Date();
   document.querySelector('.utc').textContent=
-    [now.getUTCHours(),now.getUTCMinutes(),now.getUTCSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
+    pad(now.getUTCHours())+':'+pad(now.getUTCMinutes())+':'+pad(now.getUTCSeconds());
 }
 setInterval(updateClock,1000);updateClock();
 
-// Reveal on scroll
+/* ---------- reveal on scroll ---------- */
 const rvs=document.querySelectorAll('.rv');
 const io=new IntersectionObserver((entries)=>{
   entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
 },{threshold:.15});
 rvs.forEach(el=>io.observe(el));
 
-// Tape marquee
-const tests=[
-  {n:'test_user_auth',s:'ok'},{n:'test_payment_flow',s:'fl'},{n:'test_db_connection',s:'ok'},
-  {n:'test_api_timeout',s:'fl'},{n:'test_session_mgr',s:'ok'},{n:'test_data_pipeline',s:'rt'},
-  {n:'test_email_send',s:'ok'},{n:'test_concurrent_login',s:'fl'},{n:'test_cache_invalidate',s:'ok'},
-  {n:'test_webhook_retry',s:'rt'},{n:'test_file_upload',s:'ok'},{n:'test_rate_limiter',s:'fl'},
-];
-const tapeEl=document.getElementById('tape');
-function buildTape(){
-  let h='';const labels={ok:'PASS',fl:'FLAKY',rt:'RERUN'};
-  for(let i=0;i<2;i++)tests.forEach(t=>{h+=`<span>${t.n} ··· <span class="${t.s}">${labels[t.s]}</span></span>`;});
-  tapeEl.innerHTML=h;
-}
-buildTape();
+/* ---------- tape marquee ---------- */
+const tapeItems=['test_checkout_flow <b class="ok">✓</b> 412ms','test_login_redirect <b class="rt">↻ PASS(3)</b>','test_timezone_dst <b class="fl">✗ MAG 4.1</b>','spec/payment_retry <b class="ok">✓</b> 890ms','test_cart_race <b class="fl">✗ QUARANTINED</b>','test_oauth_refresh <b class="rt">↻ PASS(2)</b>','test_search_ranking <b class="ok">✓</b> 1.2s','test_email_worker <b class="fl">✗ MAG 5.3 · EPICENTER: shared fixture</b>','test_upload_multipart <b class="ok">✓</b> 2.4s','test_session_expiry <b class="rt">↻ PASS(4)</b>'];
+document.getElementById('tape').innerHTML=tapeItems.concat(tapeItems).map(i=>'<span>'+i+'</span>').join('');
 
-// Seismograph canvas
-const canvas=document.getElementById('seismo');
-const ctx=canvas.getContext('2d');
-let W,H,seismoData=[],eventCount=0;
-function resize(){
-  const r=canvas.parentElement.getBoundingClientRect();
-  W=canvas.width=r.width;H=canvas.height=220;
-  seismoData=new Array(Math.floor(W/2)).fill(H/2);
-}
-resize();window.addEventListener('resize',resize);
+/* ---------- integrations marquee ---------- */
+const chips=['pytest','Jest','Vitest','JUnit 5','Cypress','Playwright','RSpec','Go test','Mocha','GitHub Actions','GitLab CI','CircleCI','Buildkite','Jenkins','Azure Pipelines'];
+document.getElementById('chips').innerHTML=chips.concat(chips).map(c=>'<span class="chip"><i></i>'+c+' — SUPPORTED</span>').join('');
 
-// Simulated events
-const testNames=['test_payment_timeout','test_db_pool_exhausted','test_api_rate_limit','test_concurrent_write','test_session_expire','test_cache_miss','test_webhook_fail','test_auth_token_refresh'];
-function addEvent(){
-  const mag=(Math.random()*4+1).toFixed(1);
-  const name=testNames[Math.floor(Math.random()*testNames.length)];
-  const cls=mag<2.5?'m-lo':mag<3.5?'m-md':'m-hi';
-  const log=document.getElementById('evlog');
-  const time=new Date().toTimeString().slice(0,8);
-  const div=document.createElement('div');
-  div.className='ev new';
-  div.innerHTML=`<span>${time}</span><span class="n">${name}</span><span class="m ${cls}">${mag}</span>`;
-  log.prepend(div);
-  if(log.children.length>8)log.lastChild.remove();
-  eventCount++;
-  document.getElementById('evcount').textContent=eventCount;
-  const magEl=document.getElementById('mag');
-  magEl.textContent=mag;
-  if(parseFloat(mag)>3){magEl.classList.add('flash');setTimeout(()=>magEl.classList.remove('flash'),600);}
-}
-setInterval(addEvent,3000+Math.random()*4000);
-setTimeout(addEvent,1500);
+/* ---------- seismograph ---------- */
+const cv=document.getElementById('seismo'),ctx=cv.getContext('2d');
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let W,H,dpr,buf=[],tremors=[],frameN=0,evCount=0;
+function sizeCv(){const r=cv.getBoundingClientRect();dpr=devicePixelRatio||1;
+  cv.width=r.width*dpr;cv.height=220*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);W=r.width;H=220;}
+sizeCv();addEventListener('resize',sizeCv);
 
-// Seismo animation
-let frame=0;
+const names=['test_checkout_flow','test_login_redirect','test_timezone_dst','test_cart_race','test_oauth_refresh','test_search_ranking','test_email_worker','test_session_expiry','spec/payment_retry','test_upload_multipart'];
+const notesHi=['epicenter: shared fixture in conftest.py','order-dependent — fails after test_cart','auto-quarantined · ticket filed','root cause: unseeded RNG in helper.py'];
+const notesLo=['passed after 3 retries — flagged','green by luck · fingerprint kept','timing jitter ±410ms detected','rerun passed — waveform archived'];
+const magEl=document.getElementById('mag'),evEl=document.getElementById('evcount'),logEl=document.getElementById('evlog');
+
+function pushLog(mag){
+  evCount++;evEl.textContent=evCount;
+  const t=new Date(),ts=pad(t.getUTCHours())+':'+pad(t.getUTCMinutes())+':'+pad(t.getUTCSeconds());
+  const hi=mag>=4,cls=hi?'m-hi':(mag>=2.5?'m-md':'m-lo');
+  const pool=hi?notesHi:notesLo,note=pool[Math.floor(Math.random()*pool.length)];
+  const name=names[Math.floor(Math.random()*names.length)];
+  const row=document.createElement('div');row.className='ev new';
+  row.innerHTML='<span>'+ts+'</span><span class="n">'+name+'</span><span class="m '+cls+'">MAG '+mag.toFixed(1)+'</span><span class="note">'+note+'</span>';
+  logEl.prepend(row);
+  while(logEl.children.length>5)logEl.lastChild.remove();
+}
+function spawnTremor(){
+  let amp=10+Math.random()*40;if(Math.random()<.16)amp+=26;
+  tremors.push({age:0,dur:110+Math.random()*140,amp,ph:Math.random()*6});
+  const mag=Math.min(6.8,1.2+amp/12+Math.random()*.6);
+  magEl.textContent=mag.toFixed(1);magEl.classList.add('flash');
+  setTimeout(()=>{magEl.classList.remove('flash');magEl.textContent=(0.2+Math.random()*.4).toFixed(1);},1600);
+  pushLog(mag);
+}
+['seed','seed','seed'].forEach(()=>pushLog(1.5+Math.random()*4.5));
+
 function draw(){
+  frameN++;
+  let tv=0;
+  tremors=tremors.filter(t=>t.age<t.dur);
+  for(const t of tremors){const p=t.age/t.dur;tv+=Math.sin(p*Math.PI)*t.amp*Math.sin(frameN*.06+t.ph);t.age++;}
+  const base=H/2;
+  const noise=(Math.random()-.5)*6;
+  const spike=Math.random()<.01?(Math.random()-.5)*30:0;
+  const y=base+noise+spike+tv*.5;
+  buf.push(y);if(buf.length>W)buf.shift();
   ctx.fillStyle='#0A1315';ctx.fillRect(0,0,W,H);
   // Grid
   ctx.strokeStyle='rgba(30,50,55,.4)';ctx.lineWidth=.5;
-  for(let y=0;y<H;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-  // Shift data
-  seismoData.shift();
-  // Generate new point
-  let v=H/2;
-  if(Math.random()<.03)v+=((Math.random()-.5)*H*.7);
-  else v+=((Math.random()-.5)*12);
-  seismoData.push(v);
-  // Draw line
-  ctx.beginPath();ctx.strokeStyle='#3DDC84';ctx.lineWidth=1.5;
-  seismoData.forEach((y,i)=>{if(i===0)ctx.moveTo(i*2,y);else ctx.lineTo(i*2,y);});
-  ctx.stroke();
+  for(let gy=0;gy<H;gy+=20){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke();}
+  // Center line
+  ctx.strokeStyle='rgba(44,70,75,.5)';ctx.lineWidth=.5;
+  ctx.beginPath();ctx.moveTo(0,base);ctx.lineTo(W,base);ctx.stroke();
   // Glow
-  ctx.strokeStyle='rgba(61,220,132,.15)';ctx.lineWidth=6;
   ctx.beginPath();
-  seismoData.forEach((y,i)=>{if(i===0)ctx.moveTo(i*2,y);else ctx.lineTo(i*2,y);});
-  ctx.stroke();
-  frame++;
-  requestAnimationFrame(draw);
+  buf.forEach((v,i)=>{const x=W-buf.length+i;if(i===0)ctx.moveTo(x,v);else ctx.lineTo(x,v);});
+  ctx.strokeStyle='rgba(61,220,132,.15)';ctx.lineWidth=6;ctx.stroke();
+  // Main line
+  ctx.beginPath();
+  buf.forEach((v,i)=>{const x=W-buf.length+i;if(i===0)ctx.moveTo(x,v);else ctx.lineTo(x,v);});
+  ctx.strokeStyle='#3DDC84';ctx.lineWidth=1.5;ctx.stroke();
+  // Tremor flash
+  if(tremors.length>0){
+    const last=tremors[tremors.length-1];
+    if(last.age<20){
+      ctx.fillStyle='rgba(255,75,46,'+((20-last.age)/20*.12)+')';
+      ctx.fillRect(0,0,W,H);
+    }
+  }
+  if(!reduced)requestAnimationFrame(draw);
 }
 draw();
 
-// Copy terminal
+// Auto-spawn tremors
+function scheduleTremor(){
+  spawnTremor();
+  setTimeout(scheduleTremor,3000+Math.random()*5000);
+}
+setTimeout(scheduleTremor,2000);
+
+/* ---------- copy terminal ---------- */
 function copyTerm(){
   const text=document.getElementById('termBody').textContent;
   navigator.clipboard.writeText(text).then(()=>{
@@ -624,7 +633,7 @@ function copyTerm(){
   });
 }
 
-// Smooth scroll
+/* ---------- smooth scroll ---------- */
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
   a.addEventListener('click',e=>{
     const t=document.querySelector(a.getAttribute('href'));
