@@ -523,9 +523,14 @@ def _supabase_rest(table, method="GET", data=None, filters=None, columns="*"):
         # Hardcoded fallback for user auth
         key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16Y3BscWZ4cnhmc3hud3lpeXltIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NDI2MTM0NiwiZXhwIjoyMDk5ODM3MzQ2fQ.hrgP5Axv2ZD0cEcxlz9pm32qE9RGKgYWAx78qyLHCxw"
     url = f"{_SUPABASE_URL}/rest/v1/{table}"
+    params = []
+    if columns:
+        params.append(f"select={columns}")
     if filters:
-        params = '&'.join(f'{k}=eq.{v}' for k,v in filters.items())
-        url += f"?{params}"
+        for k,v in filters.items():
+            params.append(f"{k}=eq.{v}")
+    if params:
+        url += "?" + "&".join(params)
     headers = {
         "apikey": key,
         "Authorization": f"Bearer {key}",
