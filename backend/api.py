@@ -25,6 +25,57 @@ except ImportError:
     psycopg2 = None
     psycopg2.extras = None
 
+# Supabase SDK (used for Google OAuth session verification)
+try:
+    from supabase import create_client, Client
+    _SUPABASE_SDK = True
+except ImportError:
+    create_client = None
+    Client = None
+    _SUPABASE_SDK = False
+
+logger = logging.getLogger("poly.api")
+
+# Lazy Supabase client (thread-safe enough for token verification)
+_supabase_client = None
+
+
+def get_supabase_client():
+    """Return a Supabase client using SUPABASE_URL + SUPABASE_ANON_KEY, or None if unconfigured."""
+    global _supabase_client
+    if not _SUPABASE_SDK or not SUPABASE_URL or not SUPABASE_ANON_KEY:
+        return None
+    if _supabase_client is None:
+        try:
+            _supabase_client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
+        except Exception as e:
+            logger.error(f"Failed to create Supabase client: {e}")
+            return None
+    return _supabase_client
+
+
+def verify_supabase_token(access_token: str):
+    """Verify a Supabase access token using the SDK and return user info dict, or None."""
+    client = get_supabase_client()
+    if client is None:
+        return None
+    try:
+        user_resp = client.auth.get_user(access_token)
+        user = getattr(user_resp, "user", None)
+        if not user:
+            return None
+        email = getattr(user, "email", "") or ""
+        meta = getattr(user, "user_metadata", {}) or {}
+        return {
+            "email": email,
+            "username": (meta.get("full_name") or email.split("@")[0]) if email else "",
+            "avatar": meta.get("avatar_url", ""),
+        }
+    except Exception as e:
+        logger.error(f"Supabase token verification failed: {e}")
+        return None
+
+
 from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
