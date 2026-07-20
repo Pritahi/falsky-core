@@ -81,7 +81,7 @@ SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY", "")
 SUPABASE_JWT_SECRET = os.environ.get("SUPABASE_JWT_SECRET", "")
 SITE_URL = os.environ.get("SITE_URL", "")
 ALLOWED_ADMIN_EMAILS = os.environ.get("ALLOWED_ADMIN_EMAILS", "").split(",") if os.environ.get("ALLOWED_ADMIN_EMAILS") else []
-CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "https://falsky-core-vercel.vercel.app,http://localhost:3000,http://localhost:8000").split(",")
+CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "https://falsky-test-vercel.vercel.app,http://localhost:3000,http://localhost:8000").split(",")
 
 app.add_middleware(
     CORSMiddleware,
@@ -233,7 +233,7 @@ class UserUpdate(BaseModel):
 
 @app.get("/api/health")
 def health_check():
-    return {"status": "ok", "version": "3.0.0", "service": "falsky-core", "auth": "supabase-google" if SUPABASE_URL else "legacy", "db": "supabase-sdk"}
+    return {"status": "ok", "version": "3.0.0", "service": "falsky-test", "auth": "supabase-google" if SUPABASE_URL else "legacy", "db": "supabase-sdk"}
 
 
 # ===================== SUPABASE GOOGLE AUTH =====================

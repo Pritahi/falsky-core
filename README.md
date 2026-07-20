@@ -14,7 +14,7 @@ GitHub CI Pipeline
        ▼
 ┌─────────────────┐      API Key       ┌──────────────────┐
 │  falsky-action    │────────────────────▶│                  │
-│  (GitHub Action)│   JUnit XML +      │   falsky-core      │
+│  (GitHub Action)│   JUnit XML +      │   falsky-test      │
 │                 │   repo metadata    │   (This Repo)    │
 └─────────────────┘                    │                  │
                                        │  ┌────────────┐  │
@@ -42,13 +42,13 @@ GitHub CI Pipeline
                                         PR Comment ◀──┘
 ```
 
-### How falsky-action connects to falsky-core:
+### How falsky-action connects to falsky-test:
 
 1. **User installs** `falsky-action` in their GitHub repo's workflow
 2. **CI runs tests** → generates JUnit XML file
-3. **falsky-action reads** the XML file and sends it to **falsky-core's API** (`POST /api/junit`)
-4. **falsky-core** runs the Trust Engine algorithm on the data
-5. **falsky-core** returns trust scores + flaky categories back to falsky-action
+3. **falsky-action reads** the XML file and sends it to **falsky-test's API** (`POST /api/junit`)
+4. **falsky-test** runs the Trust Engine algorithm on the data
+5. **falsky-test** returns trust scores + flaky categories back to falsky-action
 6. **falsky-action** posts a trust report as a **PR comment** on GitHub
 7. User sees the report on their PR — flaky tests flagged with scores and categories
 
@@ -57,7 +57,7 @@ GitHub CI Pipeline
 ## What's Inside — File Descriptions
 
 ```
-falsky-core/
+falsky-test/
 │
 ├── backend/
 │   └── api.py                  # FastAPI server (~520 lines) — THE MAIN ENTRY POINT
@@ -256,8 +256,8 @@ The algorithm uses **5 signal components** to calculate a Trust Score (0-100):
 ### Step 1: Push to GitHub
 
 ```bash
-git clone https://github.com/Pritahi/falsky-core.git
-cd falsky-core
+git clone https://github.com/Pritahi/falsky-test.git
+cd falsky-test
 # Make your changes, then:
 git add . && git commit -m "your changes" && git push
 ```
@@ -266,14 +266,14 @@ git add . && git commit -m "your changes" && git push
 
 1. Go to [railway.app](https://railway.app) → Login with GitHub
 2. Click **"New Project"** → **"Deploy from GitHub repo"**
-3. Select **`Pritahi/falsky-core`**
+3. Select **`Pritahi/falsky-test`**
 4. Railway will auto-detect Python and install requirements
 5. Set environment variables:
    - `FALSKY_API_KEY` — Your secret API key (e.g. `falsky_sk_abc123...`)
    - `FALSKY_ADMIN_PASSWORD` — Admin panel password (default: `admin123`)
 6. Click **Deploy**
 
-Railway will give you a URL like: `https://falsky-core-production.up.railway.app`
+Railway will give you a URL like: `https://falsky-test-production.up.railway.app`
 
 ### Step 3: Connect falsky-action
 
@@ -282,7 +282,7 @@ In your users' GitHub repos, they set up falsky-action with:
 ```yaml
 - uses: Pritahi/falsky-action@v1
   with:
-    falsky-api-url: 'https://falsky-core-production.up.railway.app'  # Your Railway URL
+    falsky-api-url: 'https://falsky-test-production.up.railway.app'  # Your Railway URL
     falsky-api-key: ${{ secrets.FALSKY_API_KEY }}                    # User's API key
     test-results-path: '**/test-results/*.xml'
 ```
@@ -301,8 +301,8 @@ In your users' GitHub repos, they set up falsky-action with:
 
 ```bash
 # Clone
-git clone https://github.com/Pritahi/falsky-core.git
-cd falsky-core
+git clone https://github.com/Pritahi/falsky-test.git
+cd falsky-test
 
 # Install dependencies
 pip install -r requirements.txt
