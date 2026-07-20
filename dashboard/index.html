@@ -59,12 +59,12 @@
   <!-- Stats -->
   <div class="stats-grid" id="statsGrid">
     <div class="stat-card">
-      <div class="label">Repositories</div>
+      <div class="label">Connected Repos</div>
       <div class="value" id="statRepos">—</div>
-      <div class="sub">connected</div>
+      <div class="sub">repositories</div>
     </div>
     <div class="stat-card green">
-      <div class="label">Avg Trust Score</div>
+      <div class="label">Overall Trust Score</div>
       <div class="value" id="statTrust">—</div>
       <div class="sub">across all tests</div>
     </div>
@@ -73,10 +73,10 @@
       <div class="value" id="statFlaky">—</div>
       <div class="sub">detected</div>
     </div>
-    <div class="stat-card red">
-      <div class="label">Failed Tests</div>
-      <div class="value" id="statFailed">—</div>
-      <div class="sub">last run</div>
+    <div class="stat-card">
+      <div class="label">Latest Analysis</div>
+      <div class="value" id="statLatest" style="font-size:1.2rem">—</div>
+      <div class="sub" id="statLatestSub">—</div>
     </div>
   </div>
 
@@ -88,13 +88,11 @@
     <div class="empty" style="padding:48px">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;margin-bottom:16px;opacity:.3"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
       <h3>Connect your first repository</h3>
-      <p style="max-width:400px;margin:12px auto">Install the Falsky GitHub App or add the Action to your workflow. Push code and results will appear here automatically.</p>
-      <div style="background:var(--ink3);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:20px auto;max-width:500px;text-align:left;font-family:var(--mono);font-size:11px;color:var(--green);white-space:pre">- uses: Pritahi/falsky-action@v1
-  with:
-    junit-xml-path: 'test-results/*.xml'
-    api-url: 'https://poly-core.vercel.app'
-    api-key: ${{ secrets.FALSKY_API_KEY }}</div>
-      <a href="https://github.com/Pritahi/falsky-action" target="_blank" class="btn btn-primary" style="margin-top:12px">Install GitHub Action →</a>
+      <p style="max-width:400px;margin:12px auto 20px">Install the Falsky GitHub App or add the Action to your workflow. Push code and results will appear here automatically.</p>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <a href="https://github.com/marketplace/actions/falsky-ai-flaky-test-detector" target="_blank" class="btn btn-primary">Install GitHub App</a>
+        <a href="/dashboard/repos.html" class="btn btn-ghost">View Setup Guide</a>
+      </div>
     </div>
   </div>
 
@@ -216,7 +214,8 @@ async function loadDashboard() {
     document.getElementById('reposTable').innerHTML = repoRows || '<tr><td colspan="6" style="text-align:center;color:var(--dim);padding:24px">No data</td></tr>';
     document.getElementById('statTrust').textContent = trustCount > 0 ? Math.round(totalTrust / trustCount) : '—';
     document.getElementById('statFlaky').textContent = totalFlaky;
-    document.getElementById('statFailed').textContent = totalFailed;
+    document.getElementById('statLatest').textContent = repos.length > 0 ? '✅ Active' : '—';
+    document.getElementById('statLatestSub').textContent = repos.length > 0 ? 'receiving data' : 'no repos yet';
     document.getElementById('activityTable').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--dim);padding:24px">Connect a repo to see runs</td></tr>';
   } catch(e) {
     console.error('Dashboard error:', e);

@@ -12,20 +12,22 @@
    └─ "Sign in with Google" button
 
 2. Login
-   └─ Google OAuth → auto-create user → set cookie
+   └─ Google OAuth → auto-create user → set cookie → redirect to Dashboard
 
-3. Dashboard (first time)
-   └─ "Connect your first repository"
-   └─ GitHub App install flow (NOT in Flasky UI)
+3. Dashboard (first time — no repos)
+   └─ "Connect your first repository" empty state
+   └─ "Install GitHub App" button → goes to GitHub
 
 4. GitHub (user leaves Flasky)
    ├─ Install Falsky GitHub App on repo
+   ├─ Select repository
    ├─ Or: Add falsky-action to .github/workflows/
    └─ Push code → GitHub Actions runs
 
-5. Dashboard (after first run)
+5. Dashboard (after first successful workflow)
    └─ Shows connected repos with trust scores
-   └─ Auto-refreshes
+   └─ Auto-refreshes every 30s
+   └─ "Last synced X sec ago"
 
 6. Repository Page (main workspace)
    ├─ Trust Score
@@ -37,7 +39,7 @@
    └─ Deep analysis of one test
 
 8. Settings
-   └─ Account, Notifications, Logout
+   └─ Profile, Notifications, Connected GitHub, Sign Out
 ```
 
 ---

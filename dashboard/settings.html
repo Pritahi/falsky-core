@@ -66,7 +66,7 @@
 
   <!-- Account -->
   <div class="card section">
-    <div class="section-title">Account</div>
+    <div class="section-title">Profile</div>
     <div class="field-row">
       <span class="field-label">Name</span>
       <span class="field-value" id="setName">—</span>
@@ -79,9 +79,18 @@
       <span class="field-label">Plan</span>
       <span class="field-value" id="setPlan">Free</span>
     </div>
+  </div>
+
+  <!-- Connected GitHub -->
+  <div class="card section">
+    <div class="section-title">Connected GitHub</div>
+    <div class="field-row">
+      <span class="field-label">Account</span>
+      <span class="field-value" id="setGithub" style="display:flex;align-items:center;gap:8px">—</span>
+    </div>
     <div class="field-row">
       <span class="field-label">Auth Provider</span>
-      <span class="field-value" id="setAuth">Google</span>
+      <span class="field-value">Google OAuth</span>
     </div>
   </div>
 
@@ -129,19 +138,9 @@ const API = '';
     document.getElementById('setName').textContent = user.name || '—';
     document.getElementById('setEmail').textContent = user.email;
     document.getElementById('setPlan').textContent = user.plan || 'Free';
-    document.getElementById('apiKey').textContent = user.api_key || 'No API key — contact support';
+    document.getElementById('setGithub').innerHTML = user.avatar ? `<img src="${user.avatar}" style="width:20px;height:20px;border-radius:50%"> ${user.email}` : user.email;
   } catch(e) { window.location.href = '/login'; }
 })();
-
-function copyKey() {
-  const key = document.getElementById('apiKey').textContent;
-  navigator.clipboard.writeText(key).then(() => {
-    const btn = document.querySelector('.copy-btn');
-    btn.textContent = 'Copied!';
-    btn.style.color = 'var(--green)';
-    setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = ''; }, 1500);
-  });
-}
 
 function saveNotifications() {
   // TODO: save to backend

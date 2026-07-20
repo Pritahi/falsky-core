@@ -97,13 +97,12 @@
     <div class="empty" style="padding:48px">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;margin-bottom:16px;opacity:.3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       <h3>Waiting for first analysis…</h3>
-      <p style="max-width:400px;margin:12px auto">Add the Falsky Action to your workflow and push. Results will appear here automatically.</p>
-      <div style="background:var(--ink3);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:20px auto;max-width:500px;text-align:left;font-family:var(--mono);font-size:11px;color:var(--green);white-space:pre">- uses: Pritahi/falsky-action@v1
-  with:
-    junit-xml-path: 'test-results/*.xml'
-    api-url: 'https://poly-core.vercel.app'
-    api-key: ${{ secrets.FALSKY_API_KEY }}</div>
-      <p style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:12px">Push to your repository to trigger the first run.</p>
+      <p style="max-width:400px;margin:12px auto 20px">Add the Falsky Action to your workflow and push. Results will appear here automatically.</p>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <a href="/dashboard/repos.html" class="btn btn-primary">View Setup Guide</a>
+        <a id="githubLink" href="https://github.com" target="_blank" class="btn btn-ghost">Open GitHub</a>
+        <a id="workflowLink" href="#" target="_blank" class="btn btn-ghost">View Latest Workflow</a>
+      </div>
     </div>
   </div>
 
@@ -251,6 +250,9 @@ async function loadRepo() {
       document.getElementById('analysisContent').style.display = 'none';
       document.getElementById('statsGrid').style.display = 'none';
       document.getElementById('repoSub').textContent = 'Waiting for first run…';
+      // Set GitHub links
+      document.getElementById('githubLink').href = `https://github.com/${repo}`;
+      document.getElementById('workflowLink').href = `https://github.com/${repo}/actions`;
       return;
     }
 
