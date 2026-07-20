@@ -3,1022 +3,197 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Falsky — Court Procedure Manual</title>
+<title>Falsky — Setup Guide</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,ital,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400;1,6..72,600&family=Fragment+Mono&family=Special+Elite&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --wood: #3B2314;
-  --paper: #FFFCF2;
-  --gavel: #121212;
-  --verdict: #8B1A1A;
-  --gold: #C8A95A;
-  --green-court: #2E5A38;
-  --bg: #FFFCF2;
-  --surface: #F5EFE0;
-  --surface-2: #EFE8D1;
-  --border: rgba(59,35,20,0.15);
-  --border-strong: rgba(59,35,20,0.3);
-  --text: #121212;
-  --text-secondary: #5C4A3A;
-  --text-muted: #8B7D6B;
-  --font: 'Newsreader', Georgia, 'Times New Roman', serif;
-  --mono: 'Fragment Mono', 'JetBrains Mono', 'Fira Code', monospace;
-  --stamp: 'Special Elite', monospace;
-  --radius: 2px;
-  --radius-sm: 2px;
-  --radius-xs: 1px;
-  --transition: 0.15s ease;
-  --transition-page: 0.3s ease;
-  --sidebar-w: 220px;
-  --sidebar-collapsed: 60px;
-  --topbar-h: 56px;
+:root{
+  --bg:#09090b;--bg-card:#18181b;--bg-hover:#27272a;--bg-input:#27272a;
+  --border:#27272a;--text:#fafafa;--text-secondary:#a1a1aa;--text-muted:#71717a;
+  --accent:#8b5cf6;--accent-soft:rgba(139,92,246,0.12);
+  --green:#22c55e;--green-soft:rgba(34,197,94,0.12);
+  --yellow:#eab308;--yellow-soft:rgba(234,179,8,0.12);
+  --orange:#f97316;--orange-soft:rgba(249,115,22,0.12);
+  --red:#ef4444;--red-soft:rgba(239,68,68,0.12);
+  --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --mono:'JetBrains Mono','Fira Code',monospace;
+  --radius:12px;--radius-sm:8px;--radius-xs:6px;
+  --sidebar-w:220px;--topbar-h:52px;
 }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.7;min-height:100vh;-webkit-font-smoothing:antialiased}
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
+.sidebar-header{display:flex;align-items:center;gap:10px;padding:14px 16px;height:var(--topbar-h);border-bottom:1px solid var(--border);flex-shrink:0}
+.sidebar-logo{font-size:18px;font-weight:700;color:var(--accent)}
+.sidebar-nav{flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:2px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius-xs);color:var(--text-muted);text-decoration:none;font-size:13px;font-weight:500;transition:all .15s}
+.nav-item:hover{background:var(--bg-hover);color:var(--text)}
+.nav-item.active{background:var(--accent-soft);color:var(--accent)}
+.nav-item svg{width:18px;height:18px;flex-shrink:0}
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font);
-  line-height: 1.7;
-  min-height: 100vh;
-  overflow-x: hidden;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-}
+.main{margin-left:var(--sidebar-w);min-height:100vh}
+.topbar{height:var(--topbar-h);background:rgba(9,9,11,0.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;position:sticky;top:0;z-index:50}
+.topbar-title{font-size:14px;font-weight:600;color:var(--text)}
 
-/* ===== WOOD GRAIN ===== */
-.wood-grain {
-  background: var(--wood);
-  background-image:
-    repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,0.04) 3px),
-    linear-gradient(180deg, #4a2e1c 0%, #3B2314 60%, #2b1a0f 100%);
-}
+.content{padding:24px 20px;max-width:820px}
 
-/* ===== STAMP ===== */
-.stamp {
-  font-family: var(--stamp);
-  border: 2.5px solid currentColor;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  line-height: 0.9;
-  box-shadow: inset 0 0 0 1px currentColor;
-}
+.guide-section{margin-bottom:40px}
+.guide-section>h2{font-size:20px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.guide-section>h2 .section-num{font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:4px;font-family:var(--mono)}
+.guide-section>p{color:var(--text-secondary);font-size:14px;margin-bottom:16px}
 
-/* ===== SIDEBAR ===== */
-.sidebar {
-  position: fixed;
-  top: 0; left: 0;
-  width: var(--sidebar-w);
-  height: 100vh;
-  background: var(--wood);
-  background-image:
-    repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,0.04) 3px),
-    linear-gradient(180deg, #4a2e1c 0%, #3B2314 60%, #2b1a0f 100%);
-  border-right: 3px solid var(--gold);
-  display: flex;
-  flex-direction: column;
-  z-index: 100;
-  transition: width var(--transition-page);
-  overflow: hidden;
-}
-.sidebar.collapsed { width: var(--sidebar-collapsed); }
+.step{display:flex;gap:14px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.step:last-child{border-bottom:none}
+.step-num{flex-shrink:0;width:32px;height:32px;background:var(--accent-soft);border:1px solid rgba(139,92,246,0.2);border-radius:8px;color:var(--accent);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.step-body{flex:1}
+.step-body h3{font-size:15px;font-weight:600;margin-bottom:4px}
+.step-body p{color:var(--text-secondary);font-size:13px;margin-bottom:10px}
 
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 16px;
-  height: var(--topbar-h);
-  border-bottom: 1px solid rgba(200,169,90,0.2);
-  flex-shrink: 0;
-}
+.code-block{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:12px}
+.code-block-header{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--border)}
+.code-lang{font-size:10px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;font-family:var(--mono)}
+.copy-btn{display:flex;align-items:center;gap:4px;padding:3px 8px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text-muted);font-size:10px;font-family:var(--mono);cursor:pointer;transition:all .15s}
+.copy-btn:hover{color:var(--text);border-color:var(--text-muted)}
+.copy-btn.copied{color:var(--green);border-color:rgba(34,197,94,0.3)}
+.code-block pre{padding:14px;overflow-x:auto;font-family:var(--mono);font-size:12px;line-height:1.7;color:var(--text-secondary)}
+.code-block pre .hl-kw{color:var(--accent);font-weight:600}
+.code-block pre .hl-str{color:var(--green)}
+.code-block pre .hl-key{color:var(--text-muted)}
+.code-block pre .hl-val{color:var(--orange)}
+.code-block pre .hl-comment{color:var(--text-muted);font-style:italic}
 
-.sidebar-logo {
-  font-size: 22px;
-  font-weight: 800;
-  font-family: var(--font);
-  color: var(--gold);
-  white-space: nowrap;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
+code{font-family:var(--mono);font-size:12px;background:var(--bg);border:1px solid var(--border);padding:1px 5px;border-radius:4px;color:var(--text-secondary)}
 
-.sidebar-toggle {
-  position: absolute;
-  top: 16px; right: -14px;
-  width: 28px; height: 28px;
-  background: var(--wood);
-  border: 1px solid var(--gold);
-  border-radius: 50%;
-  color: var(--gold);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  transition: all var(--transition);
-  z-index: 101;
-}
-.sidebar-toggle:hover {
-  background: var(--gold);
-  color: var(--gavel);
-  border-color: var(--gold);
-}
+.api-table{width:100%;border-collapse:collapse;font-size:12px}
+.api-table thead th{color:var(--text-muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.api-table tbody td{padding:8px 12px;border-bottom:1px solid var(--border-subtle);color:var(--text-secondary);vertical-align:top;font-family:var(--mono);font-size:12px}
+.api-table tbody tr:last-child td{border-bottom:none}
+.api-table tbody tr:hover td{background:var(--bg-hover)}
 
-.sidebar-nav {
-  flex: 1;
-  padding: 12px 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+.method-tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;font-family:var(--mono)}
+.method-tag.get{background:var(--green-soft);color:var(--green)}
+.method-tag.post{background:var(--accent-soft);color:var(--accent)}
+.method-tag.delete{background:var(--red-soft);color:var(--red)}
 
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
-  color: rgba(255,252,242,0.6);
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  transition: all var(--transition);
-  white-space: nowrap;
-  overflow: hidden;
-}
-.nav-item:hover { background: rgba(200,169,90,0.12); color: var(--paper); }
-.nav-item.active { background: rgba(200,169,90,0.2); color: var(--gold); }
-.nav-item svg { width: 20px; height: 20px; flex-shrink: 0; stroke: currentColor; }
-.nav-label { transition: opacity var(--transition-page); }
-.sidebar.collapsed .nav-label { opacity: 0; pointer-events: none; }
-.sidebar.collapsed .sidebar-logo span { display: none; }
+.algo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
+.algo-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;transition:all .15s}
+.algo-card:hover{border-color:var(--text-muted)}
+.algo-card::before{content:attr(data-weight);position:absolute;top:0;right:0;background:var(--bg);color:var(--text-muted);font-family:var(--mono);font-size:9px;letter-spacing:0.06em;padding:3px 8px;border-radius:0 var(--radius) 0 var(--radius-xs)}
+.algo-card h3{font-size:14px;font-weight:600;margin-bottom:4px}
+.algo-card p{font-size:12px;color:var(--text-secondary);line-height:1.6}
+.algo-bar{height:4px;background:var(--bg);border-radius:2px;overflow:hidden;margin-top:8px}
+.algo-bar-fill{height:100%;border-radius:2px;transition:width .8s}
+.algo-card.penalty{grid-column:1/-1;border-left:3px solid var(--red)}
 
-/* ===== MAIN ===== */
-.main {
-  margin-left: var(--sidebar-w);
-  min-height: 100vh;
-  transition: margin-left var(--transition-page);
-}
-.sidebar.collapsed ~ .main { margin-left: var(--sidebar-collapsed); }
+.cat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.cat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;gap:10px;transition:all .15s}
+.cat-card:hover{border-color:var(--text-muted)}
+.cat-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cat-icon svg{width:16px;height:16px}
+.cat-card h4{font-size:13px;font-weight:600;margin-bottom:2px}
+.cat-card p{font-size:11px;color:var(--text-secondary);line-height:1.5}
 
-/* ===== TOPBAR ===== */
-.topbar {
-  height: var(--topbar-h);
-  background: var(--wood);
-  background-image:
-    repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,0.04) 3px),
-    linear-gradient(180deg, #4a2e1c 0%, #3B2314 60%, #2b1a0f 100%);
-  border-bottom: 3px solid var(--gold);
-  display: flex;
-  align-items: center;
-  padding: 0 24px;
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
+.badge-preview{display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm)}
+.badge-preview-label{font-size:12px;color:var(--text-muted);flex-shrink:0}
 
-.topbar-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--paper);
-  font-family: var(--stamp);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-/* ===== CONTENT ===== */
-.content {
-  padding: 32px 24px;
-  max-width: 860px;
-  /* ruled paper background */
-  background-image: repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(59,35,20,0.06) 28px);
-}
-
-/* ===== SECTION ===== */
-.guide-section {
-  margin-bottom: 48px;
-}
-
-.guide-section > h2 {
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--font);
-}
-
-.guide-section > h2 .section-num {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--gold);
-  background: rgba(200,169,90,0.12);
-  border: 1.5px solid rgba(200,169,90,0.4);
-  padding: 2px 10px;
-  font-family: var(--stamp);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.guide-section > p {
-  color: var(--text-secondary);
-  font-size: 15px;
-  margin-bottom: 20px;
-  line-height: 1.8;
-}
-
-/* Step cards — Court Proceedings */
-.step {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 24px;
-  padding-bottom: 24px;
-  border-bottom: 1px dashed var(--border);
-}
-
-.step:last-child { border-bottom: none; }
-
-.step-num {
-  flex-shrink: 0;
-  width: 36px; height: 36px;
-  border-radius: 0;
-  background: var(--wood);
-  border: 2px solid var(--gold);
-  color: var(--gold);
-  font-size: 14px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 2px;
-  font-family: var(--stamp);
-}
-
-.step-body { flex: 1; }
-.step-body h3 {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 6px;
-  font-family: var(--font);
-}
-.step-body p {
-  color: var(--text-secondary);
-  font-size: 14px;
-  margin-bottom: 12px;
-}
-
-/* ===== CODE BLOCKS — AFFIDAVITS ===== */
-.code-block {
-  position: relative;
-  background: var(--paper);
-  border: 2px solid var(--border-strong);
-  border-radius: 0;
-  overflow: hidden;
-  margin-bottom: 16px;
-  box-shadow: 4px 4px 0px rgba(59,35,20,0.08);
-}
-
-.code-block-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 14px;
-  background: var(--wood);
-  border-bottom: 2px solid var(--gold);
-}
-
-.code-lang {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--gold);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-family: var(--mono);
-}
-
-.copy-btn {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  background: transparent;
-  border: 1px solid rgba(200,169,90,0.4);
-  border-radius: 0;
-  color: rgba(255,252,242,0.7);
-  font-size: 10px;
-  font-family: var(--mono);
-  cursor: pointer;
-  transition: all var(--transition);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-.copy-btn:hover {
-  color: var(--paper);
-  border-color: var(--gold);
-  background: rgba(200,169,90,0.15);
-}
-.copy-btn.copied {
-  color: var(--green-court);
-  border-color: var(--green-court);
-  background: rgba(46,90,56,0.1);
-}
-
-.code-block pre {
-  padding: 16px;
-  overflow-x: auto;
-  font-family: var(--mono);
-  font-size: 13px;
-  line-height: 1.7;
-  color: var(--text-secondary);
-  tab-size: 2;
-  /* ruled lines inside code blocks */
-  background-image: repeating-linear-gradient(0deg, transparent, transparent 21px, rgba(59,35,20,0.04) 22px);
-}
-
-.code-block pre .hl-kw { color: var(--verdict); font-weight: 600; }
-.code-block pre .hl-str { color: var(--green-court); }
-.code-block pre .hl-key { color: var(--wood); }
-.code-block pre .hl-val { color: #b87a2a; }
-.code-block pre .hl-comment { color: var(--text-muted); font-style: italic; }
-.code-block pre .hl-func { color: var(--gold); font-weight: 600; }
-.code-block pre .hl-num { color: #b87a2a; }
-
-/* Affidavit stamp on code blocks */
-.code-block .affidavit-stamp {
-  position: absolute;
-  bottom: 8px;
-  right: 10px;
-  font-family: var(--stamp);
-  font-size: 9px;
-  color: rgba(139,26,26,0.2);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  transform: rotate(-4deg);
-  pointer-events: none;
-}
-
-/* Inline code */
-code {
-  font-family: var(--mono);
-  font-size: 13px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 2px 6px;
-  border-radius: 0;
-  color: var(--wood);
-}
-
-/* ===== API TABLE ===== */
-.api-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-
-.api-table thead th {
-  background: var(--wood);
-  color: var(--gold);
-  font-weight: 600;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  padding: 10px 14px;
-  text-align: left;
-  border-bottom: 2px solid var(--gold);
-  font-family: var(--mono);
-}
-
-.api-table tbody td {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border);
-  color: var(--text-secondary);
-  vertical-align: top;
-  font-family: var(--mono);
-  font-size: 12px;
-}
-
-.api-table tbody tr:last-child td { border-bottom: none; }
-.api-table tbody tr:hover { background: #FFFEF9; }
-
-.method-tag {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 0;
-  font-size: 10px;
-  font-weight: 700;
-  font-family: var(--stamp);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.method-tag.get { background: rgba(46,90,56,0.1); color: var(--green-court); border: 1px solid rgba(46,90,56,0.3); }
-.method-tag.post { background: rgba(59,35,20,0.08); color: var(--wood); border: 1px solid rgba(59,35,20,0.25); }
-.method-tag.delete { background: rgba(139,26,26,0.08); color: var(--verdict); border: 1px solid rgba(139,26,26,0.25); }
-
-.path-cell {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--text);
-  white-space: nowrap;
-}
-
-/* ===== ALGORITHM VISUAL ===== */
-.algo-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 3px;
-  background: var(--border-strong);
-  border: 2px solid var(--border-strong);
-  margin-bottom: 20px;
-}
-
-.algo-card {
-  background: var(--paper);
-  border: none;
-  border-radius: 0;
-  padding: 18px;
-  transition: all var(--transition);
-  position: relative;
-}
-.algo-card:hover { background: #FFFEF9; }
-
-.algo-card::before {
-  content: attr(data-weight-label);
-  position: absolute;
-  top: 0; right: 0;
-  background: var(--gavel);
-  color: var(--gold);
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 3px 10px;
-}
-
-.algo-card .algo-weight {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--gold);
-  margin-bottom: 6px;
-  font-family: var(--stamp);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.algo-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
-
-.algo-card p {
-  font-size: 13px;
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-.algo-card.algo-penalty {
-  grid-column: 1 / -1;
-  border-left: 4px solid var(--verdict);
-}
-
-.algo-bar {
-  height: 6px;
-  background: rgba(59,35,20,0.1);
-  border-radius: 0;
-  overflow: hidden;
-  margin-top: 10px;
-}
-.algo-bar-fill {
-  height: 100%;
-  border-radius: 0;
-  transition: width 1s ease;
-}
-
-/* Flaky categories */
-.cat-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 3px;
-  background: var(--border-strong);
-  border: 2px solid var(--border-strong);
-}
-
-.cat-card {
-  background: var(--paper);
-  border: none;
-  border-radius: 0;
-  padding: 16px;
-  display: flex;
-  gap: 12px;
-  transition: all var(--transition);
-}
-.cat-card:hover { background: #FFFEF9; }
-
-.cat-icon {
-  width: 36px; height: 36px;
-  border-radius: 0;
-  border: 1.5px solid var(--border-strong);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.cat-icon svg { width: 18px; height: 18px; stroke: currentColor; }
-
-.cat-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; font-family: var(--stamp); text-transform: uppercase; letter-spacing: 0.06em; }
-.cat-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
-
-/* ===== BADGE PREVIEW ===== */
-.badge-preview {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px;
-  background: var(--paper);
-  border: 2px solid var(--border-strong);
-  border-radius: 0;
-}
-
-.badge-preview-label {
-  font-size: 13px;
-  color: var(--text-secondary);
-  flex-shrink: 0;
-  font-family: var(--stamp);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.badge-preview img {
-  height: 28px;
-  border-radius: 0;
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 900px) {
-  .sidebar { width: var(--sidebar-collapsed); }
-  .sidebar .nav-label, .sidebar .sidebar-logo span { display: none; }
-  .main { margin-left: var(--sidebar-collapsed) !important; }
-  .algo-grid, .cat-grid { grid-template-columns: 1fr; }
-  .content { padding: 24px 16px; }
-}
+@media(max-width:900px){.algo-grid,.cat-grid{grid-template-columns:1fr}.content{padding:16px}}
 </style>
 </head>
 <body>
 
-<!-- Wood grain top bar -->
-<div class="wood-grain" style="height:14px;width:100%"></div>
-
-<!-- Sidebar -->
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <div class="sidebar-logo"><span>Falsky</span></div>
-  </div>
-  <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar">
-    <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-      <path d="M3.646 3.646a.5.5 0 0 1 .708 0L8 7.293l3.646-3.647a.5.5 0 0 1 .708.708L8.707 8l3.647 3.646a.5.5 0 0 1-.708.708L8 8.707l-3.646 3.647a.5.5 0 0 1-.708-.708L7.293 8 3.646 4.354a.5.5 0 0 1 0-.708z" id="toggleIcon"/>
-    </svg>
-  </button>
+<aside class="sidebar">
+  <div class="sidebar-header"><div class="sidebar-logo">Falsky</div></div>
   <nav class="sidebar-nav">
-    <a href="/dashboard/" class="nav-item" data-page="dashboard">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>
-      </svg>
-      <span class="nav-label">Dashboard</span>
-    </a>
-    <a href="/dashboard/tests.html" class="nav-item" data-page="tests">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
-      </svg>
-      <span class="nav-label">Tests</span>
-    </a>
-    <a href="/dashboard/guide.html" class="nav-item active" data-page="guide">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-      </svg>
-      <span class="nav-label">Guide</span>
-    </a>
-    <a href="/" style="margin-top:auto;border-top:1px solid rgba(200,169,90,0.2);padding-top:14px" class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-      <span class="nav-label">Home</span>
-    </a>
+    <a href="/dashboard/" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Dashboard</a>
+    <a href="/dashboard/guide.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Guide</a>
+    <a href="/" class="nav-item" style="margin-top:auto;border-top:1px solid var(--border);padding-top:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>Home</a>
   </nav>
 </aside>
 
-<!-- Main -->
-<div class="main" id="mainArea">
-  <div class="topbar">
-    <div class="topbar-title">§ Court Procedure Manual</div>
-  </div>
-
+<div class="main">
+  <div class="topbar"><div class="topbar-title">Setup Guide</div></div>
   <div class="content">
 
-    <!-- Section 1: Quick Start -->
-    <div class="guide-section" id="quick-start">
-      <h2><span class="section-num">§1</span> Arraignment — Quick Start</h2>
-      <p>Get Falsky running in your CI pipeline in under 2 minutes. Sign up, add the GitHub Action, and start seeing trust scores.</p>
+    <div class="guide-section">
+      <h2><span class="section-num">1</span> Quick Start</h2>
+      <p>Get Falsky running in your CI pipeline in under 2 minutes.</p>
+      <div class="step"><div class="step-num">1</div><div class="step-body"><h3>Get Your API Key</h3><p>Create an account at your Falsky instance to receive an API key.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><h3>Add the GitHub Action</h3><p>Add this step after your test runner. Tests must output JUnit XML format.</p>
+        <div class="code-block"><div class="code-block-header"><span class="code-lang">YAML</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><span class="hl-comment"># .github/workflows/ci.yml</span>
+<span class="hl-kw">name</span>: <span class="hl-str">CI with Falsky</span>
+<span class="hl-kw">on</span>: <span class="hl-val">[push, pull_request]</span>
 
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <h3>File Your Motion — Sign Up &amp; Get API Key</h3>
-          <p>Create an account at your Falsky instance. You'll receive an API key to authenticate requests — your credentials to enter the courtroom.</p>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <h3>Present Your Evidence — Add the GitHub Action</h3>
-          <p>Add this step after your test runner. Make sure your tests output JUnit XML format — the court requires standardized evidence.</p>
-
-          <div class="code-block">
-            <div class="code-block-header">
-              <span class="code-lang">YAML — Filing Procedure</span>
-              <button class="copy-btn" onclick="copyCode(this)">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                Copy
-              </button>
-            </div>
-            <pre><span class="hl-comment"># .github/workflows/ci.yml</span>
-<span class="hl-kw">name</span><span class="hl-key">:</span> <span class="hl-str">CI with Falsky</span>
-<span class="hl-kw">on</span><span class="hl-key">:</span> <span class="hl-val">[push, pull_request]</span>
-
-<span class="hl-kw">jobs</span><span class="hl-key">:</span>
-  <span class="hl-key">test</span><span class="hl-key">:</span>
-    <span class="hl-kw">runs-on</span><span class="hl-key">:</span> <span class="hl-str">ubuntu-latest</span>
-    <span class="hl-kw">steps</span><span class="hl-key">:</span>
-      - <span class="hl-kw">uses</span><span class="hl-key">:</span> <span class="hl-str">actions/checkout@v4</span>
-      - <span class="hl-kw">run</span><span class="hl-key">:</span> <span class="hl-str">npm test -- --reporter junit --reporter-options output=test-results.xml</span>
-      - <span class="hl-kw">uses</span><span class="hl-key">:</span> <span class="hl-str">Pritahi/falsky-action@v1</span>
-        <span class="hl-kw">with</span><span class="hl-key">:</span>
-          <span class="hl-kw">api_key</span><span class="hl-key">:</span> <span class="hl-val">${{ secrets.FALSKY_API_KEY }}</span>
-          <span class="hl-kw">junit_path</span><span class="hl-key">:</span> <span class="hl-str">'test-results/*.xml'</span></pre>
-            <span class="affidavit-stamp">Affidavit Filed Under Oath</span>
-          </div>
-        </div>
-      </div>
+<span class="hl-kw">jobs</span>:
+  <span class="hl-key">test</span>:
+    <span class="hl-kw">runs-on</span>: <span class="hl-str">ubuntu-latest</span>
+    <span class="hl-kw">steps</span>:
+      - <span class="hl-kw">uses</span>: <span class="hl-str">actions/checkout@v4</span>
+      - <span class="hl-kw">run</span>: <span class="hl-str">npm test -- --reporter junit --reporter-options output=test-results.xml</span>
+      - <span class="hl-kw">uses</span>: <span class="hl-str">Pritahi/falsky-action@v1</span>
+        <span class="hl-kw">with</span>:
+          <span class="hl-kw">api_key</span>: <span class="hl-val">${{ secrets.FALSKY_API_KEY }}</span>
+          <span class="hl-kw">junit_path</span>: <span class="hl-str">'test-results/*.xml'</span></pre></div>
+      </div></div>
     </div>
 
-    <!-- Section 2: Python SDK -->
-    <div class="guide-section" id="python-sdk">
-      <h2><span class="section-num">§2</span> Python SDK — Court Filing Interface</h2>
-      <p>Use the Python SDK to ingest test results programmatically, query dashboards, and configure alerts — the official court filing system.</p>
-
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-lang">Shell — Court Clerk Installation</span>
-          <button class="copy-btn" onclick="copyCode(this)">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Copy
-          </button>
-        </div>
-        <pre>pip install falsky-trust</pre>
-        <span class="affidavit-stamp">Sworn &amp; Subscribed</span>
-      </div>
-
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-lang">Python — Official Testimony</span>
-          <button class="copy-btn" onclick="copyCode(this)">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Copy
-          </button>
-        </div>
-        <pre><span class="hl-kw">from falsky import</span> <span class="hl-func">Falsky</span>
-
-<span class="hl-comment"># Initialize with your API key</span>
-<span class="hl-func">p</span> = <span class="hl-func">Falsky</span>(<span class="hl-str">"your-api-key"</span>)
-
-<span class="hl-comment"># Ingest a JUnit XML file</span>
-<span class="hl-func">result</span> = p.<span class="hl-func">ingest_junit</span>(<span class="hl-str">"path/to/junit.xml"</span>)
-<span class="hl-func">print</span>(result[<span class="hl-str">"avg_trust_score"</span>])
-
-<span class="hl-comment"># Get dashboard data</span>
-<span class="hl-func">dashboard</span> = p.<span class="hl-func">dashboard</span>(<span class="hl-str">"my-repo"</span>)
-
-<span class="hl-comment"># List all tests with trust scores</span>
-<span class="hl-func">tests</span> = p.<span class="hl-func">list_tests</span>(<span class="hl-str">"my-repo"</span>)
-
-<span class="hl-comment"># Get details for a specific test</span>
-<span class="hl-func">detail</span> = p.<span class="hl-func">test_detail</span>(<span class="hl-str">"my-repo"</span>, <span class="hl-str">"TestClass.test_method"</span>)
-
-<span class="hl-comment"># View quarantined tests</span>
-<span class="hl-func">quarantined</span> = p.<span class="hl-func">quarantined</span>(<span class="hl-str">"my-repo"</span>)
-
-<span class="hl-comment"># Configure alerts (Discord/Slack)</span>
-p.<span class="hl-func">configure_alerts</span>(
-    <span class="hl-key">repo_name</span>=<span class="hl-str">"my-repo"</span>,
-    <span class="hl-key">webhook_url</span>=<span class="hl-str">"https://discord.com/api/webhooks/..."</span>,
-    <span class="hl-key">channel_type</span>=<span class="hl-str">"discord"</span>,
-    <span class="hl-key">min_trust_drop</span>=<span class="hl-num">20</span>,
-    <span class="hl-key">alert_on_flaky</span>=<span class="hl-val">True</span>,
-    <span class="hl-key">alert_on_quarantine</span>=<span class="hl-val">True</span>
-)
-
-<span class="hl-comment"># Get badge URL for your README</span>
-<span class="hl-func">url</span> = p.<span class="hl-func">badge_url</span>(<span class="hl-str">"my-repo"</span>)</pre>
-        <span class="affidavit-stamp">Deposition — Exhibit A</span>
-      </div>
-
-      <h3 style="font-size:15px;font-weight:600;margin-top:24px;margin-bottom:12px;font-family:var(--stamp);text-transform:uppercase;letter-spacing:0.08em;color:var(--verdict)">Available Motions — API Methods</h3>
+    <div class="guide-section">
+      <h2><span class="section-num">2</span> REST API</h2>
+      <p>Write operations require the <code>X-Falsky-API-Key</code> header. Read operations are open.</p>
       <table class="api-table">
-        <thead>
-          <tr><th>Motion</th><th>Description</th></tr>
-        </thead>
+        <thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
         <tbody>
-          <tr><td><code>ingest_junit(path)</code></td><td>Ingest a JUnit XML file for a repo</td></tr>
-          <tr><td><code>ingest_results(results)</code></td><td>Ingest raw test results (list of dicts)</td></tr>
-          <tr><td><code>dashboard(repo)</code></td><td>Get aggregated dashboard data</td></tr>
-          <tr><td><code>list_tests(repo)</code></td><td>List all tests with trust scores</td></tr>
-          <tr><td><code>test_detail(repo, name)</code></td><td>Get detailed info for a single test</td></tr>
-          <tr><td><code>quarantined(repo)</code></td><td>Get quarantined tests below threshold</td></tr>
-          <tr><td><code>configure_alerts(...)</code></td><td>Set up Discord/Slack webhook alerts</td></tr>
-          <tr><td><code>badge_url(repo)</code></td><td>Get the trust badge SVG URL</td></tr>
+          <tr><td><span class="method-tag post">POST</span></td><td>/api/junit</td><td>Ingest JUnit XML</td></tr>
+          <tr><td><span class="method-tag post">POST</span></td><td>/api/runs</td><td>Create test run from raw results</td></tr>
+          <tr><td><span class="method-tag get">GET</span></td><td>/api/dashboard?repo_name=X</td><td>Aggregated dashboard data</td></tr>
+          <tr><td><span class="method-tag get">GET</span></td><td>/api/tests?repo_name=X</td><td>List all tests with trust scores</td></tr>
+          <tr><td><span class="method-tag get">GET</span></td><td>/api/tests/{name}?repo_name=X</td><td>Test detail + history</td></tr>
+          <tr><td><span class="method-tag get">GET</span></td><td>/api/quarantined?repo_name=X</td><td>Quarantined tests</td></tr>
+          <tr><td><span class="method-tag get">GET</span></td><td>/api/runs?repo_name=X</td><td>Recent CI runs</td></tr>
+          <tr><td><span class="method-tag get">GET</span></td><td>/api/repos</td><td>All tracked repos</td></tr>
+          <tr><td><span class="method-tag get">GET</span></td><td>/badge/{repo_name}</td><td>SVG trust badge</td></tr>
+          <tr><td><span class="method-tag post">POST</span></td><td>/api/alerts/config?repo_name=X</td><td>Configure webhook alerts</td></tr>
+          <tr><td><span class="method-tag delete">DELETE</span></td><td>/api/tests/{name}?repo_name=X</td><td>Delete test history</td></tr>
         </tbody>
       </table>
-    </div>
-
-    <!-- Section 3: REST API -->
-    <div class="guide-section" id="rest-api">
-      <h2><span class="section-num">§3</span> REST API — Court Records Reference</h2>
-      <p>All endpoints require the <code>X-Falsky-API-Key</code> header for write operations. Read operations (GET) are open by default — public record.</p>
-
-      <table class="api-table">
-        <thead>
-          <tr><th>Method</th><th>Path</th><th>Description</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><span class="method-tag post">POST</span></td>
-            <td class="path-cell">/api/junit</td>
-            <td>Ingest JUnit XML content. Body: <code>{"xml_content": "...", "repo_name": "..."}</code></td>
-          </tr>
-          <tr>
-            <td><span class="method-tag post">POST</span></td>
-            <td class="path-cell">/api/runs</td>
-            <td>Create a test run from raw results. Body: <code>{"test_results": [...], "repo_name": "..."}</code></td>
-          </tr>
-          <tr>
-            <td><span class="method-tag get">GET</span></td>
-            <td class="path-cell">/api/dashboard?repo_name=X</td>
-            <td>Get aggregated stats, flaky tests, recent runs, and trust distribution</td>
-          </tr>
-          <tr>
-            <td><span class="method-tag get">GET</span></td>
-            <td class="path-cell">/api/tests?repo_name=X</td>
-            <td>List all tests with trust scores, pass rates, and flaky categories</td>
-          </tr>
-          <tr>
-            <td><span class="method-tag get">GET</span></td>
-            <td class="path-cell">/api/tests/{name}?repo_name=X</td>
-            <td>Get detailed test info including history, score breakdown, and error patterns</td>
-          </tr>
-          <tr>
-            <td><span class="method-tag get">GET</span></td>
-            <td class="path-cell">/api/quarantined?repo_name=X</td>
-            <td>Get tests below the trust threshold (default: 30)</td>
-          </tr>
-          <tr>
-            <td><span class="method-tag get">GET</span></td>
-            <td class="path-cell">/api/runs?repo_name=X</td>
-            <td>Get recent CI runs for a repository (max 100)</td>
-          </tr>
-          <tr>
-            <td><span class="method-tag get">GET</span></td>
-            <td class="path-cell">/api/repos</td>
-            <td>List all tracked repositories with aggregate stats</td>
-          </tr>
-          <tr>
-            <td><span class="method-tag get">GET</span></td>
-            <td class="path-cell">/badge/{repo_name}</td>
-            <td>Get an SVG trust score badge for a repository</td>
-          </tr>
-          <tr>
-            <td><span class="method-tag post">POST</span></td>
-            <td class="path-cell">/api/alerts/config?repo_name=X</td>
-            <td>Configure webhook alerts (Discord/Slack)</td>
-          </tr>
-          <tr>
-            <td><span class="method-tag delete">DELETE</span></td>
-            <td class="path-cell">/api/tests/{name}?repo_name=X</td>
-            <td>Delete all history for a specific test</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3 style="font-size:15px;font-weight:600;margin-top:28px;margin-bottom:12px;font-family:var(--stamp);text-transform:uppercase;letter-spacing:0.08em;color:var(--verdict)">Example Filings — Court Requests</h3>
-
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-lang">cURL — Ingest JUnit Evidence</span>
-          <button class="copy-btn" onclick="copyCode(this)">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Copy
-          </button>
-        </div>
-        <pre>curl -X POST https://your-falsky-instance.com/api/junit \
+      <div class="code-block" style="margin-top:16px"><div class="code-block-header"><span class="code-lang">cURL</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>curl -X POST https://your-falsky-instance.com/api/junit \
   -H <span class="hl-str">"Content-Type: application/json"</span> \
   -H <span class="hl-str">"X-Falsky-API-Key: your-key"</span> \
-  -d <span class="hl-str">'{"xml_content": "...", "repo_name": "my-repo", "branch": "main"}'</span></pre>
-        <span class="affidavit-stamp">Filed Under Oath</span>
-      </div>
-
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-lang">cURL — Request Court Records</span>
-          <button class="copy-btn" onclick="copyCode(this)">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Copy
-          </button>
-        </div>
-        <pre>curl https://your-falsky-instance.com/api/dashboard?repo_name=my-repo</pre>
-        <span class="affidavit-stamp">Public Record</span>
-      </div>
-
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-lang">cURL — Configure Court Alerts</span>
-          <button class="copy-btn" onclick="copyCode(this)">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Copy
-          </button>
-        </div>
-        <pre>curl -X POST https://your-falsky-instance.com/api/alerts/config?repo_name=my-repo \
-  -H <span class="hl-str">"Content-Type: application/json"</span> \
-  -H <span class="hl-str">"X-Falsky-API-Key: your-key"</span> \
-  -d <span class="hl-str">'{"webhook_url": "https://discord.com/...", "channel_type": "discord"}'</span></pre>
-        <span class="affidavit-stamp">Confidential Filing</span>
-      </div>
+  -d <span class="hl-str">'{"xml_content": "...", "repo_name": "my-repo"}'</span></pre></div>
     </div>
 
-    <!-- Section 4: Trust Score Algorithm -->
-    <div class="guide-section" id="algorithm">
-      <h2><span class="section-num">§4</span> Trust Score — Sentencing Guidelines</h2>
-      <p>Each test receives a trust score from 0 to 100. The score is calculated from four weighted components plus an optional flaky penalty — the court's sentencing matrix.</p>
-
+    <div class="guide-section">
+      <h2><span class="section-num">3</span> Trust Score Algorithm</h2>
+      <p>Each test gets a score from 0-100 based on four weighted components plus an optional flaky penalty.</p>
       <div class="algo-grid">
-        <div class="algo-card" data-weight-label="60% Weight">
-          <div class="algo-weight">Exhibit A — 60% weight</div>
-          <h3>Pass Rate</h3>
-          <p>The percentage of recent runs that passed. A consistently passing test earns close to the full 60 points — the primary evidence of reliability.</p>
-          <div class="algo-bar"><div class="algo-bar-fill" style="width:60%;background:var(--green-court)"></div></div>
-        </div>
-        <div class="algo-card" data-weight-label="20% Weight">
-          <div class="algo-weight">Exhibit B — 20% weight</div>
-          <h3>Recent Trend</h3>
-          <p>Compares pass rate of the last 5 runs vs. the previous 5. Improving tests get a bonus; degrading tests lose points — the trajectory of conduct.</p>
-          <div class="algo-bar"><div class="algo-bar-fill" style="width:20%;background:var(--gold)"></div></div>
-        </div>
-        <div class="algo-card" data-weight-label="10% Weight">
-          <div class="algo-weight">Exhibit C — 10% weight</div>
-          <h3>Duration Variance</h3>
-          <p>Measures coefficient of variation in execution time. Consistent durations suggest stability; erratic timing indicates flakiness — behavioral consistency under oath.</p>
-          <div class="algo-bar"><div class="algo-bar-fill" style="width:10%;background:#b87a2a"></div></div>
-        </div>
-        <div class="algo-card" data-weight-label="10% Weight">
-          <div class="algo-weight">Exhibit D — 10% weight</div>
-          <h3>Error Pattern Consistency</h3>
-          <p>When a test fails, consistent error messages indicate a real bug, while varied errors suggest flakiness — credibility of testimony.</p>
-          <div class="algo-bar"><div class="algo-bar-fill" style="width:10%;background:var(--verdict)"></div></div>
-        </div>
-        <div class="algo-card algo-penalty">
-          <div class="algo-weight" style="color:var(--verdict)">Penalty: −5 to −20</div>
-          <h3 style="color:var(--verdict)">Flaky Category — Aggravating Circumstances</h3>
-          <p>If a test is classified as flaky, an additional penalty is applied based on the category severity — the court's enhanced sentencing:</p>
-          <p style="margin-top:6px">
-            <code style="border-color:rgba(139,26,26,0.3);color:var(--verdict)">timing</code> &minus;5 &nbsp;
-            <code style="border-color:rgba(200,169,90,0.3);color:var(--gold)">order_dependency</code> &minus;10 &nbsp;
-            <code style="border-color:rgba(139,26,26,0.3);color:var(--verdict)">shared_state</code> &minus;15 &nbsp;
-            <code style="border-color:rgba(59,35,20,0.3);color:var(--wood)">non_deterministic_data</code> &minus;20
-          </p>
-        </div>
+        <div class="algo-card" data-weight="60%"><h3>Pass Rate</h3><p>Bayesian pass rate with Beta-Binomial conjugate prior. Primary reliability signal.</p><div class="algo-bar"><div class="algo-bar-fill" style="width:60%;background:var(--green)"></div></div></div>
+        <div class="algo-card" data-weight="20%"><h3>Recent Trend</h3><p>Compares last 5 runs vs previous 5. Improving tests get a bonus.</p><div class="algo-bar"><div class="algo-bar-fill" style="width:20%;background:var(--yellow)"></div></div></div>
+        <div class="algo-card" data-weight="10%"><h3>Duration Stability</h3><p>Z-score analysis on execution times. Consistent = stable.</p><div class="algo-bar"><div class="algo-bar-fill" style="width:10%;background:var(--orange)"></div></div></div>
+        <div class="algo-card" data-weight="10%"><h3>Error Consistency</h3><p>Consistent errors = real bug. Varied errors = flaky.</p><div class="algo-bar"><div class="algo-bar-fill" style="width:10%;background:var(--red)"></div></div></div>
+        <div class="algo-card penalty"><h3 style="color:var(--red)">Flaky Penalty (−5 to −20)</h3><p>Additional penalty when flaky category is detected.</p></div>
       </div>
-
-      <h3 style="font-size:15px;font-weight:600;margin-bottom:14px;font-family:var(--stamp);text-transform:uppercase;letter-spacing:0.08em;color:var(--verdict)">Flaky Categories — Criminal Classifications</h3>
+      <h3 style="font-size:14px;font-weight:600;margin:16px 0 10px">Flaky Categories</h3>
       <div class="cat-grid">
-        <div class="cat-card">
-          <div class="cat-icon" style="color:var(--verdict)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          </div>
-          <div>
-            <h4 style="color:var(--verdict)">Timing</h4>
-            <p>High duration variance. Test execution time is unpredictable, suggesting race conditions or timeout sensitivity.</p>
-          </div>
-        </div>
-        <div class="cat-card">
-          <div class="cat-icon" style="color:var(--gold)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-          </div>
-          <div>
-            <h4 style="color:var(--gold)">Order Dependency</h4>
-            <p>Test outcome changes based on execution order. Frequent pass/fail transitions indicate isolation issues.</p>
-          </div>
-        </div>
-        <div class="cat-card">
-          <div class="cat-icon" style="color:var(--verdict)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          </div>
-          <div>
-            <h4 style="color:var(--verdict)">Shared State</h4>
-            <p>Test shares mutable state with other tests. Fails intermittently with consistent error messages.</p>
-          </div>
-        </div>
-        <div class="cat-card">
-          <div class="cat-icon" style="color:#b87a2a">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-          </div>
-          <div>
-            <h4 style="color:#b87a2a">Non-deterministic Data</h4>
-            <p>Test fails due to unpredictable external data, random values, or varying API responses.</p>
-          </div>
-        </div>
+        <div class="cat-card"><div class="cat-icon" style="background:var(--orange-soft);color:var(--orange)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><h4>Timing</h4><p>High duration variance — race conditions or timeout sensitivity.</p></div></div>
+        <div class="cat-card"><div class="cat-icon" style="background:var(--accent-soft);color:var(--accent)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></div><div><h4>Order Dependency</h4><p>Outcome changes based on execution order.</p></div></div>
+        <div class="cat-card"><div class="cat-icon" style="background:var(--red-soft);color:var(--red)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div><h4>Shared State</h4><p>Shares mutable state with other tests.</p></div></div>
+        <div class="cat-card"><div class="cat-icon" style="background:var(--yellow-soft);color:var(--yellow)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></div><div><h4>Non-deterministic</h4><p>Unpredictable external data or random values.</p></div></div>
       </div>
     </div>
 
-    <!-- Section 5: Badge -->
-    <div class="guide-section" id="badge">
-      <h2><span class="section-num">§5</span> Badge — Certificate of Trustworthiness</h2>
-      <p>Add a live trust score badge to your repository's README. It updates automatically with each CI run — your public certificate of court approval.</p>
-
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-lang">Markdown — Certificate Issuance</span>
-          <button class="copy-btn" onclick="copyCode(this)">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Copy
-          </button>
-        </div>
-        <pre><span class="hl-comment">![Trust Score](https://your-falsky-instance.com/badge/your-repo)</span></pre>
-        <span class="affidavit-stamp">Official Seal</span>
-      </div>
-
-      <div class="badge-preview">
-        <span class="badge-preview-label">Certificate Preview:</span>
-        <img src="/badge/demo-repo" alt="Trust Score Badge" id="badgePreview"
-             onerror="this.style.display='none'; document.getElementById('badgePlaceholder').style.display='inline-block';">
-        <span id="badgePlaceholder" style="display:none;font-family:var(--mono);font-size:13px;color:var(--text-muted)">
-          Certificate will appear here when connected to a Falsky instance
-        </span>
-      </div>
+    <div class="guide-section">
+      <h2><span class="section-num">4</span> Badge</h2>
+      <p>Add a live trust score badge to your README.</p>
+      <div class="code-block"><div class="code-block-header"><span class="code-lang">Markdown</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>![Trust Score](https://your-falsky-instance.com/badge/your-repo)</pre></div>
+      <div class="badge-preview"><span class="badge-preview-label">Preview:</span><img src="/badge/demo-repo" alt="Badge" height="24" onerror="this.style.display='none'"></div>
     </div>
 
   </div>
 </div>
 
 <script>
-const $ = id => document.getElementById(id);
-
-// Sidebar toggle
-$('sidebarToggle').addEventListener('click', () => {
-  $('sidebar').classList.toggle('collapsed');
-});
-
-// Copy code block
-function copyCode(btn) {
-  const pre = btn.closest('.code-block').querySelector('pre');
-  const text = pre.textContent || pre.innerText;
-  navigator.clipboard.writeText(text).then(() => {
-    btn.classList.add('copied');
-    const originalHTML = btn.innerHTML;
-    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Filed!';
-    setTimeout(() => {
-      btn.classList.remove('copied');
-      btn.innerHTML = originalHTML;
-    }, 2000);
-  }).catch(() => {
-    // Fallback for non-HTTPS
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-    btn.classList.add('copied');
-    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Filed!';
-    setTimeout(() => {
-      btn.classList.remove('copied');
-      btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
-    }, 2000);
-  });
-}
-
-// Smooth scroll for hash links
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    const target = document.querySelector(a.getAttribute('href'));
-    if (target) {
-      e.preventDefault();
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  });
-});
+function copyCode(btn){const pre=btn.closest('.code-block').querySelector('pre');navigator.clipboard.writeText(pre.textContent).then(()=>{btn.classList.add('copied');btn.textContent='Copied!';setTimeout(()=>{btn.classList.remove('copied');btn.textContent='Copy';},1500);});}
 </script>
 </body>
 </html>

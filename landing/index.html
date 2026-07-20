@@ -3,557 +3,255 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Falsky — AI Flaky Test Trust Layer | Courtroom Docket</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<title>Falsky — AI Flaky Test Detection</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,ital,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400;1,6..72,600&family=Fragment+Mono&family=Special+Elite&display=swap" rel="stylesheet">
-<script>
-tailwind.config = {
- theme: {
- extend: {
- colors: {
- wood: '#3B2314',
- paper: '#FFFCF2',
- gavel: '#121212',
- verdict: '#8B1A1A',
- gold: '#C8A95A',
- },
- fontFamily: {
- serif: ['Newsreader', 'serif'],
- mono: ['Fragment Mono', 'monospace'],
- stamp: ['Special Elite', 'monospace'],
- }
- }
- }
-}
-</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-*{ -webkit-font-smoothing: antialiased; }
-body{ background:#FFFCF2; color:#121212; }
-.ruled {
- background-image: repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(59,35,20,0.06) 28px);
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#09090b;--bg-card:#18181b;--bg-hover:#27272a;
+  --border:#27272a;--text:#fafafa;--text-secondary:#a1a1aa;--text-muted:#71717a;
+  --accent:#8b5cf6;--accent-hover:#7c3aed;--accent-soft:rgba(139,92,246,0.12);
+  --green:#22c55e;--green-soft:rgba(34,197,94,0.12);
+  --yellow:#eab308;--red:#ef4444;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --mono:'JetBrains Mono','Fira Code',monospace;
+  --radius:12px;--radius-sm:8px;--radius-xs:6px;
 }
-.wood-grain{
- background: #3B2314;
- background-image:
- repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,0.04) 3px),
- linear-gradient(180deg, #4a2e1c 0%, #3B2314 60%, #2b1a0f 100%);
-}
-.paper-texture{
- background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-}
-.stamp{
- font-family:'Special Elite';
- border: 3.5px solid currentColor;
- text-transform: uppercase;
- letter-spacing: 0.12em;
- line-height: 0.9;
- box-shadow: inset 0 0 0 1px currentColor;
-}
-.stamp-double:before{
- content:'';
- position:absolute;
- inset:3px;
- border:1px solid currentColor;
- pointer-events:none;
-}
-.gavel-shadow{ box-shadow: 8px 8px 0px #121212; }
-.case-clip{
- background: linear-gradient(180deg, #C8A95A 0%, #b8984d 100%);
- box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-.hole{
- width:18px; height:18px;
- background: #FFFCF2;
- border:2px solid rgba(59,35,20,0.2);
- border-radius:50%;
- box-shadow: inset 0 2px 3px rgba(0,0,0,0.15);
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+
+/* Nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(9,9,11,0.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+nav .inner{max-width:1100px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between}
+nav .logo{font-size:20px;font-weight:700;color:var(--accent);text-decoration:none;letter-spacing:-0.02em}
+nav .links{display:flex;gap:6px}
+nav .links a{padding:6px 12px;color:var(--text-muted);text-decoration:none;font-size:13px;font-weight:500;border-radius:var(--radius-xs);transition:all .15s}
+nav .links a:hover{color:var(--text);background:var(--bg-hover)}
+nav .links .cta{background:var(--accent);color:#fff}
+nav .links .cta:hover{background:var(--accent-hover)}
+
+/* Hero */
+.hero{padding:140px 0 80px;text-align:center}
+.hero .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:var(--accent-soft);border:1px solid rgba(139,92,246,0.2);border-radius:20px;font-size:12px;font-weight:500;color:var(--accent);margin-bottom:20px}
+.hero .badge .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.hero h1{font-size:56px;font-weight:800;line-height:1.05;letter-spacing:-0.03em;margin-bottom:16px;background:linear-gradient(135deg,var(--text) 0%,var(--text-secondary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:18px;color:var(--text-secondary);max-width:560px;margin:0 auto 32px;line-height:1.6}
+.hero .buttons{display:flex;gap:12px;justify-content:center}
+.btn-primary{padding:12px 24px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px)}
+.btn-secondary{padding:12px 24px;background:var(--bg-card);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;text-decoration:none}
+.btn-secondary:hover{border-color:var(--text-muted)}
+
+/* Terminal */
+.terminal{max-width:640px;margin:40px auto 0;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.terminal-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--border)}
+.terminal-dot{width:10px;height:10px;border-radius:50%;background:var(--bg-hover);border:1px solid var(--border)}
+.terminal-title{flex:1;text-align:center;font-family:var(--mono);font-size:11px;color:var(--text-muted)}
+.terminal pre{padding:16px;font-family:var(--mono);font-size:12px;line-height:1.7;color:var(--text-secondary);overflow-x:auto}
+.terminal pre .c{color:var(--text-muted)}
+.terminal pre .k{color:var(--accent)}
+.terminal pre .s{color:var(--green)}
+.terminal pre .v{color:var(--orange)}
+
+/* Features */
+.features{padding:80px 0}
+.features h2{text-align:center;font-size:32px;font-weight:700;letter-spacing:-0.02em;margin-bottom:12px}
+.features .sub{text-align:center;color:var(--text-secondary);font-size:15px;margin-bottom:40px}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.feature-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;transition:all .2s}
+.feature-card:hover{border-color:var(--text-muted);transform:translateY(-2px)}
+.feature-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.feature-icon svg{width:20px;height:20px}
+.feature-card h3{font-size:15px;font-weight:600;margin-bottom:6px}
+.feature-card p{font-size:13px;color:var(--text-secondary);line-height:1.6}
+
+/* Stats */
+.stats-section{padding:60px 0}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;text-align:center}
+.stat{padding:24px}
+.stat .num{font-size:36px;font-weight:800;letter-spacing:-0.03em;color:var(--accent)}
+.stat .label{font-size:13px;color:var(--text-muted);margin-top:4px}
+
+/* How it works */
+.how{padding:80px 0}
+.how h2{text-align:center;font-size:32px;font-weight:700;letter-spacing:-0.02em;margin-bottom:12px}
+.how .sub{text-align:center;color:var(--text-secondary);font-size:15px;margin-bottom:40px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.step-card{text-align:center;padding:24px}
+.step-num{width:40px;height:40px;border-radius:10px;background:var(--accent-soft);border:1px solid rgba(139,92,246,0.2);color:var(--accent);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.step-card h3{font-size:15px;font-weight:600;margin-bottom:6px}
+.step-card p{font-size:13px;color:var(--text-secondary)}
+
+/* Pricing */
+.pricing{padding:80px 0}
+.pricing h2{text-align:center;font-size:32px;font-weight:700;letter-spacing:-0.02em;margin-bottom:12px}
+.pricing .sub{text-align:center;color:var(--text-secondary);font-size:15px;margin-bottom:40px}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.price-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;text-align:center;transition:all .2s}
+.price-card:hover{border-color:var(--text-muted)}
+.price-card.popular{border-color:var(--accent);position:relative}
+.price-card.popular::after{content:'Popular';position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:10px;font-weight:600;padding:2px 10px;border-radius:10px}
+.price-card h3{font-size:18px;font-weight:700;margin-bottom:4px}
+.price-card .price{font-size:36px;font-weight:800;letter-spacing:-0.03em;margin:12px 0}
+.price-card .price span{font-size:14px;font-weight:400;color:var(--text-muted)}
+.price-card ul{list-style:none;text-align:left;margin:16px 0;font-size:13px;color:var(--text-secondary)}
+.price-card ul li{padding:4px 0}
+.price-card ul li::before{content:'✓ ';color:var(--green);font-weight:600}
+
+/* CTA */
+.cta-section{padding:80px 0;text-align:center}
+.cta-section h2{font-size:32px;font-weight:700;letter-spacing:-0.02em;margin-bottom:12px}
+.cta-section p{color:var(--text-secondary);font-size:15px;margin-bottom:24px}
+
+/* Footer */
+footer{padding:40px 0;border-top:1px solid var(--border);text-align:center}
+footer p{font-size:12px;color:var(--text-muted)}
+
+@media(max-width:768px){
+  .hero h1{font-size:36px}
+  .features-grid,.steps,.pricing-grid{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  nav .links a:not(.cta){display:none}
 }
 </style>
 </head>
-<body class="font-serif paper-texture overflow-x-hidden">
+<body>
 
-<!-- TOP WOOD BENCH -->
-<div class="wood-grain h-[14px] w-full"></div>
+<nav>
+  <div class="inner">
+    <a href="/" class="logo">Falsky</a>
+    <div class="links">
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="/dashboard/guide.html">Docs</a>
+      <a href="/admin/" class="cta">Get Started</a>
+    </div>
+  </div>
+</nav>
 
-<!-- COURT HEADER DOCUMENT -->
-<header class="relative bg-paper border-b-[3px] border-gavel">
- <div class="max-w-[1360px] mx-auto px-6 md:px-10 py-4 flex items-center justify-between font-mono text-[10px] md:text-[11px] tracking-[0.14em] uppercase">
- <div class="flex items-center gap-6">
- <span class="flex items-center gap-2"><span class="w-2 h-2 bg-verdict rounded-full animate-pulse"></span> COURT IN SESSION</span>
- <span class="hidden md:inline opacity-60">DISTRICT OF CONTINUOUS INTEGRATION • DIVISION CI/CD</span>
- </div>
- <div class="flex items-center gap-4">
- <span class="opacity-60 hidden md:inline">DOCKET • 07.18.2026</span>
- <span class="border border-gavel px-2 py-[2px]">CASE NO. #1001</span>
- </div>
- </div>
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="badge"><span class="dot"></span> AI-Powered Test Analysis</div>
+    <h1>Find flaky tests<br>before they find you</h1>
+    <p>Falsky analyzes your CI test results using Bayesian statistics and anomaly detection to identify, classify, and track flaky tests.</p>
+    <div class="buttons">
+      <a href="/admin/" class="btn-primary">Get Started Free →</a>
+      <a href="/dashboard/guide.html" class="btn-secondary">View Docs</a>
+    </div>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+        <span class="terminal-title">ci.yml</span>
+      </div>
+      <pre><span class="c"># Add to your GitHub Actions workflow</span>
+- <span class="k">uses</span>: <span class="s">Pritahi/falsky-action@v1</span>
+  <span class="k">with</span>:
+    <span class="k">api_key</span>: <span class="v">${{ secrets.FALSKY_API_KEY }}</span>
+    <span class="k">junit_path</span>: <span class="s">'test-results/*.xml'</span>
 
- <div class="max-w-[1360px] mx-auto px-6 md:px-10 py-8 md:py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
- <!-- Seal -->
- <div class="flex items-center gap-5">
- <div class="w-[64px] h-[64px] rounded-full border-[2.5px] border-gavel flex items-center justify-center relative bg-paper">
- <div class="absolute inset-[5px] rounded-full border border-gold"></div>
- <span class="font-stamp text-[18px] leading-none translate-y-[1px]">§</span>
- <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-gold rounded-full border-2 border-paper flex items-center justify-center">
- <span class="w-2 h-2 bg-gavel rounded-full"></span>
- </div>
- </div>
- <div>
- <div class="font-mono text-[10px] tracking-[0.2em] uppercase opacity-60">United States of Codebase</div>
- <div class="font-serif font-[800] text-[22px] md:text-[26px] leading-[0.95] tracking-[-0.02em] uppercase">Falsky Court<br><span class="font-[300] italic normal-case text-[22px] opacity-70"> of Flaky Test Justice</span></div>
- </div>
- </div>
-
- <div class="flex items-center gap-6 md:gap-10 w-full md:w-auto">
- <div class="hidden lg:block h-[52px] w-[1px] bg-gavel/20"></div>
- <div class="flex gap-8 md:gap-12">
- <div>
- <div class="font-mono text-[9px] tracking-[0.2em] uppercase opacity-50 mb-1">Presiding</div>
- <div class="font-serif font-bold text-[13px] leading-tight">Hon. Falsky AI<br><span class="font-mono text-[11px] font-normal opacity-70">TRUST LAYER</span></div>
- </div>
- <div>
- <div class="font-mono text-[9px] tracking-[0.2em] uppercase opacity-50 mb-1">Court Clerk</div>
- <div class="font-serif font-bold text-[13px] leading-tight">falsky-action@v1<br><span class="font-mono text-[11px] font-normal opacity-70">AUTOMATED DOCKET</span></div>
- </div>
- </div>
- <div class="ml-auto md:ml-0">
- <div class="bg-gavel text-paper px-4 py-2 font-mono text-[10px] tracking-widest uppercase">Sealed • Exhibit A</div>
- </div>
- </div>
- </div>
-</header>
-
-<!-- HERO - CASE FILE -->
-<section class="relative max-w-[1360px] mx-auto px-6 md:px-10 pt-10 md:pt-14 pb-14">
- <!-- Background large CASE NO watermark -->
- <div class="absolute right-0 top-10 font-serif font-[800] text-[160px] md:text-[240px] leading-none tracking-[-0.05em] text-gavel/[0.025] select-none pointer-events-none">482</div>
-
- <div class="grid grid-cols-12 gap-8 md:gap-10 relative">
- <!-- LEFT: CASE FILE -->
- <div class="col-span-12 lg:col-span-7">
- <!-- File Tab -->
- <div class="flex">
- <div class="bg-[#E8E0C9] border-[2.5px] border-gavel border-b-0 px-5 py-2 font-mono text-[11px] tracking-[0.16em] uppercase flex items-center gap-2">
- <span class="w-2 h-2 bg-verdict rounded-full"></span> Case File #1001
- </div>
- <div class="ml-2 bg-wood h-[34px] px-4 flex items-center text-gold font-mono text-[10px] tracking-widest">CONFIDENTIAL</div>
- </div>
-
- <div class="relative bg-paper border-[3px] border-gavel gavel-shadow">
- <!-- Binding holes -->
- <div class="absolute left-0 top-0 bottom-0 w-[44px] border-r-[1.5px] border-gavel/15 flex flex-col items-center gap-8 py-10 hidden md:flex">
- <div class="hole"></div><div class="hole"></div><div class="hole"></div><div class="hole"></div>
- </div>
-
- <div class="md:pl-[44px]">
- <!-- Ruled paper -->
- <div class="ruled px-6 md:px-10 py-8 md:py-10">
- <!-- Paper clip -->
- <div class="absolute right-10 -top-3 w-[32px] h-[64px] border-[3px] border-gavel/30 rounded-[16px] hidden md:block">
- <div class="absolute top-2 left-[6px] right-[6px] bottom-2 border-[3px] border-gavel/20 rounded-[10px]"></div>
- </div>
-
- <div class="flex flex-wrap items-start justify-between gap-4 mb-8">
- <div>
- <div class="font-mono text-[10px] tracking-[0.2em] uppercase text-verdict font-bold mb-2">Criminal Docket — Flaky Test Division</div>
- <h1 class="font-serif font-[800] text-[40px] md:text-[54px] leading-[0.9] tracking-[-0.03em] uppercase">
- State <span class="font-[300] italic lowercase text-[36px] md:text-[48px] normal-case tracking-normal">vs</span><br>
- <span class="bg-gavel text-paper px-2">cart.checkout</span>.spec.ts
- </h1>
- </div>
- <!-- GUILTY stamp -->
- <div class="relative mt-2">
- <div class="stamp stamp-double relative text-verdict border-verdict px-3 py-2 rotate-[-8deg] text-[22px] tracking-[0.15em]">GUILTY<br><span class="text-[10px] tracking-[0.2em]">— FLAKY —</span></div>
- <div class="absolute -bottom-2 -right-2 w-6 h-6 bg-verdict rounded-full flex items-center justify-center text-paper font-mono text-[10px]">⚖</div>
- </div>
- </div>
-
- <div class="max-w-[560px]">
- <h2 class="font-serif text-[26px] md:text-[32px] leading-[1.05] font-[600] tracking-[-0.02em] mb-3">
- The <span class="underline decoration-gold decoration-[6px] underline-offset-[-6px]">AI Flaky Test</span> Trust Layer. Put every flaky test on trial.
- </h2>
- <p class="font-mono text-[13px] leading-[1.6] opacity-70 mb-8">
- Falsky is <span class="bg-wood text-paper px-1">Judge, Jury, and Executioner</span> for your CI. It scores trust, prosecutes flakes, and delivers verdicts before you merge. No more re-runs. No more doubt.
- </p>
-
- <!-- Charges -->
- <div class="border-[1.5px] border-gavel/20 bg-[#FAF6E8] p-4 md:p-5 mb-8">
- <div class="font-mono text-[9px] tracking-[0.2em] uppercase opacity-60 mb-3">Charges Filed</div>
- <div class="space-y-2.5 font-mono text-[12px]">
- <div class="flex gap-3"><span class="text-verdict font-bold">I.</span><span class="opacity-80">Intermittent timeout on checkout flow — 23 failures in last 100 runs.</span></div>
- <div class="flex gap-3"><span class="text-verdict font-bold">II.</span><span class="opacity-80">Non-deterministic DOM query causing false negatives.</span></div>
- <div class="flex gap-3"><span class="text-verdict font-bold">III.</span><span class="opacity-80">Contempt of CI — blocking 14 deploys without cause.</span></div>
- </div>
- </div>
-
- <div class="flex flex-wrap items-center gap-3">
- <a href="/dashboard/index.html" class="bg-gavel text-paper font-mono text-[12px] tracking-[0.15em] uppercase px-6 py-3.5 hover:bg-wood transition flex items-center gap-3">
- <span>Enter Courtroom</span><span class="opacity-60">→</span>
- </a>
- <a href="/dashboard/index.html" class="border-[2px] border-gavel bg-paper font-mono text-[12px] tracking-[0.15em] uppercase px-6 py-3 hover:bg-[#F0EAD6] transition">
- View Evidence Log
- </a>
- <div class="font-stamp text-[11px] opacity-50 ml-2 hidden md:block">FILED: TODAY • NO BAIL</div>
- </div>
- </div>
- </div>
-
- <!-- Gold footer of file -->
- <div class="h-[10px] wood-grain w-full"></div>
- </div>
- </div>
-
- <!-- Below file: mini notice -->
- <div class="mt-4 flex items-center gap-3 font-mono text-[10px] tracking-[0.12em] uppercase opacity-50">
- <div class="w-6 h-[1px] bg-gavel/30"></div> All defendants presumed flaky until proven trustworthy. <span class="hidden md:inline">§ Falsky Code 4.82</span>
- </div>
- </div>
-
- <!-- RIGHT: DOCKET LIST -->
- <div class="col-span-12 lg:col-span-5">
- <div class="lg:sticky lg:top-8 space-y-6">
- <!-- Docket Header -->
- <div class="bg-gavel text-paper p-5 flex items-center justify-between">
- <div class="flex items-center gap-3">
- <div class="w-8 h-8 bg-paper text-gavel flex items-center justify-center font-stamp text-[16px]">☰</div>
- <div>
- <div class="font-mono text-[10px] tracking-[0.2em] opacity-60 uppercase">Today's Docket</div>
- <div class="font-serif font-bold text-[15px] tracking-wide">TRIALS IN PROGRESS</div>
- </div>
- </div>
- <div class="text-right font-mono text-[10px] leading-tight opacity-60">COURTROOM<br>3B • CI-UNIT</div>
- </div>
-
- <!-- Docket List -->
- <div class="border-[2.5px] border-gavel bg-paper divide-y divide-gavel/15">
- <!-- Row -->
- <div class="p-4 flex items-center justify-between group hover:bg-[#FAF6E8] transition">
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-40">#481</span>
- <span class="font-mono text-[12px] font-bold">auth.login.spec.ts:42</span>
- </div>
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-50">Trust: 23%</span>
- <span class="stamp text-[10px] px-2 py-0.5 text-verdict border-verdict rotate-[-6deg]">GUILTY</span>
- </div>
- </div>
- <div class="p-4 flex items-center justify-between bg-[#FFFBEC] group">
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-40">#482</span>
- <span class="font-mono text-[12px] font-bold">cart.checkout.spec.ts:117</span>
- <span class="w-1.5 h-1.5 bg-verdict rounded-full animate-pulse"></span>
- </div>
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-50">Trust: 12%</span>
- <span class="stamp text-[10px] px-2 py-0.5 text-verdict border-verdict -rotate-[4deg] bg-paper">ON TRIAL</span>
- </div>
- </div>
- <div class="p-4 flex items-center justify-between hover:bg-[#FAF6E8] transition">
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-40">#479</span>
- <span class="font-mono text-[12px] font-bold">payments.webhook.spec.ts</span>
- </div>
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-50">Trust: 88%</span>
- <span class="stamp text-[10px] px-2 py-0.5 text-[#2E5A38] border-[#2E5A38] rotate-[5deg]">ACQUITTED</span>
- </div>
- </div>
- <div class="p-4 flex items-center justify-between hover:bg-[#FAF6E8] transition">
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-40">#476</span>
- <span class="font-mono text-[12px] font-bold">inventory.sync.spec.ts</span>
- </div>
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-50">Trust: 94%</span>
- <span class="stamp text-[10px] px-2 py-0.5 text-[#2E5A38] border-[#2E5A38] -rotate-[3deg]">ACQUITTED</span>
- </div>
- </div>
- <div class="p-4 flex items-center justify-between hover:bg-[#FAF6E8] transition">
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-40">#475</span>
- <span class="font-mono text-[12px] font-bold">user.profile.spec.ts:89</span>
- </div>
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-50">Trust: 41%</span>
- <span class="stamp text-[10px] px-2 py-0.5 text-gold border-gold rotate-[4deg]">QUARANTINED</span>
- </div>
- </div>
- </div>
-
- <!-- Judge Bench Card -->
- <div class="relative bg-[#121212] text-paper p-5 border-[3px] border-gold">
- <div class="absolute -top-3 left-6 bg-gold text-gavel font-mono text-[9px] tracking-[0.2em] uppercase px-2 py-1">Judge's Bench • AI Deliberation</div>
- <div class="flex gap-4 pt-2">
- <div class="w-12 h-12 bg-paper rounded-full flex items-center justify-center text-gavel font-serif font-bold text-xl shrink-0">P</div>
- <div class="flex-1">
- <div class="font-stamp text-[13px] leading-snug">"Based on 200 runs, this test lies 31% of the time. I find the defendant unreliable. Quarantine until fixed."</div>
- <div class="mt-2 font-mono text-[10px] opacity-50 tracking-widest uppercase">— Hon. Falsky, Trust Score Analysis</div>
- </div>
- </div>
- <!-- Gavel icon -->
- <div class="absolute -right-3 -bottom-3 w-10 h-10 bg-paper border-2 border-gavel rotate-12 flex items-center justify-center">
- <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#121212" stroke-width="2"><path d="M14 8 L20 14 L18 16 L12 10 Z"/><path d="M7 14 L10 17"/><path d="M3 21 L6 18"/><rect x="8" y="10" width="6" height="3" transform="rotate(-45 11 11.5)"/></svg>
- </div>
- </div>
-
- <!-- Stats Mini -->
- <div class="grid grid-cols-4 gap-[2px] bg-gavel border-[2px] border-gavel">
- <div class="bg-paper p-3 text-center"><div class="font-serif font-bold text-[20px] leading-none">2,847/div><div class="font-mono text-[8px] uppercase tracking-widest opacity-60 mt-1">Total Tests</div></div>
- <div class="bg-paper p-3 text-center"><div class="font-serif font-bold text-[20px] leading-none text-verdict">142/div><div class="font-mono text-[8px] uppercase tracking-widest opacity-60 mt-1">Flaky</div></div>
- <div class="bg-paper p-3 text-center"><div class="font-serif font-bold text-[20px] leading-none">23/div><div class="font-mono text-[8px] uppercase tracking-widest opacity-60 mt-1">Quarantined</div></div>
- <div class="bg-gold p-3 text-center"><div class="font-serif font-bold text-[20px] leading-none">89</div><div class="font-mono text-[8px] uppercase tracking-widest opacity-60 mt-1">Avg Trust</div></div>
- </div>
- </div>
- </div>
- </div>
+<span class="c"># → PR comment with trust scores & flaky detection</span></pre>
+    </div>
+  </div>
 </section>
 
-<!-- FEATURES: EXHIBITS -->
-<section class="border-t-[3px] border-gavel bg-[#F5EFE0]">
- <div class="max-w-[1360px] mx-auto px-6 md:px-10 py-12 md:py-16">
- <div class="flex items-end justify-between mb-10 gap-6 flex-wrap">
- <div>
- <div class="font-mono text-[11px] tracking-[0.2em] uppercase text-verdict mb-2 flex items-center gap-2"><span class="w-8 h-[2px] bg-verdict"></span> Exhibit A-C • Core Capabilities</div>
- <h2 class="font-serif font-[800] text-[36px] md:text-[52px] leading-[0.9] tracking-[-0.03em] uppercase">Evidence of<br>Trustworthiness</h2>
- </div>
- <div class="font-mono text-[12px] max-w-[340px] opacity-70 leading-relaxed">Every feature is a piece of evidence. We don't guess — we prosecute with data, pattern, and precedent.</div>
- </div>
-
- <div class="grid md:grid-cols-3 gap-[3px] bg-gavel border-[3px] border-gavel">
- <!-- Card 1 -->
- <div class="bg-paper p-7 md:p-8 relative group hover:bg-[#FFFEF9] transition">
- <div class="absolute top-0 right-0 bg-gavel text-paper font-mono text-[9px] tracking-widest px-3 py-1.5">EXHIBIT A</div>
- <div class="w-10 h-10 border-[2px] border-gavel flex items-center justify-center mb-6 mt-2 relative">
- <span class="font-serif font-bold text-lg">%</span>
- <div class="absolute -bottom-1 -right-1 w-3 h-3 bg-gold border border-gavel"></div>
- </div>
- <h3 class="font-serif font-bold text-[20px] leading-tight tracking-[-0.01em] mb-2">Trust Scoring</h3>
- <div class="font-stamp text-[11px] opacity-50 mb-3">RELIABILITY UNDER OATH</div>
- <p class="font-mono text-[12.5px] leading-[1.6] opacity-70 mb-6">Every test gets a trust score from 0-100 based on 50+ signals. History, variance, environment, timing. No perjury allowed.</p>
- <div class="border-t border-dashed border-gavel/20 pt-4 flex items-center justify-between font-mono text-[10px]">
- <span class="uppercase tracking-widest opacity-60">Verdict Range</span>
- <span class="flex gap-1"><span class="w-6 h-1.5 bg-verdict"></span><span class="w-6 h-1.5 bg-gold"></span><span class="w-6 h-1.5 bg-[#2E5A38]"></span></span>
- </div>
- </div>
- <!-- Card 2 -->
- <div class="bg-paper p-7 md:p-8 relative group hover:bg-[#FFFEF9] transition">
- <div class="absolute top-0 right-0 bg-verdict text-paper font-mono text-[9px] tracking-widest px-3 py-1.5">EXHIBIT B • CRITICAL</div>
- <div class="w-10 h-10 border-[2px] border-gavel flex items-center justify-center mb-6 mt-2 relative bg-gavel text-paper">
- <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12 S 3 3 12 3 S 23 3 23 12"/><path d="M1 12 S 3 21 12 21 S 23 21 23 12"/><circle cx="12" cy="12" r="3"/></svg>
- </div>
- <h3 class="font-serif font-bold text-[20px] leading-tight tracking-[-0.01em] mb-2">Flaky Detection</h3>
- <div class="font-stamp text-[11px] opacity-50 mb-3">CROSS-EXAMINATION ENGINE</div>
- <p class="font-mono text-[12.5px] leading-[1.6] opacity-70 mb-6">AI that interrogates every failure. Real bug or flaky witness? Pattern recognition across 1,203 tests quarantines liars automatically.</p>
- <div class="flex gap-2 font-mono text-[9px] uppercase tracking-widest">
- <span class="border border-gavel px-2 py-1">Timeout</span><span class="border border-gavel px-2 py-1">Race</span><span class="border border-gavel px-2 py-1 bg-gavel text-paper">Network</span>
- </div>
- </div>
- <!-- Card 3 -->
- <div class="bg-paper p-7 md:p-8 relative group hover:bg-[#FFFEF9] transition">
- <div class="absolute top-0 right-0 bg-paper border border-gavel border-t-0 border-r-0 text-gavel font-mono text-[9px] tracking-widest px-3 py-1.5">EXHIBIT C</div>
- <div class="w-10 h-10 border-[2px] border-gavel flex items-center justify-center mb-6 mt-2 relative">
- <span class="font-mono text-[14px]">◑</span>
- </div>
- <h3 class="font-serif font-bold text-[20px] leading-tight tracking-[-0.01em] mb-2">Smart Alerts</h3>
- <div class="font-stamp text-[11px] opacity-50 mb-3">COURT REPORTER • REAL-TIME</div>
- <p class="font-mono text-[12.5px] leading-[1.6] opacity-70 mb-6">Only alert when it matters. Falsky files a motion only when trust drops below threshold. No spam, no false alarms, just verdicts.</p>
- <div class="font-mono text-[10px] flex items-center gap-2 opacity-60"><span class="w-2 h-2 bg-[#2E5A38] rounded-full"></span> Alert suppressed — Trust: 91% • Not flaky</div>
- </div>
- </div>
- </div>
+<!-- Features -->
+<section class="features" id="features">
+  <div class="container">
+    <h2>Built for reliability</h2>
+    <p class="sub">Everything you need to detect, classify, and fix flaky tests.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:var(--accent-soft);color:var(--accent)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+        <h3>Bayesian Scoring</h3>
+        <p>Beta-Binomial conjugate prior for accurate trust scores, even with small sample sizes.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:var(--green-soft);color:var(--green)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+        <h3>Anomaly Detection</h3>
+        <p>Z-score analysis on test durations to catch timing-related flakiness.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:var(--yellow-soft);color:var(--yellow)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <h3>Flaky Classification</h3>
+        <p>Automatically categorizes flaky tests: timing, order dependency, shared state, and more.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:var(--red-soft);color:var(--red)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+        <h3>Smart Alerts</h3>
+        <p>Discord/Slack notifications when trust drops or new flaky tests are detected.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:var(--accent-soft);color:var(--accent)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
+        <h3>Dashboard</h3>
+        <p>Real-time dashboard with trust distribution, flaky test tables, and CI run history.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:var(--green-soft);color:var(--green)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+        <h3>PR Comments</h3>
+        <p>Automatic trust score reports posted as PR comments after every CI run.</p>
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- HOW IT WORKS - COURT PROCEDURE -->
-<section class="bg-paper border-t-[3px] border-gavel">
- <div class="max-w-[1360px] mx-auto px-6 md:px-10 py-14 md:py-20">
- <div class="grid lg:grid-cols-12 gap-10">
- <div class="lg:col-span-4">
- <div class="sticky top-10">
- <div class="inline-flex items-center gap-2 border-[1.5px] border-gavel px-3 py-1 font-mono text-[10px] tracking-[0.18em] uppercase mb-6">
- <span class="font-stamp text-[13px]">§</span> Court Procedure
- </div>
- <h2 class="font-serif font-[800] text-[38px] md:text-[46px] leading-[0.9] tracking-[-0.03em] uppercase mb-4">How The<br>Trial Works</h2>
- <p class="font-mono text-[12.5px] leading-[1.6] opacity-60 max-w-[280px]">From arraignment to verdict in under 90 seconds. Automated justice for automated tests.</p>
- <div class="mt-8 hidden lg:block">
- <div class="w-[120px] h-[120px] border-[3px] border-gavel rounded-full flex items-center justify-center relative">
- <div class="absolute inset-2 border border-dashed border-gavel/30 rounded-full"></div>
- <span class="font-stamp text-[11px] tracking-[0.2em] text-center leading-tight">SEAL OF<br>FALSKY<br>COURT</span>
- </div>
- </div>
- </div>
- </div>
- <div class="lg:col-span-8">
- <div class="space-y-0">
- <!-- Step 01 -->
- <div class="grid md:grid-cols-[96px_1fr] gap-6 border-b border-gavel/15 py-10 group">
- <div class="font-mono text-[12px] flex md:block items-center gap-3">
- <span class="font-serif font-[800] text-[44px] leading-none">01</span>
- <span class="md:mt-2 inline-block border border-gavel px-2 py-0.5 text-[9px] tracking-widest uppercase">Arraignment</span>
- </div>
- <div class="relative">
- <div class="absolute -left-3 top-0 bottom-0 w-[2px] bg-gold hidden md:block"></div>
- <h3 class="font-serif font-bold text-[22px] leading-tight">Instrument & Collect Evidence</h3>
- <p class="font-mono text-[13px] leading-[1.6] opacity-70 mt-3 max-w-[520px]">Drop our GitHub Action into your workflow. Every test run is logged, fingerprinted, and added to the docket. No code changes required — just one YAML line.</p>
- <div class="mt-4 inline-flex items-center gap-2 bg-[#F5EFE0] border border-gavel/20 px-3 py-2 font-mono text-[11px]">
- <span class="w-2 h-2 bg-wood rounded-full"></span> Evidence locker → 1,203 test histories synchronized
- </div>
- </div>
- </div>
- <!-- Step 02 -->
- <div class="grid md:grid-cols-[96px_1fr] gap-6 border-b border-gavel/15 py-10">
- <div class="font-mono text-[12px] flex md:block items-center gap-3">
- <span class="font-serif font-[800] text-[44px] leading-none">02</span>
- <span class="md:mt-2 inline-block bg-gavel text-paper px-2 py-0.5 text-[9px] tracking-widest uppercase">Deliberation</span>
- </div>
- <div class="relative">
- <div class="absolute -left-3 top-0 bottom-0 w-[2px] bg-gavel hidden md:block"></div>
- <h3 class="font-serif font-bold text-[22px] leading-tight">AI Jury Deliberates</h3>
- <p class="font-mono text-[13px] leading-[1.6] opacity-70 mt-3 max-w-[520px]">Our model cross-examines duration variance, exit codes, stack trace entropy, and infra signals. It separates a real regression from a lying witness in milliseconds.</p>
- <div class="mt-5 flex flex-wrap gap-2">
- <span class="stamp text-verdict border-verdict px-2 py-1 text-[10px] rotate-[-3deg]">FLAKY • 142</span>
- <span class="stamp text-[#2E5A38] border-[#2E5A38] px-2 py-1 text-[10px] rotate-[2deg]">STABLE • 2705</span>
- <span class="stamp text-gold border-gold px-2 py-1 text-[10px] rotate-[-1deg]">QUARANTINED • 23</span>
- </div>
- </div>
- </div>
- <!-- Step 03 -->
- <div class="grid md:grid-cols-[96px_1fr] gap-6 py-10">
- <div class="font-mono text-[12px] flex md:block items-center gap-3">
- <span class="font-serif font-[800] text-[44px] leading-none">03</span>
- <span class="md:mt-2 inline-block border border-verdict text-verdict px-2 py-0.5 text-[9px] tracking-widest uppercase">Verdict</span>
- </div>
- <div class="relative">
- <div class="absolute -left-3 top-0 bottom-0 w-[2px] bg-verdict hidden md:block"></div>
- <h3 class="font-serif font-bold text-[22px] leading-tight">Deliver Verdict & Execute Sentence</h3>
- <p class="font-mono text-[13px] leading-[1.6] opacity-70 mt-3 max-w-[520px]">Guilty tests are quarantined, not failed. PRs continue. Trust dashboard updates. Slack & GitHub comment auto-filed. Justice served without blocking velocity.</p>
- <div class="mt-4 flex gap-3">
- <div class="bg-gavel text-paper px-3 py-2 font-mono text-[10px] tracking-widest uppercase">GAVEL STRIKE → CI PASSES</div>
- <div class="border border-gavel px-3 py-2 font-mono text-[10px] tracking-widest uppercase">Docket updated</div>
- </div>
- </div>
- </div>
- </div>
- </div>
- </div>
- </div>
+<!-- How it works -->
+<section class="how">
+  <div class="container">
+    <h2>How it works</h2>
+    <p class="sub">Three steps to flaky test detection.</p>
+    <div class="steps">
+      <div class="step-card"><div class="step-num">1</div><h3>Connect</h3><p>Add the Falsky GitHub Action to your CI workflow.</p></div>
+      <div class="step-card"><div class="step-num">2</div><h3>Analyze</h3><p>Falsky processes your JUnit XML results with Bayesian scoring.</p></div>
+      <div class="step-card"><div class="step-num">3</div><h3>Fix</h3><p>Review flaky tests, track trends, and improve reliability.</p></div>
+    </div>
+  </div>
 </section>
 
-<!-- CODE SNIPPET - AFFIDAVIT -->
-<section class="bg-wood py-10 md:py-14">
- <div class="max-w-[1360px] mx-auto px-6 md:px-10">
- <div class="grid lg:grid-cols-12 gap-8 items-start">
- <div class="lg:col-span-5 text-[#E8E0C9]">
- <div class="font-mono text-[10px] tracking-[0.2em] uppercase text-gold mb-3">Affidavit • Installation</div>
- <h2 class="font-serif font-bold text-[30px] md:text-[38px] leading-[0.95] tracking-[-0.02em] text-paper">One line. Case closed in 30 sec.</h2>
- <p class="font-mono text-[13px] leading-[1.6] opacity-60 mt-4 max-w-[360px]">No sidecars, no agents, no restructuring. This is the entire integration. The court awaits your filing.</p>
- <div class="mt-8 space-y-3 font-mono text-[11px]">
- <div class="flex items-center gap-3 text-paper/80"><span class="w-5 h-5 bg-gold text-wood flex items-center justify-center font-bold">✓</span> Works with Jest, Vitest, Playwright, Cypress</div>
- <div class="flex items-center gap-3 text-paper/80"><span class="w-5 h-5 bg-gold text-wood flex items-center justify-center font-bold">✓</span> Zero flake re-run policy</div>
- <div class="flex items-center gap-3 text-paper/80"><span class="w-5 h-5 bg-gold text-wood flex items-center justify-center font-bold">✓</span> SOC-2 • Evidence encrypted at rest</div>
- </div>
- </div>
- <div class="lg:col-span-7">
- <div class="relative">
- <!-- paperclip decor -->
- <div class="absolute -top-4 right-14 w-8 h-14 border-[2.5px] border-gold/40 rounded-[14px] hidden md:block z-10">
- <div class="absolute top-1 left-1.5 right-1.5 bottom-1 border-[2px] border-gold/30 rounded-[10px]"></div>
- </div>
-
- <div class="bg-paper border-[2.5px] border-gavel gavel-shadow relative">
- <div class="flex items-center justify-between bg-[#EFE8D1] border-b-[1.5px] border-gavel/20 px-5 py-3">
- <div class="flex items-center gap-3">
- <div class="flex gap-1.5"><span class="w-2.5 h-2.5 bg-verdict rounded-full"></span><span class="w-2.5 h-2.5 bg-gold rounded-full"></span><span class="w-2.5 h-2.5 bg-[#2E5A38] rounded-full"></span></div>
- <span class="font-mono text-[11px] tracking-widest uppercase opacity-70">.github/workflows/falsky.yml</span>
- </div>
- <span class="font-stamp text-[10px] tracking-widest border border-gavel px-2 py-0.5">FILED UNDER OATH</span>
- </div>
- <div class="p-6 md:p-7 font-mono text-[12.5px] leading-[1.7] overflow-x-auto">
-<pre class="whitespace-pre"><span class="opacity-40">name: falsky-trust-layer</span>
-<span class="opacity-40">on: [push, pull_request]</span>
-<span class="opacity-40">jobs:</span>
- <span class="opacity-80">test:</span>
- <span class="opacity-60">runs-on: ubuntu-latest</span>
- <span class="opacity-60">steps:</span>
- - <span class="opacity-60">uses: actions/checkout@v4</span>
- - <span class="opacity-60">run: npm test</span>
-
- <span class="text-verdict font-bold"># ↳ THE COURT ARRIVES</span>
- - <span class="opacity-80">name: Falsky AI Flaky Test Trust Layer</span>
- <span class="opacity-80">uses: Pritahi/falsky-action@v1</span>
- <span class="opacity-60">with:</span>
- <span class="opacity-80">api-key: ${{ secrets.FALSKY_KEY }}</span>
- <span class="opacity-80">quarantine: <span class="text-[#2E5A38] font-bold">true</span></span>
- <span class="opacity-80">trust-threshold: <span class="font-bold">75</span></span>
- <span class="opacity-80">fail-on-new-flake: <span class="text-verdict">false</span></span>
- <span class="opacity-40"># → verdicts delivered in PR comments</span>
- <span class="opacity-40"># → dashboard: app.falsky.dev/case/482</span></pre>
- </div>
- <!-- bottom tape -->
- <div class="h-3 bg-[#F0EAD6] border-t border-gavel/10 flex items-center px-6 gap-2">
- <div class="w-14 h-1 bg-gavel/20"></div><div class="w-10 h-1 bg-verdict/30"></div><div class="w-8 h-1 bg-gold/50"></div>
- </div>
- </div>
-
- <!-- Floating verdict -->
- <div class="absolute -bottom-6 -left-4 md:-left-8 stamp bg-paper text-gavel border-gavel px-4 py-2 rotate-[-6deg] text-[14px] shadow-[4px_4px_0px_#121212] hidden md:block">
- VERDICT ISSUED • TRUST: 89%
- </div>
- </div>
- </div>
- </div>
- </div>
+<!-- Pricing -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <h2>Simple pricing</h2>
+    <p class="sub">Start free, scale as you grow.</p>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <h3>Free</h3>
+        <div class="price">$0<span>/mo</span></div>
+        <ul><li>1 repository</li><li>100 test runs/month</li><li>Dashboard access</li><li>PR comments</li></ul>
+        <a href="/admin/" class="btn-secondary" style="display:inline-block;margin-top:12px">Get Started</a>
+      </div>
+      <div class="price-card popular">
+        <h3>Pro</h3>
+        <div class="price">$29<span>/mo</span></div>
+        <ul><li>10 repositories</li><li>Unlimited runs</li><li>Alerts (Discord/Slack)</li><li>Priority support</li></ul>
+        <a href="/admin/" class="btn-primary" style="display:inline-block;margin-top:12px">Get Started</a>
+      </div>
+      <div class="price-card">
+        <h3>Enterprise</h3>
+        <div class="price">Custom</div>
+        <ul><li>Unlimited repos</li><li>SSO / SAML</li><li>Dedicated support</li><li>Custom integrations</li></ul>
+        <a href="/admin/" class="btn-secondary" style="display:inline-block;margin-top:12px">Contact Sales</a>
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- FOOTER STATS - COURT RECORDS -->
-<footer class="bg-paper border-t-[4px] border-gavel">
- <div class="max-w-[1360px] mx-auto px-6 md:px-10 py-8 md:py-10">
- <div class="flex flex-wrap items-center justify-between gap-6 mb-8">
- <div class="flex items-center gap-4">
- <div class="font-serif font-[800] text-[28px] leading-none tracking-[-0.02em]">FALSKY</div>
- <div class="h-8 w-[1px] bg-gavel/20"></div>
- <div class="font-mono text-[10px] leading-tight opacity-60 uppercase tracking-widest">AI Flaky Test<br>Trust Layer • EST 2024<br>Case No 1001 Jurisdiction</div>
- </div>
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] tracking-widest uppercase opacity-60">Final Disposition</span>
- <span class="stamp text-[12px] text-[#2E5A38] border-[#2E5A38] px-3 py-1 rotate-[2deg]">COURT ADJOURNED</span>
- </div>
- </div>
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <h2>Ready to fix your flaky tests?</h2>
+    <p>Start detecting flaky tests in under 2 minutes.</p>
+    <a href="/admin/" class="btn-primary">Get Started Free →</a>
+  </div>
+</section>
 
- <div class="grid grid-cols-2 md:grid-cols-4 gap-[2px] bg-gavel border-[2px] border-gavel">
- <div class="bg-[#FFFCF2] p-6 md:p-8 group hover:bg-[#FFFEF9] transition">
- <div class="flex items-start justify-between">
- <div class="font-mono text-[10px] tracking-[0.18em] uppercase opacity-50">Total Tests • Record</div>
- <div class="w-6 h-6 border border-gavel flex items-center justify-center font-mono text-[10px]">§</div>
- </div>
- <div class="font-serif font-[800] text-[44px] md:text-[56px] leading-none tracking-[-0.04em] mt-6">1203</div>
- <div class="font-mono text-[11px] opacity-60 mt-2">All cases filed since inception • Docket full</div>
- </div>
- <div class="bg-[#FFF5F5] p-6 md:p-8">
- <div class="font-mono text-[10px] tracking-[0.18em] uppercase text-verdict">Flaky • Guilty Pleas</div>
- <div class="font-serif font-[800] text-[44px] md:text-[56px] leading-none tracking-[-0.04em] mt-6 text-verdict">87</div>
- <div class="flex items-center gap-2 mt-3"><div class="h-1.5 flex-1 bg-gavel/10"><div class="h-full w-[72%] bg-verdict"></div></div><span class="font-mono text-[10px] opacity-60">7.2% of docket</span></div>
- </div>
- <div class="bg-[#FFFBEB] p-6 md:p-8">
- <div class="font-mono text-[10px] tracking-[0.18em] uppercase text-gold">Quarantined • Holding</div>
- <div class="font-serif font-[800] text-[44px] md:text-[56px] leading-none tracking-[-0.04em] mt-6">14</div>
- <div class="font-mono text-[11px] opacity-60 mt-2">Awaiting remediation • Not blocking CI</div>
- </div>
- <div class="bg-gavel text-paper p-6 md:p-8 relative overflow-hidden">
- <div class="absolute top-0 right-0 w-24 h-24 border border-gold/20 rounded-full -translate-y-8 translate-x-8"></div>
- <div class="font-mono text-[10px] tracking-[0.18em] uppercase text-gold">Avg Trust • Verdict Score</div>
- <div class="font-serif font-[800] text-[44px] md:text-[56px] leading-none tracking-[-0.04em] mt-6 text-paper">81<span class="text-[28px] align-super">%</span></div>
- <div class="font-stamp text-[11px] text-gold/80 mt-2 tracking-widest">TRUSTWORTHY • ADMISSIBLE</div>
- </div>
- </div>
-
- <div class="mt-6 flex flex-col md:flex-row items-center justify-between gap-4 font-mono text-[10px] tracking-[0.14em] uppercase opacity-40">
- <div>© FALSKY LABS • The People vs. Flaky Tests • No flaky tests were harmed, only quarantined.</div>
- <div class="flex gap-4"><span>Privacy Docket</span><span>Terms of Court</span><span>API Exhibit</span></div>
- </div>
- </div>
- <div class="wood-grain h-3 w-full"></div>
+<footer>
+  <div class="container">
+    <p>© 2026 Falsky. Built for developers who care about test reliability.</p>
+  </div>
 </footer>
 
 </body>
