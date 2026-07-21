@@ -309,7 +309,7 @@ def user_google_login():
     """User Google login — any Google account allowed."""
     if not SUPABASE_URL:
         raise HTTPException(status_code=501, detail="Google Sign-In not configured.")
-    redirect_to = urllib.parse.quote(f"{SITE_URL}/api/user/callback")
+    redirect_to = urllib.parse.quote(f"{SITE_URL}/login")
     auth_url = f"{SUPABASE_URL}/auth/v1/authorize?provider=google&redirect_to={redirect_to}"
     return RedirectResponse(url=auth_url)
 
