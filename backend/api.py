@@ -1023,12 +1023,12 @@ def dashboard(repo_name: str = Query(...), threshold: float = Query(50)):
         # Get repo
         repos = _supabase_rest("repositories", filters={"name": repo_name}, columns="id,name")
         if not repos or len(repos) == 0:
-            return {"repo": repo_name, "tests": [], "total": 0}
+            return {"repo": repo_name, "tests": [], "total": 0, "avg_trust": 0, "flaky_count": 0, "total_tests": 0}
         repo_id = repos[0]["id"]
         # Get test results
         tests = _supabase_rest("test_results", filters={"repo_id": str(repo_id)}, columns="test_name,status,trust_score,flaky_category,duration,run_id")
         if not tests:
-            return {"repo": repo_name, "tests": [], "total": 0}
+            return {"repo": repo_name, "tests": [], "total": 0, "avg_trust": 0, "flaky_count": 0, "total_tests": 0}
         # Aggregate by test name
         from collections import defaultdict
         agg = defaultdict(lambda: {"scores": [], "passes": 0, "total": 0, "category": None, "durations": []})
