@@ -3,558 +3,814 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Poly — AI Flaky Test Trust Layer | Courtroom Docket</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<title>FLK-01 · Poly Console — Station Entry</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,ital,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400;1,6..72,600&family=Fragment+Mono&family=Special+Elite&display=swap" rel="stylesheet">
-<script>
-tailwind.config = {
- theme: {
- extend: {
- colors: {
- wood: '#3B2314',
- paper: '#FFFCF2',
- gavel: '#121212',
- verdict: '#8B1A1A',
- gold: '#C8A95A',
- },
- fontFamily: {
- serif: ['Newsreader', 'serif'],
- mono: ['Fragment Mono', 'monospace'],
- stamp: ['Special Elite', 'monospace'],
- }
- }
- }
-}
-</script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-*{ -webkit-font-smoothing: antialiased; }
-body{ background:#FFFCF2; color:#121212; }
-.ruled {
- background-image: repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(59,35,20,0.06) 28px);
+:root {
+  --void:#06090f; --deep:#0a0f1a; --panel:#0d1420; --panel2:#111927;
+  --border:#1c2a3a; --border2:#243447;
+  --orbit:#00d4ff; --orbit2:rgba(0,212,255,0.15);
+  --seismic:#ff6b2b; --seismic2:rgba(255,107,43,0.15);
+  --green:#00ff88; --green2:rgba(0,255,136,0.12);
+  --amber:#ffb000; --amber2:rgba(255,176,0,0.12);
+  --red:#ff3344; --red2:rgba(255,51,68,0.12);
+  --purple:#a855f7;
+  --text:#e2eaf5; --text2:#8ba3bf; --text3:#4a6380;
+  --mono:'JetBrains Mono',monospace; --sans:'Inter',sans-serif;
+  --r:4px; --r-sm:3px;
 }
-.wood-grain{
- background: #3B2314;
- background-image:
- repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,0.04) 3px),
- linear-gradient(180deg, #4a2e1c 0%, #3B2314 60%, #2b1a0f 100%);
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{background:var(--void);color:var(--text);font-family:var(--sans);font-size:14px;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);pointer-events:none;z-index:9999;}
+
+/* Orbit radar bg */
+.radar-bg {
+  position: fixed; inset: 0;
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(0,212,255,0.04) 0%, transparent 70%),
+    linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+  pointer-events: none;
 }
-.paper-texture{
- background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+
+.top-bar {
+  position: relative;
+  background: var(--deep);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 10;
 }
-.stamp{
- font-family:'Special Elite';
- border: 3.5px solid currentColor;
- text-transform: uppercase;
- letter-spacing: 0.12em;
- line-height: 0.9;
- box-shadow: inset 0 0 0 1px currentColor;
+.top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
-.stamp-double:before{
- content:'';
- position:absolute;
- inset:3px;
- border:1px solid currentColor;
- pointer-events:none;
+.orbit-sm {
+  width: 22px; height: 22px;
+  border: 2px solid var(--orbit);
+  border-radius: 50%;
+  position: relative;
+  animation: spin 4s linear infinite;
 }
-.gavel-shadow{ box-shadow: 8px 8px 0px #121212; }
-.case-clip{
- background: linear-gradient(180deg, #C8A95A 0%, #b8984d 100%);
- box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+.orbit-sm::before {
+  content: '';
+  position: absolute;
+  top: -4px; left: 50%;
+  width: 7px; height: 7px;
+  background: var(--seismic);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--seismic);
+  transform: translateX(-50%);
 }
-.hole{
- width:18px; height:18px;
- background: #FFFCF2;
- border:2px solid rgba(59,35,20,0.2);
- border-radius:50%;
- box-shadow: inset 0 2px 3px rgba(0,0,0,0.15);
+@keyframes spin { to { transform: rotate(360deg); } }
+.top-bar-brand {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--orbit);
+  text-transform: uppercase;
+}
+.top-bar-right {
+  margin-left: auto;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.top-bar-meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--text3);
+  text-transform: uppercase;
+}
+.top-bar-sep { width:1px; height:20px; background:var(--border); }
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--green);
+  background: var(--green2);
+  border: 1px solid rgba(0,255,136,0.2);
+  padding: 3px 10px;
+}
+
+.main { position: relative; max-width: 1200px; margin: 0 auto; padding: 48px 24px 80px; z-index: 5; }
+
+/* HERO */
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+  margin-bottom: 80px;
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--seismic);
+  background: var(--seismic2);
+  border: 1px solid rgba(255,107,43,0.3);
+  padding: 4px 12px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.hero-h1 {
+  font-family: var(--sans);
+  font-size: 52px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  color: var(--text);
+}
+.hero-h1 em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--orbit);
+}
+
+.hero-desc {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.7;
+  margin-bottom: 28px;
+  max-width: 460px;
+}
+
+.hero-btns { display:flex; gap:12px; flex-wrap:wrap; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: var(--r);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid;
+}
+.btn-primary { background:var(--orbit); color:var(--void); border-color:var(--orbit); }
+.btn-primary:hover { background:var(--void); color:var(--orbit); }
+.btn-ghost { background:transparent; color:var(--text); border-color:var(--border); }
+.btn-ghost:hover { border-color:var(--orbit); color:var(--orbit); background:var(--orbit2); }
+
+/* RIGHT: DOCKET CARD */
+.docket-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  position: relative;
+}
+.docket-header {
+  background: var(--deep);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.docket-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text2);
+}
+.docket-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--seismic);
+  background: var(--seismic2);
+  border: 1px solid rgba(255,107,43,0.2);
+  padding: 2px 8px;
+  text-transform: uppercase;
+}
+.docket-list { border-top: 1px solid var(--border); }
+.docket-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(28,42,58,0.6);
+  transition: background 0.15s;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text);
+}
+.docket-row:last-child { border-bottom:none; }
+.docket-row:hover { background: var(--panel2); }
+.docket-left { display:flex; align-items:center; gap:12px; }
+.docket-num { font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.1em; }
+.docket-name { font-family:var(--mono);font-size:12px;font-weight:600; }
+.docket-right { display:flex; align-items:center; gap:12px; }
+.docket-trust { font-family:var(--mono);font-size:11px;color:var(--text2); }
+.stamp {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border: 1px solid;
+}
+.stamp-guilty { color:var(--red); border-color:rgba(255,51,68,0.3); background:var(--red2); }
+.stamp-acquitted { color:var(--green); border-color:rgba(0,255,136,0.3); background:var(--green2); }
+.stamp-quarantined { color:var(--amber); border-color:rgba(255,176,0,0.3); background:var(--amber2); }
+
+/* STATS STRIP */
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  margin-bottom: 64px;
+  overflow: hidden;
+}
+.stat-pill {
+  background: var(--panel);
+  padding: 20px;
+  position: relative;
+  transition: background 0.2s;
+}
+.stat-pill:hover { background: var(--panel2); }
+.stat-pill::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.stat-pill.s-orbit::before { background:var(--orbit); }
+.stat-pill.s-seismic::before { background:var(--seismic); }
+.stat-pill.s-amber::before { background:var(--amber); }
+.stat-pill.s-green::before { background:var(--green); }
+.stat-pill-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.stat-pill-value {
+  font-family: var(--mono);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.stat-pill-sub {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* FEATURES */
+.features { margin-bottom: 80px; }
+.section-header-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+.section-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--seismic);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::before { content:'◆'; color:var(--seismic); }
+.section-h2 {
+  font-family: var(--sans);
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  line-height: 0.95;
+}
+.section-h2 em { font-style:italic; font-weight:300; }
+.section-right {
+  max-width: 340px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.7;
+  padding-bottom: 8px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.feat-card {
+  background: var(--panel);
+  padding: 28px;
+  position: relative;
+  transition: background 0.2s;
+}
+.feat-card:hover { background: var(--panel2); }
+.feat-card::before {
+  content: attr(data-exhibit);
+  position: absolute;
+  top: 0; right: 0;
+  background: var(--deep);
+  color: var(--text3);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-bottom: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+}
+.feat-icon {
+  width: 40px; height: 40px;
+  border: 2px solid var(--border);
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--orbit);
+  margin-bottom: 16px;
+  margin-top: 4px;
+}
+.feat-tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.feat-title {
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+.feat-desc {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.65;
+  margin-bottom: 16px;
+}
+.feat-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.feat-tag-pill {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  color: var(--text3);
+  border-radius: var(--r-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* HOW IT WORKS */
+.how-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 80px;
+}
+.how-card {
+  background: var(--panel);
+  padding: 28px;
+  position: relative;
+}
+.how-num {
+  font-family: var(--mono);
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--deep);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: 16px;
+  -webkit-text-stroke: 1px var(--border2);
+}
+.how-title {
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+.how-desc {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+.how-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.how-chip {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 10px;
+  background: var(--deep);
+  border: 1px solid var(--border);
+  color: var(--text3);
+  border-radius: var(--r-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* CODE BLOCK */
+.install-block {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 80px;
+}
+.install-header {
+  background: var(--deep);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.install-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--text2);
+  text-transform: uppercase;
+}
+.install-dots {
+  display: flex;
+  gap: 6px;
+}
+.install-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+.install-dot:nth-child(1){background:var(--red);}
+.install-dot:nth-child(2){background:var(--amber);}
+.install-dot:nth-child(3){background:var(--green);}
+.install-body {
+  padding: 24px;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text2);
+  overflow-x: auto;
+}
+.install-body .kw{color:var(--orbit);font-weight:600;} .install-body .str{color:var(--green);} .install-body .val{color:var(--amber);} .install-body .cmt{color:var(--text3);font-style:italic;} .install-body .bl{color:var(--red);}
+
+/* FOOTER */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 32px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 5;
+}
+.footer-brand {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--orbit);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.footer-meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.footer-seal {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text3);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.bottom-bar {
+  position: relative;
+  height: 6px;
+  background: linear-gradient(90deg, var(--orbit), var(--seismic), var(--purple), var(--green), var(--orbit));
+  background-size: 200% 100%;
+  animation: shift 4s linear infinite;
+  z-index: 5;
+}
+@keyframes shift {
+  0%{background-position:0% 0%} 100%{background-position:200% 0%}
+}
+
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr;}
+  .features-grid,.how-grid{grid-template-columns:1fr;}
+  .hero-h1{font-size:36px;}
+  .stats-strip{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:500px){
+  .stats-strip{grid-template-columns:1fr;}
 }
 </style>
 </head>
-<body class="font-serif paper-texture overflow-x-hidden">
+<body>
+<div class="radar-bg"></div>
 
-<!-- TOP WOOD BENCH -->
-<div class="wood-grain h-[14px] w-full"></div>
+<!-- Top Bar -->
+<div class="top-bar">
+  <div class="top-bar-left">
+    <div class="orbit-sm"></div>
+    <div class="top-bar-brand">FLK-01 · Poly Console</div>
+  </div>
+  <div class="top-bar-right">
+    <div class="top-bar-meta">Tremor Station · Build 2026.07</div>
+    <div class="top-bar-sep"></div>
+    <div class="status-pill"><span style="width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite"></span>Systems Nominal</div>
+  </div>
+</div>
 
-<!-- COURT HEADER DOCUMENT -->
-<header class="relative bg-paper border-b-[3px] border-gavel">
- <div class="max-w-[1360px] mx-auto px-6 md:px-10 py-4 flex items-center justify-between font-mono text-[10px] md:text-[11px] tracking-[0.14em] uppercase">
- <div class="flex items-center gap-6">
- <span class="flex items-center gap-2"><span class="w-2 h-2 bg-verdict rounded-full animate-pulse"></span> COURT IN SESSION</span>
- <span class="hidden md:inline opacity-60">DISTRICT OF CONTINUOUS INTEGRATION • DIVISION CI/CD</span>
- </div>
- <div class="flex items-center gap-4">
- <span class="opacity-60 hidden md:inline">DOCKET • 07.18.2026</span>
- <span class="border border-gavel px-2 py-[2px]">CASE NO. #1001</span>
- </div>
- </div>
+<main class="main">
+  <!-- HER0 -->
+  <div class="hero-grid">
+    <div>
+      <div class="hero-tag">⛁ AI Flaky Test · Trust Layer</div>
+      <h1 class="hero-h1">The <em>Seismic</em> Test Justice System</h1>
+      <p class="hero-desc">Poly is Judge, Jury, and Executioner for your CI. It scores trust, prosecutes flakes, and delivers verdicts before you merge. No more re-runs. No more doubt.</p>
+      <div class="hero-btns">
+        <a href="/dashboard/" class="btn btn-primary">Enter Station →</a>
+        <a href="/dashboard/guide.html" class="btn btn-ghost">Read Protocol</a>
+      </div>
+    </div>
 
- <div class="max-w-[1360px] mx-auto px-6 md:px-10 py-8 md:py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
- <!-- Seal -->
- <div class="flex items-center gap-5">
- <div class="w-[64px] h-[64px] rounded-full border-[2.5px] border-gavel flex items-center justify-center relative bg-paper">
- <div class="absolute inset-[5px] rounded-full border border-gold"></div>
- <span class="font-stamp text-[18px] leading-none translate-y-[1px]">§</span>
- <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-gold rounded-full border-2 border-paper flex items-center justify-center">
- <span class="w-2 h-2 bg-gavel rounded-full"></span>
- </div>
- </div>
- <div>
- <div class="font-mono text-[10px] tracking-[0.2em] uppercase opacity-60">United States of Codebase</div>
- <div class="font-serif font-[800] text-[22px] md:text-[26px] leading-[0.95] tracking-[-0.02em] uppercase">Poly Court<br><span class="font-[300] italic normal-case text-[22px] opacity-70"> of Flaky Test Justice</span></div>
- </div>
- </div>
+    <div>
+      <div class="docket-card">
+        <div class="docket-header">
+          <div class="docket-title">Today's Docket</div>
+          <div class="docket-badge">Trials Active</div>
+        </div>
+        <div class="docket-list">
+          <a href="/dashboard/test-detail.html?repo_name=demo-repo&test_name=auth.login.spec.ts" class="docket-row">
+            <div class="docket-left">
+              <div class="docket-num">#482</div>
+              <div class="docket-name">auth.login.spec.ts:42</div>
+            </div>
+            <div class="docket-right">
+              <div class="docket-trust">Trust: 23%</div>
+              <div class="stamp stamp-guilty">Flaky</div>
+            </div>
+          </a>
+          <a href="/dashboard/test-detail.html?repo_name=demo-repo&test_name=cart.checkout.spec.ts" class="docket-row" style="background:var(--seismic2)">
+            <div class="docket-left">
+              <div class="docket-num">#481</div>
+              <div class="docket-name">cart.checkout.spec.ts:117</div>
+            </div>
+            <div class="docket-right">
+              <div class="docket-trust">Trust: 41%</div>
+              <div class="stamp stamp-quarantined">Quarantined</div>
+            </div>
+          </a>
+          <a href="/dashboard/test-detail.html?repo_name=demo-repo&test_name=payments.webhook.spec.ts" class="docket-row">
+            <div class="docket-left">
+              <div class="docket-num">#479</div>
+              <div class="docket-name">payments.webhook.spec.ts</div>
+            </div>
+            <div class="docket-right">
+              <div class="docket-trust">Trust: 88%</div>
+              <div class="stamp stamp-acquitted">Acquitted</div>
+            </div>
+          </a>
+          <a href="/dashboard/test-detail.html?repo_name=demo-repo&test_name=inventory.sync.spec.ts" class="docket-row">
+            <div class="docket-left">
+              <div class="docket-num">#476</div>
+              <div class="docket-name">inventory.sync.spec.ts</div>
+            </div>
+            <div class="docket-right">
+              <div class="docket-trust">Trust: 94%</div>
+              <div class="stamp stamp-acquitted">Acquitted</div>
+            </div>
+          </a>
+        </div>
+        <div style="background:var(--deep);border-top:1px solid var(--border);padding:14px 20px;font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;display:flex;align-items:center;gap:8px">
+          <span style="color:var(--amber)">⚠</span> 142 anomalies flagged today — quarantine protocols active
+        </div>
+      </div>
+    </div>
+  </div>
 
- <div class="flex items-center gap-6 md:gap-10 w-full md:w-auto">
- <div class="hidden lg:block h-[52px] w-[1px] bg-gavel/20"></div>
- <div class="flex gap-8 md:gap-12">
- <div>
- <div class="font-mono text-[9px] tracking-[0.2em] uppercase opacity-50 mb-1">Presiding</div>
- <div class="font-serif font-bold text-[13px] leading-tight">Hon. Poly AI<br><span class="font-mono text-[11px] font-normal opacity-70">TRUST LAYER</span></div>
- </div>
- <div>
- <div class="font-mono text-[9px] tracking-[0.2em] uppercase opacity-50 mb-1">Court Clerk</div>
- <div class="font-serif font-bold text-[13px] leading-tight">poly-action@v1<br><span class="font-mono text-[11px] font-normal opacity-70">AUTOMATED DOCKET</span></div>
- </div>
- </div>
- <div class="ml-auto md:ml-0">
- <div class="bg-gavel text-paper px-4 py-2 font-mono text-[10px] tracking-widest uppercase">Sealed • Exhibit A</div>
- </div>
- </div>
- </div>
-</header>
+  <!-- Stats -->
+  <div class="stats-strip">
+    <div class="stat-pill s-orbit">
+      <div class="stat-pill-label">Total Circuit Tests</div>
+      <div class="stat-pill-value" style="color:var(--orbit)">2,847</div>
+      <div class="stat-pill-sub">under monitoring</div>
+    </div>
+    <div class="stat-pill s-seismic">
+      <div class="stat-pill-label">Seismic Anomalies</div>
+      <div class="stat-pill-value" style="color:var(--seismic)">142</div>
+      <div class="stat-pill-sub">flaky · flagged</div>
+    </div>
+    <div class="stat-pill s-amber">
+      <div class="stat-pill-label">Quarantined</div>
+      <div class="stat-pill-value" style="color:var(--amber)">23</div>
+      <div class="stat-pill-sub">isolated from circuit</div>
+    </div>
+    <div class="stat-pill s-green">
+      <div class="stat-pill-label">Avg Circuit Integrity</div>
+      <div class="stat-pill-value" style="color:var(--green)">89%</div>
+      <div class="stat-pill-sub">trust index</div>
+    </div>
+  </div>
 
-<!-- HERO - CASE FILE -->
-<section class="relative max-w-[1360px] mx-auto px-6 md:px-10 pt-10 md:pt-14 pb-14">
- <!-- Background large CASE NO watermark -->
- <div class="absolute right-0 top-10 font-serif font-[800] text-[160px] md:text-[240px] leading-none tracking-[-0.05em] text-gavel/[0.025] select-none pointer-events-none">482</div>
+  <!-- FEATURES -->
+  <div class="features">
+    <div class="section-header-row">
+      <div>
+        <div class="section-label">Exhibits A-C · Core Capabilities</div>
+        <div class="section-h2">Evidence of<br><em>Trustworthiness</em></div>
+      </div>
+      <div class="section-right">Every feature is a piece of evidence. We prosecute with data, pattern, and precedent.</div>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card" data-exhibit="A">
+        <div class="feat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+        </div>
+        <div class="feat-tag">Reliability — Primary Signal</div>
+        <div class="feat-title">Trust Scoring</div>
+        <div class="feat-desc">Every test gets a 0-100 trust score from 50+ signals. History, variance, timing, error patterns. No perjury.</div>
+        <div class="feat-tags">
+          <span class="feat-tag-pill" style="color:var(--green);border-color:rgba(0,255,136,0.2)">0-100 Range</span>
+          <span class="feat-tag-pill" style="color:var(--amber);border-color:rgba(255,176,0,0.2)">50+ Signals</span>
+        </div>
+      </div>
+      <div class="feat-card" data-exhibit="B">
+        <div class="feat-icon" style="color:var(--red);border-color:rgba(255,51,68,0.3)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="feat-tag">Cross-Examination Engine</div>
+        <div class="feat-title">Flaky Detection</div>
+        <div class="feat-desc">Real bug or flaky witness? Pattern recognition across the docket quarantines unreliable testimony automatically.</div>
+        <div class="feat-tags">
+          <span class="feat-tag-pill" style="color:var(--red);border-color:rgba(255,51,68,0.2)">14 Patterns</span>
+          <span class="feat-tag-pill" style="color:var(--seismic);border-color:rgba(255,107,43,0.2)">Auto Quarantine</span>
+        </div>
+      </div>
+      <div class="feat-card" data-exhibit="C">
+        <div class="feat-icon" style="color:var(--amber);border-color:rgba(255,176,0,0.3)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </div>
+        <div class="feat-tag">Court Reporter · Real-Time</div>
+        <div class="feat-title">Smart Alerts</div>
+        <div class="feat-desc">Only when it matters. Poly files a motion only when trust drops below threshold. No spam, no false alarms.</div>
+        <div class="feat-tags">
+          <span class="feat-tag-pill" style="color:var(--amber);border-color:rgba(255,176,0,0.2)">Discord</span>
+          <span class="feat-tag-pill" style="color:var(--purple);border-color:rgba(168,85,247,0.2)">Slack</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
- <div class="grid grid-cols-12 gap-8 md:gap-10 relative">
- <!-- LEFT: CASE FILE -->
- <div class="col-span-12 lg:col-span-7">
- <!-- File Tab -->
- <div class="flex">
- <div class="bg-[#E8E0C9] border-[2.5px] border-gavel border-b-0 px-5 py-2 font-mono text-[11px] tracking-[0.16em] uppercase flex items-center gap-2">
- <span class="w-2 h-2 bg-verdict rounded-full"></span> Case File #1001
- </div>
- <div class="ml-2 bg-wood h-[34px] px-4 flex items-center text-gold font-mono text-[10px] tracking-widest">CONFIDENTIAL</div>
- </div>
+  <!-- HOW IT WORKS -->
+  <div class="section-header-row" style="margin-bottom:32px">
+    <div>
+      <div class="section-label">Court Procedure · Three Acts</div>
+      <div class="section-h2">How the<br><em>Trial</em> Works</div>
+    </div>
+    <div class="section-right">Arraignment to verdict in under 90 seconds. Automated justice for automated tests.</div>
+  </div>
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-num">01</div>
+      <div class="how-title">Instrument &amp; Collect Evidence</div>
+      <div class="how-desc">Drop the GitHub Action into your workflow. Every test run is logged and added to the docket. No code changes required.</div>
+      <div class="how-meta">
+        <span class="how-chip" style="color:var(--green);border-color:rgba(0,255,136,0.2)">Zero Config</span>
+        <span class="how-chip" style="color:var(--orbit);border-color:rgba(0,212,255,0.2)">JUnit XML</span>
+      </div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">02</div>
+      <div class="how-title">AI Jury Deliberates</div>
+      <div class="how-desc">Cross-examines duration variance, exit codes, stack trace entropy. Separates real bugs from lying witnesses in milliseconds.</div>
+      <div class="how-meta">
+        <span class="how-chip" style="color:var(--red);border-color:rgba(255,51,68,0.2)">142 Anomalies</span>
+        <span class="how-chip" style="color:var(--green);border-color:rgba(0,255,136,0.2)">2,705 Stable</span>
+      </div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">03</div>
+      <div class="how-title">Deliver Verdict</div>
+      <div class="how-desc">Guilty tests quarantined, not failed. PRs continue. Dashboard updates. Justice without blocking velocity.</div>
+      <div class="how-meta">
+        <span class="how-chip" style="color:var(--green);border-color:rgba(0,255,136,0.2)">CI Passes</span>
+        <span class="how-chip" style="color:var(--amber);border-color:rgba(255,176,0,0.2)">Docket Updated</span>
+      </div>
+    </div>
+  </div>
 
- <div class="relative bg-paper border-[3px] border-gavel gavel-shadow">
- <!-- Binding holes -->
- <div class="absolute left-0 top-0 bottom-0 w-[44px] border-r-[1.5px] border-gavel/15 flex flex-col items-center gap-8 py-10 hidden md:flex">
- <div class="hole"></div><div class="hole"></div><div class="hole"></div><div class="hole"></div>
- </div>
+  <!-- INSTALL -->
+  <div style="margin-bottom:80px">
+    <div class="section-label" style="margin-bottom:16px">Affidavit · Installation</div>
+    <div class="install-block">
+      <div class="install-header">
+        <div class="install-title">.github/workflows/poly.yml</div>
+        <div class="install-dots"><div class="install-dot"></div><div class="install-dot"></div><div class="install-dot"></div></div>
+      </div>
+      <div class="install-body">
+<span class="cmt"># .github/workflows/ci.yml</span>
+<span class="kw">name</span><span class="key">:</span> <span class="str">poly-trust-layer</span>
+<span class="kw">on</span><span class="key">:</span> <span class="val">[push, pull_request]</span>
 
- <div class="md:pl-[44px]">
- <!-- Ruled paper -->
- <div class="ruled px-6 md:px-10 py-8 md:py-10">
- <!-- Paper clip -->
- <div class="absolute right-10 -top-3 w-[32px] h-[64px] border-[3px] border-gavel/30 rounded-[16px] hidden md:block">
- <div class="absolute top-2 left-[6px] right-[6px] bottom-2 border-[3px] border-gavel/20 rounded-[10px]"></div>
- </div>
+<span class="kw">jobs</span><span class="key">:</span>
+  <span class="key">test</span><span class="key">:</span>
+    <span class="kw">runs-on</span><span class="key">:</span> <span class="str">ubuntu-latest</span>
+    <span class="kw">steps</span><span class="key">:</span>
+    <span class="bl">- uses: actions/checkout@v4</span>
+    <span class="bl">- run: npm test</span>
 
- <div class="flex flex-wrap items-start justify-between gap-4 mb-8">
- <div>
- <div class="font-mono text-[10px] tracking-[0.2em] uppercase text-verdict font-bold mb-2">Criminal Docket — Flaky Test Division</div>
- <h1 class="font-serif font-[800] text-[40px] md:text-[54px] leading-[0.9] tracking-[-0.03em] uppercase">
- State <span class="font-[300] italic lowercase text-[36px] md:text-[48px] normal-case tracking-normal">vs</span><br>
- <span class="bg-gavel text-paper px-2">cart.checkout</span>.spec.ts
- </h1>
- </div>
- <!-- GUILTY stamp -->
- <div class="relative mt-2">
- <div class="stamp stamp-double relative text-verdict border-verdict px-3 py-2 rotate-[-8deg] text-[22px] tracking-[0.15em]">GUILTY<br><span class="text-[10px] tracking-[0.2em]">— FLAKY —</span></div>
- <div class="absolute -bottom-2 -right-2 w-6 h-6 bg-verdict rounded-full flex items-center justify-center text-paper font-mono text-[10px]">⚖</div>
- </div>
- </div>
+    <span class="kw"># ↳ THE COURT ARRIVES</span>
+    <span class="kw">- name</span><span class="key">:</span> <span class="str">Poly AI Flaky Test Trust Layer</span>
+      <span class="kw">uses</span><span class="key">:</span> <span class="str">Pritahi/falsky-action@v1</span>
+      <span class="kw">with</span><span class="key">:</span>
+        <span class="kw">api_key</span><span class="key">:</span> <span class="val">${{ secrets.POLY_KEY }}</span>
+        <span class="kw">quarantine</span><span class="key">:</span> <span class="val">true</span>
+        <span class="kw">trust_threshold</span><span class="key">:</span> <span class="val">75</span>
+        <span class="kw">fail_on_new_flake</span><span class="key">:</span> <span class="val">false</span></div>
+      <div style="background:var(--deep);border-top:1px solid var(--border);padding:10px 24px;font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase">◆ Verdicts delivered in PR comments · Dashboard: app.poly.dev/case/482</div>
+    </div>
+  </div>
+</main>
 
- <div class="max-w-[560px]">
- <h2 class="font-serif text-[26px] md:text-[32px] leading-[1.05] font-[600] tracking-[-0.02em] mb-3">
- The <span class="underline decoration-gold decoration-[6px] underline-offset-[-6px]">AI Flaky Test</span> Trust Layer. Put every flaky test on trial.
- </h2>
- <p class="font-mono text-[13px] leading-[1.6] opacity-70 mb-8">
- Poly is <span class="bg-wood text-paper px-1">Judge, Jury, and Executioner</span> for your CI. It scores trust, prosecutes flakes, and delivers verdicts before you merge. No more re-runs. No more doubt.
- </p>
+<!-- Bottom gradient bar -->
+<div class="bottom-bar"></div>
 
- <!-- Charges -->
- <div class="border-[1.5px] border-gavel/20 bg-[#FAF6E8] p-4 md:p-5 mb-8">
- <div class="font-mono text-[9px] tracking-[0.2em] uppercase opacity-60 mb-3">Charges Filed</div>
- <div class="space-y-2.5 font-mono text-[12px]">
- <div class="flex gap-3"><span class="text-verdict font-bold">I.</span><span class="opacity-80">Intermittent timeout on checkout flow — 23 failures in last 100 runs.</span></div>
- <div class="flex gap-3"><span class="text-verdict font-bold">II.</span><span class="opacity-80">Non-deterministic DOM query causing false negatives.</span></div>
- <div class="flex gap-3"><span class="text-verdict font-bold">III.</span><span class="opacity-80">Contempt of CI — blocking 14 deploys without cause.</span></div>
- </div>
- </div>
-
- <div class="flex flex-wrap items-center gap-3">
- <a href="/dashboard/index.html" class="bg-gavel text-paper font-mono text-[12px] tracking-[0.15em] uppercase px-6 py-3.5 hover:bg-wood transition flex items-center gap-3">
- <span>Enter Courtroom</span><span class="opacity-60">→</span>
- </a>
- <a href="/dashboard/index.html" class="border-[2px] border-gavel bg-paper font-mono text-[12px] tracking-[0.15em] uppercase px-6 py-3 hover:bg-[#F0EAD6] transition">
- View Evidence Log
- </a>
- <div class="font-stamp text-[11px] opacity-50 ml-2 hidden md:block">FILED: TODAY • NO BAIL</div>
- </div>
- </div>
- </div>
-
- <!-- Gold footer of file -->
- <div class="h-[10px] wood-grain w-full"></div>
- </div>
- </div>
-
- <!-- Below file: mini notice -->
- <div class="mt-4 flex items-center gap-3 font-mono text-[10px] tracking-[0.12em] uppercase opacity-50">
- <div class="w-6 h-[1px] bg-gavel/30"></div> All defendants presumed flaky until proven trustworthy. <span class="hidden md:inline">§ Poly Code 4.82</span>
- </div>
- </div>
-
- <!-- RIGHT: DOCKET LIST -->
- <div class="col-span-12 lg:col-span-5">
- <div class="lg:sticky lg:top-8 space-y-6">
- <!-- Docket Header -->
- <div class="bg-gavel text-paper p-5 flex items-center justify-between">
- <div class="flex items-center gap-3">
- <div class="w-8 h-8 bg-paper text-gavel flex items-center justify-center font-stamp text-[16px]">☰</div>
- <div>
- <div class="font-mono text-[10px] tracking-[0.2em] opacity-60 uppercase">Today's Docket</div>
- <div class="font-serif font-bold text-[15px] tracking-wide">TRIALS IN PROGRESS</div>
- </div>
- </div>
- <div class="text-right font-mono text-[10px] leading-tight opacity-60">COURTROOM<br>3B • CI-UNIT</div>
- </div>
-
- <!-- Docket List -->
- <div class="border-[2.5px] border-gavel bg-paper divide-y divide-gavel/15">
- <!-- Row -->
- <div class="p-4 flex items-center justify-between group hover:bg-[#FAF6E8] transition">
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-40">#481</span>
- <span class="font-mono text-[12px] font-bold">auth.login.spec.ts:42</span>
- </div>
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-50">Trust: 23%</span>
- <span class="stamp text-[10px] px-2 py-0.5 text-verdict border-verdict rotate-[-6deg]">GUILTY</span>
- </div>
- </div>
- <div class="p-4 flex items-center justify-between bg-[#FFFBEC] group">
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-40">#482</span>
- <span class="font-mono text-[12px] font-bold">cart.checkout.spec.ts:117</span>
- <span class="w-1.5 h-1.5 bg-verdict rounded-full animate-pulse"></span>
- </div>
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-50">Trust: 12%</span>
- <span class="stamp text-[10px] px-2 py-0.5 text-verdict border-verdict -rotate-[4deg] bg-paper">ON TRIAL</span>
- </div>
- </div>
- <div class="p-4 flex items-center justify-between hover:bg-[#FAF6E8] transition">
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-40">#479</span>
- <span class="font-mono text-[12px] font-bold">payments.webhook.spec.ts</span>
- </div>
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-50">Trust: 88%</span>
- <span class="stamp text-[10px] px-2 py-0.5 text-[#2E5A38] border-[#2E5A38] rotate-[5deg]">ACQUITTED</span>
- </div>
- </div>
- <div class="p-4 flex items-center justify-between hover:bg-[#FAF6E8] transition">
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-40">#476</span>
- <span class="font-mono text-[12px] font-bold">inventory.sync.spec.ts</span>
- </div>
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-50">Trust: 94%</span>
- <span class="stamp text-[10px] px-2 py-0.5 text-[#2E5A38] border-[#2E5A38] -rotate-[3deg]">ACQUITTED</span>
- </div>
- </div>
- <div class="p-4 flex items-center justify-between hover:bg-[#FAF6E8] transition">
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-40">#475</span>
- <span class="font-mono text-[12px] font-bold">user.profile.spec.ts:89</span>
- </div>
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] opacity-50">Trust: 41%</span>
- <span class="stamp text-[10px] px-2 py-0.5 text-gold border-gold rotate-[4deg]">QUARANTINED</span>
- </div>
- </div>
- </div>
-
- <!-- Judge Bench Card -->
- <div class="relative bg-[#121212] text-paper p-5 border-[3px] border-gold">
- <div class="absolute -top-3 left-6 bg-gold text-gavel font-mono text-[9px] tracking-[0.2em] uppercase px-2 py-1">Judge's Bench • AI Deliberation</div>
- <div class="flex gap-4 pt-2">
- <div class="w-12 h-12 bg-paper rounded-full flex items-center justify-center text-gavel font-serif font-bold text-xl shrink-0">P</div>
- <div class="flex-1">
- <div class="font-stamp text-[13px] leading-snug">"Based on 200 runs, this test lies 31% of the time. I find the defendant unreliable. Quarantine until fixed."</div>
- <div class="mt-2 font-mono text-[10px] opacity-50 tracking-widest uppercase">— Hon. Poly, Trust Score Analysis</div>
- </div>
- </div>
- <!-- Gavel icon -->
- <div class="absolute -right-3 -bottom-3 w-10 h-10 bg-paper border-2 border-gavel rotate-12 flex items-center justify-center">
- <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#121212" stroke-width="2"><path d="M14 8 L20 14 L18 16 L12 10 Z"/><path d="M7 14 L10 17"/><path d="M3 21 L6 18"/><rect x="8" y="10" width="6" height="3" transform="rotate(-45 11 11.5)"/></svg>
- </div>
- </div>
-
- <!-- Stats Mini -->
- <div class="grid grid-cols-4 gap-[2px] bg-gavel border-[2px] border-gavel">
- <div class="bg-paper p-3 text-center"><div class="font-serif font-bold text-[20px] leading-none">2,847/div><div class="font-mono text-[8px] uppercase tracking-widest opacity-60 mt-1">Total Tests</div></div>
- <div class="bg-paper p-3 text-center"><div class="font-serif font-bold text-[20px] leading-none text-verdict">142/div><div class="font-mono text-[8px] uppercase tracking-widest opacity-60 mt-1">Flaky</div></div>
- <div class="bg-paper p-3 text-center"><div class="font-serif font-bold text-[20px] leading-none">23/div><div class="font-mono text-[8px] uppercase tracking-widest opacity-60 mt-1">Quarantined</div></div>
- <div class="bg-gold p-3 text-center"><div class="font-serif font-bold text-[20px] leading-none">89</div><div class="font-mono text-[8px] uppercase tracking-widest opacity-60 mt-1">Avg Trust</div></div>
- </div>
- </div>
- </div>
- </div>
-</section>
-
-<!-- FEATURES: EXHIBITS -->
-<section class="border-t-[3px] border-gavel bg-[#F5EFE0]">
- <div class="max-w-[1360px] mx-auto px-6 md:px-10 py-12 md:py-16">
- <div class="flex items-end justify-between mb-10 gap-6 flex-wrap">
- <div>
- <div class="font-mono text-[11px] tracking-[0.2em] uppercase text-verdict mb-2 flex items-center gap-2"><span class="w-8 h-[2px] bg-verdict"></span> Exhibit A-C • Core Capabilities</div>
- <h2 class="font-serif font-[800] text-[36px] md:text-[52px] leading-[0.9] tracking-[-0.03em] uppercase">Evidence of<br>Trustworthiness</h2>
- </div>
- <div class="font-mono text-[12px] max-w-[340px] opacity-70 leading-relaxed">Every feature is a piece of evidence. We don't guess — we prosecute with data, pattern, and precedent.</div>
- </div>
-
- <div class="grid md:grid-cols-3 gap-[3px] bg-gavel border-[3px] border-gavel">
- <!-- Card 1 -->
- <div class="bg-paper p-7 md:p-8 relative group hover:bg-[#FFFEF9] transition">
- <div class="absolute top-0 right-0 bg-gavel text-paper font-mono text-[9px] tracking-widest px-3 py-1.5">EXHIBIT A</div>
- <div class="w-10 h-10 border-[2px] border-gavel flex items-center justify-center mb-6 mt-2 relative">
- <span class="font-serif font-bold text-lg">%</span>
- <div class="absolute -bottom-1 -right-1 w-3 h-3 bg-gold border border-gavel"></div>
- </div>
- <h3 class="font-serif font-bold text-[20px] leading-tight tracking-[-0.01em] mb-2">Trust Scoring</h3>
- <div class="font-stamp text-[11px] opacity-50 mb-3">RELIABILITY UNDER OATH</div>
- <p class="font-mono text-[12.5px] leading-[1.6] opacity-70 mb-6">Every test gets a trust score from 0-100 based on 50+ signals. History, variance, environment, timing. No perjury allowed.</p>
- <div class="border-t border-dashed border-gavel/20 pt-4 flex items-center justify-between font-mono text-[10px]">
- <span class="uppercase tracking-widest opacity-60">Verdict Range</span>
- <span class="flex gap-1"><span class="w-6 h-1.5 bg-verdict"></span><span class="w-6 h-1.5 bg-gold"></span><span class="w-6 h-1.5 bg-[#2E5A38]"></span></span>
- </div>
- </div>
- <!-- Card 2 -->
- <div class="bg-paper p-7 md:p-8 relative group hover:bg-[#FFFEF9] transition">
- <div class="absolute top-0 right-0 bg-verdict text-paper font-mono text-[9px] tracking-widest px-3 py-1.5">EXHIBIT B • CRITICAL</div>
- <div class="w-10 h-10 border-[2px] border-gavel flex items-center justify-center mb-6 mt-2 relative bg-gavel text-paper">
- <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12 S 3 3 12 3 S 23 3 23 12"/><path d="M1 12 S 3 21 12 21 S 23 21 23 12"/><circle cx="12" cy="12" r="3"/></svg>
- </div>
- <h3 class="font-serif font-bold text-[20px] leading-tight tracking-[-0.01em] mb-2">Flaky Detection</h3>
- <div class="font-stamp text-[11px] opacity-50 mb-3">CROSS-EXAMINATION ENGINE</div>
- <p class="font-mono text-[12.5px] leading-[1.6] opacity-70 mb-6">AI that interrogates every failure. Real bug or flaky witness? Pattern recognition across 1,203 tests quarantines liars automatically.</p>
- <div class="flex gap-2 font-mono text-[9px] uppercase tracking-widest">
- <span class="border border-gavel px-2 py-1">Timeout</span><span class="border border-gavel px-2 py-1">Race</span><span class="border border-gavel px-2 py-1 bg-gavel text-paper">Network</span>
- </div>
- </div>
- <!-- Card 3 -->
- <div class="bg-paper p-7 md:p-8 relative group hover:bg-[#FFFEF9] transition">
- <div class="absolute top-0 right-0 bg-paper border border-gavel border-t-0 border-r-0 text-gavel font-mono text-[9px] tracking-widest px-3 py-1.5">EXHIBIT C</div>
- <div class="w-10 h-10 border-[2px] border-gavel flex items-center justify-center mb-6 mt-2 relative">
- <span class="font-mono text-[14px]">◑</span>
- </div>
- <h3 class="font-serif font-bold text-[20px] leading-tight tracking-[-0.01em] mb-2">Smart Alerts</h3>
- <div class="font-stamp text-[11px] opacity-50 mb-3">COURT REPORTER • REAL-TIME</div>
- <p class="font-mono text-[12.5px] leading-[1.6] opacity-70 mb-6">Only alert when it matters. Poly files a motion only when trust drops below threshold. No spam, no false alarms, just verdicts.</p>
- <div class="font-mono text-[10px] flex items-center gap-2 opacity-60"><span class="w-2 h-2 bg-[#2E5A38] rounded-full"></span> Alert suppressed — Trust: 91% • Not flaky</div>
- </div>
- </div>
- </div>
-</section>
-
-<!-- HOW IT WORKS - COURT PROCEDURE -->
-<section class="bg-paper border-t-[3px] border-gavel">
- <div class="max-w-[1360px] mx-auto px-6 md:px-10 py-14 md:py-20">
- <div class="grid lg:grid-cols-12 gap-10">
- <div class="lg:col-span-4">
- <div class="sticky top-10">
- <div class="inline-flex items-center gap-2 border-[1.5px] border-gavel px-3 py-1 font-mono text-[10px] tracking-[0.18em] uppercase mb-6">
- <span class="font-stamp text-[13px]">§</span> Court Procedure
- </div>
- <h2 class="font-serif font-[800] text-[38px] md:text-[46px] leading-[0.9] tracking-[-0.03em] uppercase mb-4">How The<br>Trial Works</h2>
- <p class="font-mono text-[12.5px] leading-[1.6] opacity-60 max-w-[280px]">From arraignment to verdict in under 90 seconds. Automated justice for automated tests.</p>
- <div class="mt-8 hidden lg:block">
- <div class="w-[120px] h-[120px] border-[3px] border-gavel rounded-full flex items-center justify-center relative">
- <div class="absolute inset-2 border border-dashed border-gavel/30 rounded-full"></div>
- <span class="font-stamp text-[11px] tracking-[0.2em] text-center leading-tight">SEAL OF<br>POLY<br>COURT</span>
- </div>
- </div>
- </div>
- </div>
- <div class="lg:col-span-8">
- <div class="space-y-0">
- <!-- Step 01 -->
- <div class="grid md:grid-cols-[96px_1fr] gap-6 border-b border-gavel/15 py-10 group">
- <div class="font-mono text-[12px] flex md:block items-center gap-3">
- <span class="font-serif font-[800] text-[44px] leading-none">01</span>
- <span class="md:mt-2 inline-block border border-gavel px-2 py-0.5 text-[9px] tracking-widest uppercase">Arraignment</span>
- </div>
- <div class="relative">
- <div class="absolute -left-3 top-0 bottom-0 w-[2px] bg-gold hidden md:block"></div>
- <h3 class="font-serif font-bold text-[22px] leading-tight">Instrument & Collect Evidence</h3>
- <p class="font-mono text-[13px] leading-[1.6] opacity-70 mt-3 max-w-[520px]">Drop our GitHub Action into your workflow. Every test run is logged, fingerprinted, and added to the docket. No code changes required — just one YAML line.</p>
- <div class="mt-4 inline-flex items-center gap-2 bg-[#F5EFE0] border border-gavel/20 px-3 py-2 font-mono text-[11px]">
- <span class="w-2 h-2 bg-wood rounded-full"></span> Evidence locker → 1,203 test histories synchronized
- </div>
- </div>
- </div>
- <!-- Step 02 -->
- <div class="grid md:grid-cols-[96px_1fr] gap-6 border-b border-gavel/15 py-10">
- <div class="font-mono text-[12px] flex md:block items-center gap-3">
- <span class="font-serif font-[800] text-[44px] leading-none">02</span>
- <span class="md:mt-2 inline-block bg-gavel text-paper px-2 py-0.5 text-[9px] tracking-widest uppercase">Deliberation</span>
- </div>
- <div class="relative">
- <div class="absolute -left-3 top-0 bottom-0 w-[2px] bg-gavel hidden md:block"></div>
- <h3 class="font-serif font-bold text-[22px] leading-tight">AI Jury Deliberates</h3>
- <p class="font-mono text-[13px] leading-[1.6] opacity-70 mt-3 max-w-[520px]">Our model cross-examines duration variance, exit codes, stack trace entropy, and infra signals. It separates a real regression from a lying witness in milliseconds.</p>
- <div class="mt-5 flex flex-wrap gap-2">
- <span class="stamp text-verdict border-verdict px-2 py-1 text-[10px] rotate-[-3deg]">FLAKY • 142</span>
- <span class="stamp text-[#2E5A38] border-[#2E5A38] px-2 py-1 text-[10px] rotate-[2deg]">STABLE • 2705</span>
- <span class="stamp text-gold border-gold px-2 py-1 text-[10px] rotate-[-1deg]">QUARANTINED • 23</span>
- </div>
- </div>
- </div>
- <!-- Step 03 -->
- <div class="grid md:grid-cols-[96px_1fr] gap-6 py-10">
- <div class="font-mono text-[12px] flex md:block items-center gap-3">
- <span class="font-serif font-[800] text-[44px] leading-none">03</span>
- <span class="md:mt-2 inline-block border border-verdict text-verdict px-2 py-0.5 text-[9px] tracking-widest uppercase">Verdict</span>
- </div>
- <div class="relative">
- <div class="absolute -left-3 top-0 bottom-0 w-[2px] bg-verdict hidden md:block"></div>
- <h3 class="font-serif font-bold text-[22px] leading-tight">Deliver Verdict & Execute Sentence</h3>
- <p class="font-mono text-[13px] leading-[1.6] opacity-70 mt-3 max-w-[520px]">Guilty tests are quarantined, not failed. PRs continue. Trust dashboard updates. Slack & GitHub comment auto-filed. Justice served without blocking velocity.</p>
- <div class="mt-4 flex gap-3">
- <div class="bg-gavel text-paper px-3 py-2 font-mono text-[10px] tracking-widest uppercase">GAVEL STRIKE → CI PASSES</div>
- <div class="border border-gavel px-3 py-2 font-mono text-[10px] tracking-widest uppercase">Docket updated</div>
- </div>
- </div>
- </div>
- </div>
- </div>
- </div>
- </div>
-</section>
-
-<!-- CODE SNIPPET - AFFIDAVIT -->
-<section class="bg-wood py-10 md:py-14">
- <div class="max-w-[1360px] mx-auto px-6 md:px-10">
- <div class="grid lg:grid-cols-12 gap-8 items-start">
- <div class="lg:col-span-5 text-[#E8E0C9]">
- <div class="font-mono text-[10px] tracking-[0.2em] uppercase text-gold mb-3">Affidavit • Installation</div>
- <h2 class="font-serif font-bold text-[30px] md:text-[38px] leading-[0.95] tracking-[-0.02em] text-paper">One line. Case closed in 30 sec.</h2>
- <p class="font-mono text-[13px] leading-[1.6] opacity-60 mt-4 max-w-[360px]">No sidecars, no agents, no restructuring. This is the entire integration. The court awaits your filing.</p>
- <div class="mt-8 space-y-3 font-mono text-[11px]">
- <div class="flex items-center gap-3 text-paper/80"><span class="w-5 h-5 bg-gold text-wood flex items-center justify-center font-bold">✓</span> Works with Jest, Vitest, Playwright, Cypress</div>
- <div class="flex items-center gap-3 text-paper/80"><span class="w-5 h-5 bg-gold text-wood flex items-center justify-center font-bold">✓</span> Zero flake re-run policy</div>
- <div class="flex items-center gap-3 text-paper/80"><span class="w-5 h-5 bg-gold text-wood flex items-center justify-center font-bold">✓</span> SOC-2 • Evidence encrypted at rest</div>
- </div>
- </div>
- <div class="lg:col-span-7">
- <div class="relative">
- <!-- paperclip decor -->
- <div class="absolute -top-4 right-14 w-8 h-14 border-[2.5px] border-gold/40 rounded-[14px] hidden md:block z-10">
- <div class="absolute top-1 left-1.5 right-1.5 bottom-1 border-[2px] border-gold/30 rounded-[10px]"></div>
- </div>
-
- <div class="bg-paper border-[2.5px] border-gavel gavel-shadow relative">
- <div class="flex items-center justify-between bg-[#EFE8D1] border-b-[1.5px] border-gavel/20 px-5 py-3">
- <div class="flex items-center gap-3">
- <div class="flex gap-1.5"><span class="w-2.5 h-2.5 bg-verdict rounded-full"></span><span class="w-2.5 h-2.5 bg-gold rounded-full"></span><span class="w-2.5 h-2.5 bg-[#2E5A38] rounded-full"></span></div>
- <span class="font-mono text-[11px] tracking-widest uppercase opacity-70">.github/workflows/poly.yml</span>
- </div>
- <span class="font-stamp text-[10px] tracking-widest border border-gavel px-2 py-0.5">FILED UNDER OATH</span>
- </div>
- <div class="p-6 md:p-7 font-mono text-[12.5px] leading-[1.7] overflow-x-auto">
-<pre class="whitespace-pre"><span class="opacity-40">name: poly-trust-layer</span>
-<span class="opacity-40">on: [push, pull_request]</span>
-<span class="opacity-40">jobs:</span>
- <span class="opacity-80">test:</span>
- <span class="opacity-60">runs-on: ubuntu-latest</span>
- <span class="opacity-60">steps:</span>
- - <span class="opacity-60">uses: actions/checkout@v4</span>
- - <span class="opacity-60">run: npm test</span>
-
- <span class="text-verdict font-bold"># ↳ THE COURT ARRIVES</span>
- - <span class="opacity-80">name: Poly AI Flaky Test Trust Layer</span>
- <span class="opacity-80">uses: Pritahi/falsky-action@v1</span>
- <span class="opacity-60">with:</span>
- <span class="opacity-80">api-key: ${{ secrets.POLY_KEY }}</span>
- <span class="opacity-80">quarantine: <span class="text-[#2E5A38] font-bold">true</span></span>
- <span class="opacity-80">trust-threshold: <span class="font-bold">75</span></span>
- <span class="opacity-80">fail-on-new-flake: <span class="text-verdict">false</span></span>
- <span class="opacity-40"># → verdicts delivered in PR comments</span>
- <span class="opacity-40"># → dashboard: app.poly.dev/case/482</span></pre>
- </div>
- <!-- bottom tape -->
- <div class="h-3 bg-[#F0EAD6] border-t border-gavel/10 flex items-center px-6 gap-2">
- <div class="w-14 h-1 bg-gavel/20"></div><div class="w-10 h-1 bg-verdict/30"></div><div class="w-8 h-1 bg-gold/50"></div>
- </div>
- </div>
-
- <!-- Floating verdict -->
- <div class="absolute -bottom-6 -left-4 md:-left-8 stamp bg-paper text-gavel border-gavel px-4 py-2 rotate-[-6deg] text-[14px] shadow-[4px_4px_0px_#121212] hidden md:block">
- VERDICT ISSUED • TRUST: 89%
- </div>
- </div>
- </div>
- </div>
- </div>
-</section>
-
-<!-- FOOTER STATS - COURT RECORDS -->
-<footer class="bg-paper border-t-[4px] border-gavel">
- <div class="max-w-[1360px] mx-auto px-6 md:px-10 py-8 md:py-10">
- <div class="flex flex-wrap items-center justify-between gap-6 mb-8">
- <div class="flex items-center gap-4">
- <div class="font-serif font-[800] text-[28px] leading-none tracking-[-0.02em]">POLY</div>
- <div class="h-8 w-[1px] bg-gavel/20"></div>
- <div class="font-mono text-[10px] leading-tight opacity-60 uppercase tracking-widest">AI Flaky Test<br>Trust Layer • EST 2024<br>Case No 1001 Jurisdiction</div>
- </div>
- <div class="flex items-center gap-3">
- <span class="font-mono text-[10px] tracking-widest uppercase opacity-60">Final Disposition</span>
- <span class="stamp text-[12px] text-[#2E5A38] border-[#2E5A38] px-3 py-1 rotate-[2deg]">COURT ADJOURNED</span>
- </div>
- </div>
-
- <div class="grid grid-cols-2 md:grid-cols-4 gap-[2px] bg-gavel border-[2px] border-gavel">
- <div class="bg-[#FFFCF2] p-6 md:p-8 group hover:bg-[#FFFEF9] transition">
- <div class="flex items-start justify-between">
- <div class="font-mono text-[10px] tracking-[0.18em] uppercase opacity-50">Total Tests • Record</div>
- <div class="w-6 h-6 border border-gavel flex items-center justify-center font-mono text-[10px]">§</div>
- </div>
- <div class="font-serif font-[800] text-[44px] md:text-[56px] leading-none tracking-[-0.04em] mt-6">1203</div>
- <div class="font-mono text-[11px] opacity-60 mt-2">All cases filed since inception • Docket full</div>
- </div>
- <div class="bg-[#FFF5F5] p-6 md:p-8">
- <div class="font-mono text-[10px] tracking-[0.18em] uppercase text-verdict">Flaky • Guilty Pleas</div>
- <div class="font-serif font-[800] text-[44px] md:text-[56px] leading-none tracking-[-0.04em] mt-6 text-verdict">87</div>
- <div class="flex items-center gap-2 mt-3"><div class="h-1.5 flex-1 bg-gavel/10"><div class="h-full w-[72%] bg-verdict"></div></div><span class="font-mono text-[10px] opacity-60">7.2% of docket</span></div>
- </div>
- <div class="bg-[#FFFBEB] p-6 md:p-8">
- <div class="font-mono text-[10px] tracking-[0.18em] uppercase text-gold">Quarantined • Holding</div>
- <div class="font-serif font-[800] text-[44px] md:text-[56px] leading-none tracking-[-0.04em] mt-6">14</div>
- <div class="font-mono text-[11px] opacity-60 mt-2">Awaiting remediation • Not blocking CI</div>
- </div>
- <div class="bg-gavel text-paper p-6 md:p-8 relative overflow-hidden">
- <div class="absolute top-0 right-0 w-24 h-24 border border-gold/20 rounded-full -translate-y-8 translate-x-8"></div>
- <div class="font-mono text-[10px] tracking-[0.18em] uppercase text-gold">Avg Trust • Verdict Score</div>
- <div class="font-serif font-[800] text-[44px] md:text-[56px] leading-none tracking-[-0.04em] mt-6 text-paper">81<span class="text-[28px] align-super">%</span></div>
- <div class="font-stamp text-[11px] text-gold/80 mt-2 tracking-widest">TRUSTWORTHY • ADMISSIBLE</div>
- </div>
- </div>
-
- <div class="mt-6 flex flex-col md:flex-row items-center justify-between gap-4 font-mono text-[10px] tracking-[0.14em] uppercase opacity-40">
- <div>© POLY LABS • The People vs. Flaky Tests • No flaky tests were harmed, only quarantined.</div>
- <div class="flex gap-4"><span>Privacy Docket</span><span>Terms of Court</span><span>API Exhibit</span></div>
- </div>
- </div>
- <div class="wood-grain h-3 w-full"></div>
-</footer>
+<!-- Footer -->
+<div class="footer">
+  <div class="footer-brand">◉ Poly Console</div>
+  <div class="footer-meta">FLK-01 Station · Tremor Mode Active · Build 2026.07 · No flaky tests were harmed, only quarantined.</div>
+  <div class="footer-seal">Sealed · Exhibit A · Public Record</div>
+</div>
 
 </body>
 </html>

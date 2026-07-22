@@ -194,32 +194,25 @@ def verify_api_key(x_poly_api_key: Optional[str] = Header(None)):
 
 
 def _get_admin_session(request: Request):
-    """Verify admin session — supports both JWT (Google) and legacy tokens."""
+    """Verify admin session — supports both Supabase Google JWT (via SDK) and legacy tokens."""
     token = request.cookies.get("poly_admin_token")
     if not token:
         return None
-    # Try JWT verification (Supabase Google Auth)
-    if SUPABASE_JWT_SECRET and token.count(".") == 2:
-        try:
-            payload = jwt.decode(token, SUPABASE_JWT_SECRET, algorithms=["HS256"], audience="authenticated")
-            email = payload.get("email", "")
-            # If allowed emails set, check access
-            if ALLOWED_ADMIN_EMAILS and email not in ALLOWED_ADMIN_EMAILS:
-                logger.warning(f"Google auth rejected for: {email}")
-                return None
-            meta = payload.get("user_metadata") or {}
-            return {
-                "username": meta.get("full_name") or email.split("@")[0],
-                "role": "admin",
-                "email": email,
-                "avatar": meta.get("avatar_url", ""),
-                "auth_provider": "google",
-            }
-        except jwt.ExpiredSignatureError:
-            logger.warning("JWT token expired")
+    # Try Supabase SDK verification (preferred — uses SUPABASE_ANON_KEY, no JWT secret needed)
+    user_info = verify_supabase_token(token)
+    if user_info:
+        email = user_info.get("email", "")
+        if ALLOWED_ADMIN_EMAILS and email not in ALLOWED_ADMIN_EMAILS:
+            logger.warning(f"Google auth rejected (not in allowed list): {email}")
             return None
-        except Exception:
-            pass
+        logger.info(f"Google auth success via SDK: {email}")
+        return {
+            "username": user_info.get("username") or email.split("@")[0],
+            "role": "admin",
+            "email": email,
+            "avatar": user_info.get("avatar", ""),
+            "auth_provider": "google",
+        }
     # Fallback: legacy session token verification (DB-backed)
     if len(token) >= 32:
         try:
@@ -316,11 +309,11 @@ def google_login(request: Request):
             detail="Google Sign-In not configured. Missing env var SUPABASE_URL. "
                    "Set it in your hosting dashboard (e.g. https://xxxx.supabase.co).",
         )
-    if not SUPABASE_JWT_SECRET:
+    if not SUPABASE_ANON_KEY:
         raise HTTPException(
             status_code=501,
-            detail="Google Sign-In not configured. Missing env var SUPABASE_JWT_SECRET "
-                   "(used to verify the returned token). Set it in your hosting dashboard.",
+            detail="Google Sign-In not configured. Missing env var SUPABASE_ANON_KEY "
+                   "(project anon/public key). Set it in your hosting dashboard.",
         )
     if not SITE_URL:
         raise HTTPException(
@@ -375,18 +368,16 @@ def auth_callback(request: Request):
         )
         return HTMLResponse(content=bridge)
 
-    # Verify the JWT before setting cookie
-    if SUPABASE_JWT_SECRET:
-        try:
-            payload = jwt.decode(access_token, SUPABASE_JWT_SECRET, algorithms=["HS256"], audience="authenticated")
-            email = payload.get("email", "")
-            if ALLOWED_ADMIN_EMAILS and email not in ALLOWED_ADMIN_EMAILS:
-                logger.warning(f"Google auth rejected (not in allowed list): {email}")
-                return RedirectResponse(url="/admin/?error=unauthorized")
-            logger.info(f"Google auth success: {email}")
-        except Exception as e:
-            logger.error(f"JWT verification failed: {e}")
-            return RedirectResponse(url="/admin/?error=invalid_token")
+    # Verify the token via Supabase SDK (no JWT secret needed)
+    user_info = verify_supabase_token(access_token)
+    if not user_info:
+        logger.error("Supabase token verification failed")
+        return RedirectResponse(url="/admin/?error=invalid_token")
+    email = user_info.get("email", "")
+    if ALLOWED_ADMIN_EMAILS and email not in ALLOWED_ADMIN_EMAILS:
+        logger.warning(f"Google auth rejected (not in allowed list): {email}")
+        return RedirectResponse(url="/admin/?error=unauthorized")
+    logger.info(f"Google auth success via callback: {email}")
 
     response = RedirectResponse(url="/admin/")
     response.set_cookie(
