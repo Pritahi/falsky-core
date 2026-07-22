@@ -267,6 +267,11 @@ def health_check():
         }
     }
 
+@app.get("/api/debug/outbound-test")
+def outbound_test():
+    result = _supabase_rest("users", columns="id", limit=1)
+    return {"result": result, "type": type(result).__name__}
+
 
 # ===================== SUPABASE GOOGLE AUTH =====================
 
@@ -654,7 +659,7 @@ def _supabase_rest(table, method="GET", data=None, filters=None, columns="*"):
     key = _SUPABASE_SERVICE_KEY or _SUPABASE_ANON
     if not key:
         logger.error("No Supabase credentials configured — set SUPABASE_SERVICE_ROLE_KEY")
-        return {"_error": "no_key"}
+        return None
     url = f"{_SUPABASE_URL}/rest/v1/{table}"
     params = []
     if columns:
@@ -677,8 +682,8 @@ def _supabase_rest(table, method="GET", data=None, filters=None, columns="*"):
         with urllib.request.urlopen(req, timeout=10) as resp:
             return _json.loads(resp.read().decode())
     except Exception as e:
-        logger.error(f"Supabase REST error: {e}")
-        return {"_error": str(e)}
+        logger.error(f"Supabase REST error: {_SUPABASE_URL}: {e}")
+        return None
 
 # ===================== USER AUTH =====================
 
@@ -739,9 +744,8 @@ def user_register(data: UserRegister, request: Request, response: Response):
             "is_active": True,
             "signup_source": data.signup_source or "direct",
         })
-        if not result or len(result) == 0 or "_error" in (result if isinstance(result, dict) else {}):
-            detail = result.get("_error", "Failed to create user") if isinstance(result, dict) else "Failed to create user"
-            raise HTTPException(status_code=500, detail=detail)
+        if not result or len(result) == 0:
+            raise HTTPException(status_code=500, detail="Failed to create user")
         user = result[0]
         # Create JWT session (survives cold starts)
         token = _create_user_token(user["id"], data.email, data.name)
