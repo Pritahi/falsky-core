@@ -232,11 +232,16 @@ function updateSyncIndicator() {
 // Auto-refresh every 30s
 setInterval(() => { loadDashboard(); }, 30000);
 setInterval(() => { updateSyncIndicator(); }, 5000);
+enableMobileCards();
 
-async function doLogout() {
-  await fetch(API + '/api/user/logout', {method: 'POST'});
-  window.location.href = '/';
+function enableMobileCards() {
+  const isMobile = window.innerWidth <= 768;
+  document.querySelectorAll('.table-wrap').forEach(wrap => {
+    if (isMobile) wrap.classList.add('mobile-cards');
+    else wrap.classList.remove('mobile-cards');
+  });
 }
+window.addEventListener('resize', enableMobileCards);
 </script>
 </body>
 </html>
