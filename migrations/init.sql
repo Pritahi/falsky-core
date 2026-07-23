@@ -1,4 +1,4 @@
--- Poly — AI Flaky Test Trust Layer
+-- Falsky — AI Flaky Test Trust Layer
 -- Database Initialization Script
 -- Run this in Supabase SQL Editor: https://supabase.com/dashboard/project/mzcplqfxrxfsxnwyiyym/sql
 
@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255),
     email VARCHAR(255) UNIQUE,
+    password_hash VARCHAR(255),
     github_username VARCHAR(255),
     api_key VARCHAR(255) UNIQUE,
     plan VARCHAR(50) DEFAULT 'free',
@@ -103,4 +104,4 @@ INSERT INTO admin_users (username, password_hash, role)
 VALUES ('admin', '$2b$12$qNOWxX1e6Hv4iYemtBN5IeRzk70i2I2/CNJImclKVilOn2ifaAZ0W', 'admin')
 ON CONFLICT (username) DO NOTHING;
 
-SELECT 'Poly database initialized successfully!' as status;
+SELECT 'Falsky database initialized successfully!' as status;
