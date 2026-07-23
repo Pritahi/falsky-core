@@ -15,20 +15,20 @@
 
 <!-- Sidebar -->
 <aside class="sidebar">
-  <a href="./" class="logo">
+  <a href="/dashboard/" class="logo">
     <svg width="28" height="13" viewBox="0 0 34 16" fill="none"><polyline points="0,8 8,8 12,1 17,15 21,4 25,8 34,8" stroke="var(--primary)" stroke-width="2.4"/></svg>
     FALS<em>KY</em>
   </a>
   <nav>
-    <a href="./" class="active">
+    <a href="/dashboard/" class="active">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
       <span>Dashboard</span>
     </a>
-    <a href="./repos.html">
+    <a href="/dashboard/repos.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
       <span>Repositories</span>
     </a>
-    <a href="./settings.html">
+    <a href="/dashboard/settings.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       <span>Settings</span>
     </a>
@@ -52,7 +52,7 @@
       <h1 class="page-title">Dashboard</h1>
       <p class="page-sub">Overview of your test reliability</p>
     </div>
-    <a href="./repos.html" class="btn btn-primary btn-sm">+ Add Repository</a>
+    <a href="/dashboard/repos.html" class="btn btn-primary btn-sm">+ Add Repository</a>
   </div>
 
   <!-- Stats -->
@@ -90,7 +90,7 @@
       <p style="max-width:400px;margin:12px auto 20px">Install the Falsky GitHub App or add the Action to your workflow. Push code and results will appear here automatically.</p>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
         <a href="https://github.com/marketplace/actions/falsky-ai-flaky-test-detector" target="_blank" class="btn btn-primary">Install GitHub App</a>
-        <a href="./repos.html" class="btn btn-ghost">View Setup Guide</a>
+        <a href="/dashboard/repos.html" class="btn btn-ghost">View Setup Guide</a>
       </div>
     </div>
   </div>
@@ -200,12 +200,12 @@ async function loadDashboard() {
         const trustClass = avgTrust >= 80 ? 'high' : avgTrust >= 50 ? 'mid' : 'low';
 
         repoRows += `<tr>
-          <td><a href="./repo.html?repo=${encodeURIComponent(repo.name)}" style="color:var(--text);text-decoration:none;font-weight:600">${repo.name}</a></td>
+          <td><a href="/dashboard/repo.html?repo=${encodeURIComponent(repo.name)}" style="color:var(--text);text-decoration:none;font-weight:600">${repo.name}</a></td>
           <td>${tests.length}</td>
           <td><span class="trust-badge ${trustClass}">${avgTrust}</span></td>
           <td>${flaky > 0 ? '<span style="color:var(--amber)">'+flaky+'</span>' : '<span style="color:var(--green)">0</span>'}</td>
           <td style="color:var(--text-muted)">—</td>
-          <td><a href="./repo.html?repo=${encodeURIComponent(repo.name)}" class="btn btn-ghost btn-sm">View →</a></td>
+          <td><a href="/dashboard/repo.html?repo=${encodeURIComponent(repo.name)}" class="btn btn-ghost btn-sm">View →</a></td>
         </tr>`;
       } catch(e) {}
     }

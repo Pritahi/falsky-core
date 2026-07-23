@@ -349,7 +349,7 @@ def auth_callback(request: Request):
         except Exception:
             return RedirectResponse(url="/analytics?error=invalid_token")
     response = RedirectResponse(url="/analytics")
-    response.set_cookie(key="falsky_admin_token", value=access_token, httponly=True, secure=True, samesite="lax", max_age=86400 * 7, path="/")
+    response.set_cookie(key="falsky_admin_token", value=access_token, httponly=True, secure=False, samesite="lax", max_age=86400 * 7, path="/")
     return response
 
 
@@ -415,7 +415,7 @@ def user_auth_callback(request: Request, response: Response):
 
     # Set cookie and redirect to dashboard
     resp = RedirectResponse(url="/dashboard/")
-    resp.set_cookie(key="falsky_user_token", value=access_token, httponly=True, secure=True, samesite="lax", max_age=86400 * 30, path="/")
+    resp.set_cookie(key="falsky_user_token", value=access_token, httponly=True, secure=False, samesite="lax", max_age=86400 * 30, path="/")
     return resp
 
 
@@ -523,7 +523,7 @@ def admin_login(data: AdminLogin, request: Request, response: Response):
         }
         token = jwt.encode(jwt_payload, FALSKY_ADMIN_SECRET, algorithm="HS256")
         
-        response.set_cookie(key="falsky_admin_token", value=token, httponly=True, secure=True, samesite="lax", max_age=86400 * 7)
+        response.set_cookie(key="falsky_admin_token", value=token, httponly=True, secure=False, samesite="lax", max_age=86400 * 7)
         logger.info(f"Admin login successful: {data.username}")
         return {"status": "ok", "username": admin["username"], "role": admin["role"]}
     except HTTPException:
@@ -754,7 +754,7 @@ def user_register(data: UserRegister, request: Request, response: Response):
         user = result[0]
         # Create JWT session (survives cold starts)
         token = _create_user_token(user["id"], data.email, data.name)
-        response.set_cookie(key="falsky_user_token", value=token, httponly=True, secure=True, samesite="lax", max_age=86400 * 30)
+        response.set_cookie(key="falsky_user_token", value=token, httponly=True, secure=False, samesite="lax", max_age=86400 * 30)
         return {"status": "ok", "name": data.name, "email": data.email, "api_key": api_key}
     except HTTPException:
         raise
@@ -776,7 +776,7 @@ def user_login(data: UserLogin, request: Request, response: Response):
         if not bcrypt.checkpw(data.password.encode(), user["password_hash"].encode()):
             raise HTTPException(status_code=401, detail="Invalid email or password")
         token = _create_user_token(user["id"], user["email"], user.get("name", ""))
-        response.set_cookie(key="falsky_user_token", value=token, httponly=True, secure=True, samesite="lax", max_age=86400 * 30)
+        response.set_cookie(key="falsky_user_token", value=token, httponly=True, secure=False, samesite="lax", max_age=86400 * 30)
         return {"status": "ok", "name": user.get("name", ""), "email": user["email"], "api_key": user.get("api_key", "")}
     except HTTPException:
         raise
@@ -912,7 +912,7 @@ def user_register(data: UserRegister, request: Request, response: Response):
         user = result[0]
         # Create JWT session (survives cold starts)
         token = _create_user_token(user["id"], data.email, data.name)
-        response.set_cookie(key="falsky_user_token", value=token, httponly=True, secure=True, samesite="lax", max_age=86400 * 30)
+        response.set_cookie(key="falsky_user_token", value=token, httponly=True, secure=False, samesite="lax", max_age=86400 * 30)
         return {"status": "ok", "name": data.name, "email": data.email, "api_key": api_key}
     except HTTPException:
         raise
@@ -934,7 +934,7 @@ def user_login(data: UserLogin, request: Request, response: Response):
         if not bcrypt.checkpw(data.password.encode(), user["password_hash"].encode()):
             raise HTTPException(status_code=401, detail="Invalid email or password")
         token = _create_user_token(user["id"], user["email"], user.get("name", ""))
-        response.set_cookie(key="falsky_user_token", value=token, httponly=True, secure=True, samesite="lax", max_age=86400 * 30)
+        response.set_cookie(key="falsky_user_token", value=token, httponly=True, secure=False, samesite="lax", max_age=86400 * 30)
         return {"status": "ok", "name": user.get("name", ""), "email": user["email"], "api_key": user.get("api_key", "")}
     except HTTPException:
         raise
@@ -1275,6 +1275,24 @@ def serve_dashboard(request: Request):
     if not _check_user_auth(request):
         return RedirectResponse(url="/login", status_code=302)
     return _serve_html(os.path.join("dashboard", "index.html"), "Falsky Dashboard")
+
+@app.get("/dashboard/repos.html", response_class=HTMLResponse)
+def serve_repos(request: Request):
+    if not _check_user_auth(request):
+        return RedirectResponse(url="/login", status_code=302)
+    return _serve_html(os.path.join("dashboard", "repos.html"), "Repositories")
+
+@app.get("/dashboard/settings.html", response_class=HTMLResponse)
+def serve_settings(request: Request):
+    if not _check_user_auth(request):
+        return RedirectResponse(url="/login", status_code=302)
+    return _serve_html(os.path.join("dashboard", "settings.html"), "Settings")
+
+@app.get("/dashboard/repo.html", response_class=HTMLResponse)
+def serve_repo(request: Request):
+    if not _check_user_auth(request):
+        return RedirectResponse(url="/login", status_code=302)
+    return _serve_html(os.path.join("dashboard", "repo.html"), "Repository")
 
 @app.get("/dashboard/test-detail.html", response_class=HTMLResponse)
 def serve_test_detail(request: Request):
