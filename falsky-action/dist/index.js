@@ -34607,10 +34607,10 @@ function parseJUnitXML(xmlContent) {
   if (doc.testcase) cases.push(...toArray(doc.testcase));
 
   for (const tc of cases) {
-    const attrs = tc['@_'] || {};
-    const name = attrs.name || 'unknown';
-    const classname = attrs.classname || '';
-    const duration = attrs.time !== undefined ? parseFloat(attrs.time) : 0;
+    const attrs = tc['@_'] || tc;
+    const name = attrs['@_name'] || 'unknown';
+    const classname = attrs['@_classname'] || '';
+    const duration = attrs['@_time'] !== undefined ? parseFloat(attrs['@_time']) : 0;
 
     let status = 'passed';
     let message = '';

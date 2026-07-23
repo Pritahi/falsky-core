@@ -25,7 +25,7 @@ jobs:
           EOF
 
       - name: Analyze with Falsky
-        uses: Pritahi/falsky-action@v1
+        uses: ./falsky-action
         with:
           junit-xml-path: '/tmp/demo-results.xml'
           api-url: 'https://poly-core-vercel.vercel.app'
