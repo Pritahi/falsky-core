@@ -1266,6 +1266,10 @@ def _check_user_auth(request: Request):
 
 # ===================== PAGE ROUTES =====================
 
+@app.get("/dashboard/design-system.css")
+def serve_css():
+    return _serve_html(os.path.join("dashboard", "design-system.css"))
+
 @app.get("/dashboard/", response_class=HTMLResponse)
 def serve_dashboard(request: Request):
     if not _check_user_auth(request):
