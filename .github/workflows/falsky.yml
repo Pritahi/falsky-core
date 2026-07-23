@@ -1,0 +1,57 @@
+name: Falsky Test Analysis
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  test-and-analyze:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: falsky_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Run real tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/falsky_test
+        run: |
+          python -m pytest tests/ -v --junitxml=test-results.xml --tb=short
+
+      - name: Analyze with Falsky
+        uses: falsky-action
+        with:
+          junit-xml-path: 'test-results.xml'
+          api-url: 'https://poly-core-vercel.vercel.app'
+          api-key: ${{ secrets.FALSKY_API_KEY }}
+          repo-name: '${{ github.repository }}'
+          comment-on-pr: 'true'
+          fail-on-flaky: 'false'
+          flaky-threshold: '50'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
