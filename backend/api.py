@@ -690,124 +690,6 @@ def admin_stats(request: Request):
         logger.error(f"Admin stats error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-# ===================== USER AUTH =====================
-
-class UserRegister(BaseModel):
-    name: str
-    email: str
-    password: str
-    github_username: Optional[str] = None
-    signup_source: Optional[str] = None
-
-class UserLogin(BaseModel):
-    email: str
-    password: str
-
-# JWT-based user sessions (survives serverless cold starts)
-_USER_JWT_SECRET = os.environ.get("FALSKY_USER_SECRET", "falsky-user-secret-change-in-production")
-
-def _create_user_token(user_id, email, name):
-    """Create a JWT token for user session."""
-    from datetime import datetime, timezone, timedelta
-    payload = {
-        "uid": user_id,
-        "email": email,
-        "name": name,
-        "aud": "falsky-user",
-        "exp": datetime.now(timezone.utc) + timedelta(days=30),
-        "iat": datetime.now(timezone.utc),
-    }
-    return jwt.encode(payload, _USER_JWT_SECRET, algorithm="HS256")
-
-def _decode_user_token(token):
-    """Decode and verify a user JWT token."""
-    try:
-        payload = jwt.decode(token, _USER_JWT_SECRET, algorithms=["HS256"], audience="falsky-user")
-        return {"user_id": payload["uid"], "email": payload["email"], "name": payload.get("name", "")}
-    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
-        return None
-
-@app.post("/api/user/register")
-def user_register(data: UserRegister, request: Request, response: Response):
-    try:
-        # Check if email exists
-        existing = _supabase_rest("users", filters={"email": data.email}, columns="id")
-        if existing and len(existing) > 0:
-            raise HTTPException(status_code=400, detail="Email already registered")
-        # Hash password
-        pw_hash = bcrypt.hashpw(data.password.encode(), bcrypt.gensalt()).decode()
-        # Generate API key
-        api_key = "fky_" + secrets.token_hex(20)
-        # Insert user
-        result = _supabase_rest("users", method="POST", data={
-            "name": data.name,
-            "email": data.email,
-            "password_hash": pw_hash,
-            "github_username": data.github_username,
-            "api_key": api_key,
-            "plan": "free",
-            "is_active": True,
-            "signup_source": data.signup_source or "direct",
-        })
-        if not result or len(result) == 0:
-            raise HTTPException(status_code=500, detail="Failed to create user")
-        user = result[0]
-        # Create JWT session (survives cold starts)
-        token = _create_user_token(user["id"], data.email, data.name)
-        response.set_cookie(key="falsky_user_token", value=token, httponly=True, secure=False, samesite="lax", max_age=86400 * 30)
-        return {"status": "ok", "name": data.name, "email": data.email, "api_key": api_key}
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"User register error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/api/user/login")
-def user_login(data: UserLogin, request: Request, response: Response):
-    try:
-        users = _supabase_rest("users", filters={"email": data.email}, columns="id,name,email,password_hash,api_key,is_active")
-        if not users or len(users) == 0:
-            raise HTTPException(status_code=401, detail="Invalid email or password")
-        user = users[0]
-        if not user.get("is_active", True):
-            raise HTTPException(status_code=403, detail="Account is disabled")
-        if not user.get("password_hash"):
-            raise HTTPException(status_code=401, detail="Account has no password set. Please register again.")
-        if not bcrypt.checkpw(data.password.encode(), user["password_hash"].encode()):
-            raise HTTPException(status_code=401, detail="Invalid email or password")
-        token = _create_user_token(user["id"], user["email"], user.get("name", ""))
-        response.set_cookie(key="falsky_user_token", value=token, httponly=True, secure=False, samesite="lax", max_age=86400 * 30)
-        return {"status": "ok", "name": user.get("name", ""), "email": user["email"], "api_key": user.get("api_key", "")}
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"User login error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/user/me")
-def user_me(request: Request):
-    token = request.cookies.get("falsky_user_token")
-    if not token:
-        raise HTTPException(status_code=401, detail="Not logged in")
-    session = _decode_user_token(token)
-    if not session:
-        raise HTTPException(status_code=401, detail="Session expired")
-    users = _supabase_rest("users", filters={"id": session["user_id"]}, columns="id,name,email,api_key,plan,is_active")
-    if not users or len(users) == 0 or not users[0].get("is_active", True):
-        raise HTTPException(status_code=401, detail="Account not found")
-    user = users[0]
-    return {"name": user.get("name", ""), "email": user["email"], "api_key": user.get("api_key", ""), "plan": user.get("plan", "free")}
-
-@app.post("/api/user/logout")
-def user_logout(request: Request, response: Response):
-    response.delete_cookie("falsky_user_token")
-    return {"status": "ok"}
-
-@app.get("/login", response_class=HTMLResponse)
-def serve_login():
-    return _serve_html(os.path.join("dashboard", "auth.html"), "Falsky — Sign In")
-
-
 # ===================== DIRECT SUPABASE CLIENT (fallback) =====================
 
 import urllib.request
@@ -960,6 +842,21 @@ def user_me(request: Request):
 def user_logout(request: Request, response: Response):
     response.delete_cookie("falsky_user_token")
     return {"status": "ok"}
+
+@app.post("/api/user/regenerate-key")
+def regenerate_api_key(request: Request):
+    """Regenerate the user's API key. Old key stops working immediately."""
+    token = request.cookies.get("falsky_user_token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Not logged in")
+    session = _decode_user_token(token)
+    if not session:
+        raise HTTPException(status_code=401, detail="Session expired")
+    new_key = "fky_" + secrets.token_hex(20)
+    result = _supabase_rest("users", method="PATCH", data={"api_key": new_key}, filters={"id": session["user_id"]}, columns="id,api_key")
+    if not result or len(result) == 0:
+        raise HTTPException(status_code=500, detail="Failed to regenerate key")
+    return {"status": "ok", "api_key": new_key}
 
 @app.get("/login", response_class=HTMLResponse)
 def serve_login():
@@ -1287,6 +1184,12 @@ def serve_settings(request: Request):
     if not _check_user_auth(request):
         return RedirectResponse(url="/login", status_code=302)
     return _serve_html(os.path.join("dashboard", "settings.html"), "Settings")
+
+@app.get("/dashboard/api-keys.html", response_class=HTMLResponse)
+def serve_api_keys(request: Request):
+    if not _check_user_auth(request):
+        return RedirectResponse(url="/login", status_code=302)
+    return _serve_html(os.path.join("dashboard", "api-keys.html"), "API Keys")
 
 @app.get("/dashboard/repo.html", response_class=HTMLResponse)
 def serve_repo(request: Request):
