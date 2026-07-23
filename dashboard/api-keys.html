@@ -6,60 +6,34 @@
 <title>Falsky — API Keys</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 16'><polyline points='0,8 8,8 12,1 17,15 21,4 25,8 34,8' fill='none' stroke='%232563eb' stroke-width='2.4'/></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 16'><polyline points='0,8 8,8 12,1 17,15 21,4 25,8 34,8' fill='none' stroke='%23FF4B2E' stroke-width='2.4'/></svg>">
 <link rel="stylesheet" href="design-system.css">
-<style>
-.section{margin-bottom:32px}
-.section-title{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--primary);text-transform:uppercase;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-
-.api-key-display{display:flex;align-items:center;gap:12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px}
-.api-key-display code{flex:1;font-family:var(--mono);font-size:13px;color:var(--green);word-break:break-all;user-select:all;min-width:0}
-.api-key-display .copy-btn{padding:8px 14px;font-family:var(--mono);font-size:11px;background:var(--bg-card);border:1px solid var(--border);color:var(--text-muted);cursor:pointer;border-radius:var(--radius-sm);transition:all .15s;white-space:nowrap}
-.api-key-display .copy-btn:hover{color:var(--primary);border-color:var(--primary)}
-.api-key-display .copy-btn.copied{color:var(--green);border-color:var(--green)}
-
-.info-box{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:20px}
-.info-box h4{font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px}
-.info-box p{font-family:var(--mono);font-size:12px;color:var(--text-secondary);line-height:1.6}
-.info-box code{font-family:var(--mono);font-size:12px;background:var(--bg);border:1px solid var(--border);padding:2px 6px;border-radius:4px;color:var(--text-secondary)}
-
-.code-block{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:12px}
-.code-block-header{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--border)}
-.code-lang{font-size:10px;font-weight:600;color:var(--primary);text-transform:uppercase;letter-spacing:0.06em;font-family:var(--mono)}
-.code-block pre{padding:14px;overflow-x:auto;font-family:var(--mono);font-size:12px;line-height:1.7;color:var(--text-secondary)}
-
-.danger-btn{padding:10px 16px;background:none;border:1px solid var(--red);color:var(--red);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;border-radius:var(--radius-sm);transition:all .15s}
-.danger-btn:hover{background:var(--red);color:#fff}
-
-.key-meta{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-subtle)}
-.key-meta:last-child{border-bottom:none}
-.key-label{font-family:var(--mono);font-size:12px;color:var(--text-muted)}
-.key-value{font-family:var(--mono);font-size:13px;color:var(--text)}
-</style>
 </head>
 <body>
+<div class="grain"></div>
 <div class="app">
 
+<!-- Sidebar -->
 <aside class="sidebar">
-  <a href="/dashboard/" class="logo">
-    <svg width="28" height="13" viewBox="0 0 34 16" fill="none"><polyline points="0,8 8,8 12,1 17,15 21,4 25,8 34,8" stroke="var(--primary)" stroke-width="2.4"/></svg>
+  <a href="./" class="logo">
+    <svg width="28" height="13" viewBox="0 0 34 16" fill="none"><polyline points="0,8 8,8 12,1 17,15 21,4 25,8 34,8" stroke="#FF4B2E" stroke-width="2.4"/></svg>
     FALS<em>KY</em>
   </a>
   <nav>
-    <a href="/dashboard/">
+    <a href="./">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
       <span>Dashboard</span>
     </a>
-    <a href="/dashboard/repos.html">
+    <a href="./repos.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
       <span>Repositories</span>
     </a>
-    <a href="/dashboard/api-keys.html" class="active">
+    <a href="./api-keys.html" class="active">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L9 11"/></svg>
       <span>API Keys</span>
     </a>
-    <a href="/dashboard/settings.html">
+    <a href="./settings.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       <span>Settings</span>
     </a>
@@ -72,71 +46,66 @@
         <div class="email" id="userEmail"></div>
       </div>
     </div>
-    <a href="#" onclick="doLogout()" style="display:block;margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--text-muted);text-decoration:none">Sign Out →</a>
+    <a href="#" onclick="doLogout()" style="display:block;margin-top:8px;font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em;text-decoration:none">SIGN OUT →</a>
   </div>
 </aside>
 
+<!-- Main -->
 <main class="main">
   <div class="page-header">
     <div>
       <h1 class="page-title">API Keys</h1>
-      <p class="page-sub">Manage your API keys for CI integration</p>
+      <p class="page-sub">Manage your API key for CI integration</p>
     </div>
   </div>
 
   <!-- Current API Key -->
-  <div class="card section">
-    <div class="section-title">Active Key</div>
-    <div class="key-meta">
-      <span class="key-label">Created</span>
-      <span class="key-value" id="keyCreated">On signup</span>
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-header">
+      <span class="card-title">Active API Key</span>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--green);letter-spacing:.1em">● ACTIVE</span>
     </div>
-    <div class="key-meta">
-      <span class="key-label">Status</span>
-      <span class="key-value" style="color:var(--green)">Active</span>
+    <div style="display:flex;align-items:center;gap:12px;padding:8px 0">
+      <code id="apiKeyValue" style="flex:1;font-family:var(--mono);font-size:13px;color:var(--green);word-break:break-all;background:var(--ink3);border:1px solid var(--line);padding:12px 16px;user-select:all;border-radius:var(--radius)">Loading…</code>
+      <button onclick="copyKey()" id="copyBtn" class="btn btn-ghost btn-sm" style="white-space:nowrap">Copy Key</button>
     </div>
-    <div class="api-key-display" id="apiKeyBox">
-      <code id="apiKeyValue">Loading…</code>
-      <button class="copy-btn" onclick="copyKey()">Copy</button>
-    </div>
+    <p style="font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em;margin-top:8px">Click the key to select · Keep this secret</p>
   </div>
 
-  <!-- How to use -->
-  <div class="card section">
-    <div class="section-title">How to Use</div>
-    <div class="info-box">
-      <h4>Use in GitHub Actions</h4>
-      <p>Add your API key as a GitHub secret named <code>FALSKY_API_KEY</code> and reference it in your workflow.</p>
+  <!-- Usage Examples -->
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-header">
+      <span class="card-title">Usage Examples</span>
     </div>
-    <div class="code-block">
-      <div class="code-block-header"><span class="code-lang">YAML</span></div>
-      <pre>- uses: Pritahi/falsky-action@v1
+    <div style="padding:16px;background:var(--ink3);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:16px">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--amber);text-transform:uppercase;margin-bottom:8px">GitHub Actions</div>
+      <p style="font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px">Add your API key as a GitHub secret named <code style="background:var(--ink);padding:2px 6px;border-radius:2px;color:var(--text)">FALSKY_API_KEY</code> and reference it in your workflow.</p>
+      <pre style="font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.7;background:var(--ink);border:1px solid var(--line);padding:14px;border-radius:var(--radius);overflow-x:auto">- uses: Pritahi/falsky-action@v1
   with:
     api_key: ${{ secrets.FALSKY_API_KEY }}
     junit_path: 'test-results/*.xml'</pre>
     </div>
-    <div class="info-box">
-      <h4>Use in cURL</h4>
-      <p>Pass your API key via the <code>X-Falsky-API-Key</code> header for write operations.</p>
-    </div>
-    <div class="code-block">
-      <div class="code-block-header"><span class="code-lang">Shell</span></div>
-      <pre>curl -X POST https://your-instance.com/api/junit \
-  -H "X-Falsky-API-Key: YOUR_KEY_HERE" \
+    <div style="padding:16px;background:var(--ink3);border:1px solid var(--line);border-radius:var(--radius)">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--amber);text-transform:uppercase;margin-bottom:8px">cURL</div>
+      <p style="font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px">Pass your API key via the <code style="background:var(--ink);padding:2px 6px;border-radius:2px;color:var(--text)">X-Poly-API-Key</code> header for write operations.</p>
+      <pre style="font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.7;background:var(--ink);border:1px solid var(--line);padding:14px;border-radius:var(--radius);overflow-x:auto">curl -X POST /api/junit \
+  -H "X-Poly-API-Key: YOUR_KEY_HERE" \
   -H "Content-Type: application/json" \
   -d '{"xml_content": "...", "repo_name": "my-repo"}'</pre>
     </div>
   </div>
 
   <!-- Danger Zone -->
-  <div class="card section" style="border-color:rgba(239,68,68,.3)">
-    <div class="section-title" style="color:var(--red)">Danger Zone</div>
-    <div class="key-meta">
+  <div class="card" style="border-color:rgba(255,75,46,.3)">
+    <div class="card-header">
+      <span class="card-title" style="color:var(--red)">Danger Zone</span>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0">
       <div>
-        <span class="key-label">Regenerate Key</span>
-        <p style="font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:2px">Your old key will stop working immediately. Update all CI workflows.</p>
+        <div style="font-family:var(--mono);font-size:12px;color:var(--text);letter-spacing:.08em">Regenerate API Key</div>
+        <p style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:4px;letter-spacing:.1em">Your old key will stop working immediately. Update all CI workflows.</p>
       </div>
-      <button class="danger-btn" onclick="regenerateKey()">Regenerate</button>
+      <button onclick="regenerateKey()" class="btn btn-sm" style="background:none;border:1px solid var(--red);color:var(--red);cursor:pointer">Regenerate</button>
     </div>
   </div>
 </main>
@@ -162,10 +131,11 @@ const API = '';
 function copyKey() {
   const key = document.getElementById('apiKeyValue').textContent;
   navigator.clipboard.writeText(key).then(() => {
-    const btn = document.querySelector('.copy-btn');
-    btn.classList.add('copied');
+    const btn = document.getElementById('copyBtn');
     btn.textContent = 'Copied!';
-    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = 'Copy'; }, 1500);
+    btn.style.borderColor = 'var(--green)';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => { btn.textContent = 'Copy Key'; btn.style.borderColor = ''; btn.style.color = ''; }, 1500);
   });
 }
 
