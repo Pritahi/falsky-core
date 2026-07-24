@@ -12,13 +12,13 @@
 <style>
 .trust-gauge{width:140px;height:140px;position:relative;margin:0 auto 12px}
 .trust-gauge svg{width:100%;height:100%}
-.trust-gauge .score{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:2.4rem;color:#F4F3EE}
+.trust-gauge .score{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:2.4rem;color:var(--ink)}
 .trust-gauge .label{position:absolute;bottom:-4px;left:0;right:0;text-align:center;font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:#5A616B;text-transform:uppercase}
 .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
 @media(max-width:900px){.chart-row{grid-template-columns:1fr}}
 .filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
 .filter-bar .input{max-width:240px}
-.filter-bar select{padding:8px 10px;background:var(--tile);border:1px solid var(--hair);color:#D7DCE3;font-family:var(--mono);font-size:11px;border-radius:var(--radius);outline:none}
+.filter-bar select{padding:8px 10px;background:#fff;border:1px solid var(--line);color:var(--ink);font-family:var(--mono);font-size:11px;border-radius:var(--radius);outline:none}
 .issue-list{list-style:none}
 .issue-list li{padding:10px 0;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px}
 .issue-list li:last-child{border-bottom:none}
@@ -145,11 +145,11 @@
       <input class="input" placeholder="Search tests…" id="searchFlaky" oninput="filterTests()">
       <select id="filterCat" onchange="filterTests()">
         <option value="">All Categories</option>
-        <option value="timing">⏱️ Timing</option>
-        <option value="order_dependency">🔗 Order</option>
-        <option value="shared_state">🤝 Shared State</option>
-        <option value="non_deterministic_data">🎲 Random</option>
-        <option value="environment_specific">🌐 Environment</option>
+        <option value="timing">Timing</option>
+        <option value="order_dependency">Order Dependency</option>
+        <option value="shared_state">Shared State</option>
+        <option value="non_deterministic_data">Non-Deterministic</option>
+        <option value="environment_specific">Environment</option>
       </select>
     </div>
     <div class="card">
@@ -198,11 +198,11 @@
   <div class="tab-content" id="tab-issues">
     <div class="chart-row">
       <div class="card">
-        <span class="card-title">🔴 Most Unstable</span>
+        <span class="card-title">Most Unstable</span>
         <ul class="issue-list" id="unstableList"></ul>
       </div>
       <div class="card">
-        <span class="card-title">📉 Recently Degraded</span>
+        <span class="card-title">Recently Degraded</span>
         <ul class="issue-list" id="degradedList"></ul>
       </div>
     </div>
@@ -230,7 +230,7 @@ setTimeout(() => {
 
 const API = '';
 let allTests = [];
-const catNames = {timing:'⏱️ Timing',order_dependency:'🔗 Order',shared_state:'🤝 Shared State',non_deterministic_data:'🎲 Random',environment_specific:'🌐 Environment'};
+const catNames = {timing:'Timing',order_dependency:'Order',shared_state:'Shared State',non_deterministic_data:'Random',environment_specific:'Environment'};
 const catClasses = {timing:'timing',order_dependency:'order',shared_state:'shared',non_deterministic_data:'random',environment_specific:'env'};
 
 function getRepo() { return new URLSearchParams(window.location.search).get('repo') || ''; }
@@ -335,7 +335,7 @@ function renderFlaky() {
     const cat = t.flaky_category;
     const catHtml = cat ? `<span class="cat-pill ${catClasses[cat] || ''}">${catNames[cat] || cat}</span>` : '—';
     return `<tr>
-      <td><a href="./test.html?repo=${encodeURIComponent(getRepo())}&test=${encodeURIComponent(t.test_name)}" style="color:#F4F3EE;text-decoration:none">${t.test_name}</a></td>
+      <td><a href="./test.html?repo=${encodeURIComponent(getRepo())}&test=${encodeURIComponent(t.test_name)}" style="color:var(--ink);text-decoration:none">${t.test_name}</a></td>
       <td><span class="trust-badge ${trustClass(t.trust_score)}">${Math.round(t.trust_score)}</span></td>
       <td>${catHtml}</td>
       <td>${Math.round(t.pass_rate * 100)}%</td>
@@ -348,9 +348,9 @@ function renderFlaky() {
 function renderAll() {
   const sorted = [...allTests].sort((a,b) => a.trust_score - b.trust_score);
   document.getElementById('allTable').innerHTML = sorted.map(t => {
-    const status = t.trust_score >= 80 ? '✅' : t.trust_score >= 50 ? '⚠️' : '🔴';
+    const status = t.trust_score >= 80 ? 'STABLE' : t.trust_score >= 50 ? 'FLAKY' : 'UNSTABLE';
     return `<tr>
-      <td><a href="./test.html?repo=${encodeURIComponent(getRepo())}&test=${encodeURIComponent(t.test_name)}" style="color:#F4F3EE;text-decoration:none">${t.test_name}</a></td>
+      <td><a href="./test.html?repo=${encodeURIComponent(getRepo())}&test=${encodeURIComponent(t.test_name)}" style="color:var(--ink);text-decoration:none">${t.test_name}</a></td>
       <td><span class="trust-badge ${trustClass(t.trust_score)}">${Math.round(t.trust_score)}</span></td>
       <td>${status}</td>
       <td>${Math.round(t.pass_rate * 100)}%</td>
@@ -363,7 +363,7 @@ function renderAll() {
 function renderIssues() {
   const unstable = [...allTests].sort((a,b) => a.trust_score - b.trust_score).slice(0,5);
   document.getElementById('unstableList').innerHTML = unstable.map(t =>
-    `<li><span class="trust-badge ${trustClass(t.trust_score)}">${Math.round(t.trust_score)}</span> <a href="./test.html?repo=${encodeURIComponent(getRepo())}&test=${encodeURIComponent(t.test_name)}" style="color:#D7DCE3">${t.test_name}</a></li>`
+    `<li><span class="trust-badge ${trustClass(t.trust_score)}">${Math.round(t.trust_score)}</span> <a href="./test.html?repo=${encodeURIComponent(getRepo())}&test=${encodeURIComponent(t.test_name)}" style="color:var(--ink)">${t.test_name}</a></li>`
   ).join('') || '<li style="color:#5A616B">No issues</li>';
 
   document.getElementById('degradedList').innerHTML = '<li style="color:#5A616B">Connect more runs to see trends</li>';

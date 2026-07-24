@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="design-system.css">
 <style>
 .score-big{text-align:center;padding:24px}
-.score-big .value{font-family:var(--disp);font-size:4rem;color:#F4F3EE}
+.score-big .value{font-family:var(--disp);font-size:4rem;color:var(--ink)}
 .score-big .label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:#5A616B;text-transform:uppercase;margin-top:4px}
 .breakdown{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 .breakdown-item{background:var(--tile);padding:12px;border:1px solid var(--hair);border-radius:var(--radius)}
@@ -172,7 +172,7 @@ setTimeout(() => {
 }, 0);
 
 const API = '';
-const catNames = {timing:'⏱️ Timing Flakiness',order_dependency:'🔗 Order Dependency',shared_state:'🤝 Shared State Contamination',non_deterministic_data:'🎲 Non-Deterministic Data',environment_specific:'🌐 Environment Specific'};
+const catNames = {timing:'Timing Flakiness',order_dependency:'Order Dependency',shared_state:'Shared State Contamination',non_deterministic_data:'Non-Deterministic Data',environment_specific:'Environment Specific'};
 const catClasses = {timing:'timing',order_dependency:'order',shared_state:'shared',non_deterministic_data:'random',environment_specific:'env'};
 
 function getParam(k) { return new URLSearchParams(window.location.search).get(k) || ''; }
@@ -208,7 +208,7 @@ async function loadTest() {
     const score = Math.round(data.trust_score || 0);
     document.getElementById('trustScore').textContent = score;
     const badge = document.getElementById('trustBadge');
-    badge.textContent = score >= 80 ? '✅ Stable' : score >= 50 ? '⚠️ Flaky' : '🔴 Unstable';
+    badge.textContent = score >= 80 ? 'Stable' : score >= 50 ? 'Flaky' : 'Unstable';
     badge.className = 'trust-badge ' + trustClass(score);
 
     // Flaky probability
@@ -254,7 +254,7 @@ async function loadTest() {
       document.getElementById('historyTable').innerHTML = '<tr><td colspan="5" style="text-align:center;color:#5A616B;padding:24px">No history yet</td></tr>';
     } else {
       document.getElementById('historyTable').innerHTML = history.map(h => {
-        const status = h.status === 'passed' ? '✅' : h.status === 'failed' ? '❌' : '⏭️';
+        const status = h.status === 'passed' ? 'PASS' : h.status === 'failed' ? 'FAIL' : 'SKIP';
         const time = h.run_timestamp ? new Date(h.run_timestamp).toLocaleString() : '—';
         return `<tr>
           <td style="color:#5A616B">${time}</td>
@@ -274,7 +274,7 @@ async function loadTest() {
       document.getElementById('errorPatterns').innerHTML = patterns.map(p =>
         `<div style="padding:10px;background:var(--tile);border:1px solid var(--hair);border-radius:var(--radius);margin-bottom:8px">
           <div style="color:var(--badB);font-size:11px;margin-bottom:4px">${p.count}x (${p.percentage}%)</div>
-          <div style="color:#D7DCE3;font-size:11px;word-break:break-all">${p.pattern}</div>
+          <div style="color:var(--ink);font-size:11px;word-break:break-all">${p.pattern}</div>
         </div>`
       ).join('');
     }

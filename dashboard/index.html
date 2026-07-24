@@ -220,7 +220,7 @@ async function loadDashboard() {
         const trustClass = avgTrust >= 80 ? 'high' : avgTrust >= 50 ? 'mid' : 'low';
 
         repoRows += `<tr>
-          <td><a href="./repo.html?repo=${encodeURIComponent(repo.name)}" style="color:#F4F3EE;text-decoration:none;font-weight:600">${repo.name}</a></td>
+          <td><a href="./repo.html?repo=${encodeURIComponent(repo.name)}" style="color:var(--ink);text-decoration:none;font-weight:600">${repo.name}</a></td>
           <td>${tests.length}</td>
           <td><span class="trust-badge ${trustClass}">${avgTrust}</span></td>
           <td>${flaky > 0 ? '<span style="color:var(--warnB)">'+flaky+'</span>' : '<span style="color:var(--okB)">0</span>'}</td>
@@ -233,7 +233,7 @@ async function loadDashboard() {
     document.getElementById('reposTable').innerHTML = repoRows || '<tr><td colspan="6" style="text-align:center;color:#5A616B;padding:24px">No data</td></tr>';
     document.getElementById('statTrust').textContent = trustCount > 0 ? Math.round(totalTrust / trustCount) : '—';
     document.getElementById('statFlaky').textContent = totalFlaky;
-    document.getElementById('statLatest').textContent = repos.length > 0 ? '✅ Active' : '—';
+    document.getElementById('statLatest').textContent = repos.length > 0 ? 'Active' : '—';
     document.getElementById('statLatestSub').textContent = repos.length > 0 ? 'receiving data' : 'no repos yet';
     document.getElementById('activityTable').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#5A616B;padding:24px">Connect a repo to see runs</td></tr>';
   } catch(e) {

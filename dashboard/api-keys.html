@@ -6,20 +6,31 @@
 <title>Falsky — Setup & API Keys</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 16'><polyline points='0,8 8,8 12,1 17,15 21,4 25,8 34,8' fill='none' stroke='%23FF4B2E' stroke-width='2.4'/></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 16'><polyline points='0,8 8,8 12,1 17,15 21,4 25,8 34,8' fill='none' stroke='%23FFB224' stroke-width='2.4'/></svg>">
 <link rel="stylesheet" href="design-system.css">
+<style>
+.step-card{margin-bottom:24px;border-left:3px solid var(--warnB)}
+.step-card.s2{border-left-color:var(--ink)}
+.step-card.s3{border-left-color:var(--okB)}
+.step-card.s4{border-left-color:#8b5cf6}
+.step-num{font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:.1em}
+.step-title{font-family:var(--mono);letter-spacing:.1em}
+.var-box{background:var(--panel);border:1px solid var(--hair);border-radius:var(--radius);padding:14px}
+.var-box .vb-label{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px}
+.code-block-inner{background:var(--panel);border:1px solid var(--hair);border-radius:var(--radius);overflow:hidden}
+.code-block-inner .cb-head{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--hair)}
+.code-block-inner .cb-head span{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase}
+.code-block-inner pre{font-family:var(--mono);font-size:12px;color:#8A9099;line-height:1.7;padding:14px;margin:0;overflow-x:auto}
+.highlight-box{background:var(--panel);border:1px solid var(--warnB);border-radius:var(--radius);padding:12px;margin-bottom:16px}
+</style>
 </head>
 <body>
-<div class="grain"></div>
 <div class="app">
 
 <!-- Sidebar -->
 <aside class="sidebar">
-  <a href="./" class="logo">
-    <svg width="28" height="13" viewBox="0 0 34 16" fill="none"><polyline points="0,8 8,8 12,1 17,15 21,4 25,8 34,8" stroke="#FF4B2E" stroke-width="2.4"/></svg>
-    FALS<em>KY</em>
-  </a>
+  <a href="./" class="logo"><i></i>Falsky</a>
   <nav>
     <a href="./">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
@@ -50,11 +61,10 @@
         <div class="email" id="userEmail"></div>
       </div>
     </div>
-    <a href="#" onclick="doLogout()" style="display:block;margin-top:8px;font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em;text-decoration:none">SIGN OUT →</a>
   </div>
   <div class="theme-toggle">
-    <button onclick="setTheme('dark')" id="btnDark">🌙 DARK</button>
-    <button onclick="setTheme('light')" id="btnLight">☀️ LIGHT</button>
+    <button onclick="setTheme('dark')" id="btnDark">DARK</button>
+    <button onclick="setTheme('light')" id="btnLight">LIGHT</button>
   </div>
 </aside>
 
@@ -68,175 +78,175 @@
   </div>
 
   <!-- ====== STEP 1: API Key ====== -->
-  <div class="card" style="margin-bottom:24px;border-left:3px solid var(--amber)">
+  <div class="card step-card">
     <div class="card-header">
-      <span class="card-title" style="font-family:var(--mono);letter-spacing:.1em"><span style="color:var(--amber);font-size:14px;font-weight:700">STEP 1</span> — GET YOUR API KEY</span>
+      <span class="card-title step-title"><span class="step-num" style="color:var(--warnB)">STEP 1</span> — GET YOUR API KEY</span>
     </div>
     <div style="padding:4px 0">
-      <p style="font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px">
+      <p style="font-family:var(--sans);font-size:13px;color:var(--mut);line-height:1.6;margin-bottom:16px">
         Your Falsky API key authenticates your CI workflow. Copy this key — you'll add it to GitHub as a secret in Step 2.
       </p>
       <div style="display:flex;align-items:center;gap:12px;padding:8px 0">
-        <code id="apiKeyValue" style="flex:1;font-family:var(--mono);font-size:13px;color:var(--green);word-break:break-all;background:var(--ink3);border:1px solid var(--line);padding:12px 16px;user-select:all;border-radius:var(--radius)">Loading…</code>
-        <button onclick="copyKey()" id="copyBtn" class="btn btn-ghost btn-sm" style="white-space:nowrap">📋 Copy Key</button>
+        <code id="apiKeyValue" style="flex:1;font-family:var(--mono);font-size:13px;color:var(--okB);word-break:break-all;background:var(--panel);border:1px solid var(--hair);padding:12px 16px;user-select:all;border-radius:var(--radius)">Loading…</code>
+        <button onclick="copyKey()" id="copyBtn" class="btn btn-ghost btn-sm" style="white-space:nowrap">Copy Key</button>
       </div>
-      <p style="font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em;margin-top:8px">⚠ Keep this secret — don't commit it to your repo</p>
+      <p style="font-family:var(--mono);font-size:10px;color:#5A616B;letter-spacing:.1em;margin-top:8px">Keep this secret — don't commit it to your repo</p>
     </div>
   </div>
 
   <!-- ====== STEP 2: GitHub Secret ====== -->
-  <div class="card" style="margin-bottom:24px;border-left:3px solid var(--text)">
+  <div class="card step-card s2">
     <div class="card-header">
-      <span class="card-title" style="font-family:var(--mono);letter-spacing:.1em"><span style="color:var(--text);font-size:14px;font-weight:700">STEP 2</span> — ADD KEY TO GITHUB</span>
+      <span class="card-title step-title"><span class="step-num" style="color:var(--ink)">STEP 2</span> — ADD KEY TO GITHUB</span>
     </div>
     <div style="padding:4px 0">
-      <p style="font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px">
-        Go to your GitHub repo → Settings → Secrets and variables → Actions → New repository secret. Name it <code style="background:var(--ink);padding:2px 8px;border-radius:2px;color:var(--green);font-family:var(--mono)">FALSKY_API_KEY</code> and paste your key as the value.
+      <p style="font-family:var(--sans);font-size:13px;color:var(--mut);line-height:1.6;margin-bottom:16px">
+        Go to your GitHub repo → Settings → Secrets and variables → Actions → New repository secret. Name it <code style="background:var(--panel);padding:2px 8px;border-radius:2px;color:var(--okB);font-family:var(--mono)">FALSKY_API_KEY</code> and paste your key as the value.
       </p>
 
       <!-- Visual step-by-step -->
       <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px">
-        <div style="flex:1;min-width:200px;background:var(--ink3);border:1px solid var(--line);border-radius:var(--radius);padding:12px">
-          <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--amber);text-transform:uppercase;margin-bottom:8px">① Go to your repo</div>
-          <p style="font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.6">
-            <code style="color:var(--text)">github.com/YOUR-ORG/YOUR-REPO</code><br>
-            → Click <strong style="color:var(--text)">Settings</strong> tab
+        <div class="var-box" style="flex:1;min-width:200px">
+          <div class="vb-label" style="color:var(--warnB)">Go to your repo</div>
+          <p style="font-family:var(--mono);font-size:12px;color:#8A9099;line-height:1.6">
+            <code style="color:var(--ink)">github.com/YOUR-ORG/YOUR-REPO</code><br>
+            → Click <strong style="color:var(--ink)">Settings</strong> tab
           </p>
         </div>
-        <div style="flex:1;min-width:200px;background:var(--ink3);border:1px solid var(--line);border-radius:var(--radius);padding:12px">
-          <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--amber);text-transform:uppercase;margin-bottom:8px">② Secrets page</div>
-          <p style="font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.6">
-            Left sidebar → <strong style="color:var(--text)">Secrets and variables</strong><br>
-            → <strong style="color:var(--text)">Actions</strong>
+        <div class="var-box" style="flex:1;min-width:200px">
+          <div class="vb-label" style="color:var(--warnB)">Secrets page</div>
+          <p style="font-family:var(--mono);font-size:12px;color:#8A9099;line-height:1.6">
+            Left sidebar → <strong style="color:var(--ink)">Secrets and variables</strong><br>
+            → <strong style="color:var(--ink)">Actions</strong>
           </p>
         </div>
-        <div style="flex:1;min-width:200px;background:var(--ink3);border:1px solid var(--line);border-radius:var(--radius);padding:12px">
-          <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--amber);text-transform:uppercase;margin-bottom:8px">③ Add secret</div>
-          <p style="font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.6">
-            Click <strong style="color:var(--text)">New repository secret</strong><br>
-            Name: <code style="color:var(--green)">FALSKY_API_KEY</code><br>
-            Value: <em style="color:var(--dim)">paste your key</em>
+        <div class="var-box" style="flex:1;min-width:200px">
+          <div class="vb-label" style="color:var(--warnB)">Add secret</div>
+          <p style="font-family:var(--mono);font-size:12px;color:#8A9099;line-height:1.6">
+            Click <strong style="color:var(--ink)">New repository secret</strong><br>
+            Name: <code style="color:var(--okB)">FALSKY_API_KEY</code><br>
+            Value: <em style="color:#5A616B">paste your key</em>
           </p>
         </div>
       </div>
 
-      <div class="code-block" style="background:var(--ink3);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:0">
-        <div class="code-block-header" style="display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--line)">
-          <span style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--amber);text-transform:uppercase">Direct link</span>
-          <button onclick="copyDirectLink()" class="btn btn-ghost btn-sm">📋 Copy</button>
+      <div class="code-block-inner" style="margin-bottom:0">
+        <div class="cb-head">
+          <span style="color:var(--warnB)">Direct link</span>
+          <button onclick="copyDirectLink()" class="btn btn-ghost btn-sm">Copy</button>
         </div>
-        <pre id="directLink" style="font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.7;padding:14px;margin:0;overflow-x:auto">https://github.com/YOUR-ORG/YOUR-REPO/settings/secrets/actions</pre>
+        <pre id="directLink">https://github.com/YOUR-ORG/YOUR-REPO/settings/secrets/actions</pre>
       </div>
     </div>
   </div>
 
   <!-- ====== STEP 3: YML File ====== -->
-  <div class="card" style="margin-bottom:24px;border-left:3px solid var(--green)">
+  <div class="card step-card s3">
     <div class="card-header">
-      <span class="card-title" style="font-family:var(--mono);letter-spacing:.1em"><span style="color:var(--green);font-size:14px;font-weight:700">STEP 3</span> — ADD WORKFLOW YML FILE</span>
-      <button onclick="copyYml()" class="btn btn-ghost btn-sm" style="white-space:nowrap">📋 Copy YML</button>
+      <span class="card-title step-title"><span class="step-num" style="color:var(--okB)">STEP 3</span> — ADD WORKFLOW YML FILE</span>
+      <button onclick="copyYml()" class="btn btn-ghost btn-sm" style="white-space:nowrap">Copy YML</button>
     </div>
     <div style="padding:4px 0">
-      <p style="font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px">
-        Create this file in your repo at <code style="background:var(--ink);padding:2px 8px;border-radius:2px;color:var(--green);font-family:var(--mono)">.github/workflows/falsky.yml</code>. This is the complete workflow — it runs your tests and sends results to Falsky.
+      <p style="font-family:var(--sans);font-size:13px;color:var(--mut);line-height:1.6;margin-bottom:16px">
+        Create this file in your repo at <code style="background:var(--panel);padding:2px 8px;border-radius:2px;color:var(--okB);font-family:var(--mono)">.github/workflows/falsky.yml</code>. This is the complete workflow — it runs your tests and sends results to Falsky.
       </p>
 
       <!-- What to change highlights -->
-      <div style="background:var(--ink3);border:1px solid var(--amber);border-radius:var(--radius);padding:12px;margin-bottom:16px">
-        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--amber);text-transform:uppercase;margin-bottom:8px">⚡ WHAT TO CHANGE IN THIS YML</div>
+      <div class="highlight-box">
+        <div class="vb-label" style="color:var(--warnB);margin-bottom:8px">WHAT TO CHANGE IN THIS YML</div>
         <div style="display:grid;gap:8px">
           <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-family:var(--mono);font-size:11px;color:var(--amber);background:rgba(255,180,0,.15);padding:2px 6px;border-radius:2px;font-weight:600">TEST PATH</span>
-            <span style="font-family:var(--mono);font-size:12px;color:var(--muted)">Change <code style="color:var(--text)">pytest tests/test_real.py</code> → your actual test path</span>
+            <span style="font-family:var(--mono);font-size:11px;color:var(--warnB);background:rgba(255,178,36,.12);padding:2px 6px;border-radius:2px;font-weight:600">TEST PATH</span>
+            <span style="font-family:var(--mono);font-size:12px;color:#8A9099">Change <code style="color:#D7DCE3">pytest tests/test_real.py</code> → your actual test path</span>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-family:var(--mono);font-size:11px;color:var(--amber);background:rgba(255,180,0,.15);padding:2px 6px;border-radius:2px;font-weight:600">PYTHON VER</span>
-            <span style="font-family:var(--mono);font-size:12px;color:var(--muted)">Change <code style="color:var(--text)">"3.11"</code> → your project's Python version</span>
+            <span style="font-family:var(--mono);font-size:11px;color:var(--warnB);background:rgba(255,178,36,.12);padding:2px 6px;border-radius:2px;font-weight:600">PYTHON VER</span>
+            <span style="font-family:var(--mono);font-size:12px;color:#8A9099">Change <code style="color:#D7DCE3">"3.11"</code> → your project's Python version</span>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-family:var(--mono);font-size:11px;color:var(--amber);background:rgba(255,180,0,.15);padding:2px 6px;border-radius:2px;font-weight:600">DEPS INSTALL</span>
-            <span style="font-family:var(--mono);font-size:12px;color:var(--muted)">If using Node → replace <code style="color:var(--text)">pip install</code> with <code style="color:var(--text)">npm ci && npm test</code></span>
+            <span style="font-family:var(--mono);font-size:11px;color:var(--warnB);background:rgba(255,178,36,.12);padding:2px 6px;border-radius:2px;font-weight:600">DEPS INSTALL</span>
+            <span style="font-family:var(--mono);font-size:12px;color:#8A9099">If using Node → replace <code style="color:#D7DCE3">pip install</code> with <code style="color:#D7DCE3">npm ci && npm test</code></span>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-family:var(--mono);font-size:11px;color:var(--green);background:rgba(0,255,100,.1);padding:2px 6px;border-radius:2px;font-weight:600">NO CHANGE</span>
-            <span style="font-family:var(--mono);font-size:12px;color:var(--muted)"><code style="color:var(--green)">api-url</code>, <code style="color:var(--green)">api-key</code>, <code style="color:var(--green)">repo-name</code> — auto-handled ✅</span>
+            <span style="font-family:var(--mono);font-size:11px;color:var(--okB);background:rgba(47,191,113,.12);padding:2px 6px;border-radius:2px;font-weight:600">NO CHANGE</span>
+            <span style="font-family:var(--mono);font-size:12px;color:#8A9099"><code style="color:var(--okB)">api-url</code>, <code style="color:var(--okB)">api-key</code>, <code style="color:var(--okB)">repo-name</code> — auto-handled</span>
           </div>
         </div>
       </div>
 
       <!-- Full YML code -->
-      <div class="code-block" style="background:var(--ink);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden">
-        <div class="code-block-header" style="display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--line)">
-          <span style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--green);text-transform:uppercase">Complete workflow — falsky.yml</span>
+      <div class="code-block-inner">
+        <div class="cb-head">
+          <span style="color:var(--okB)">Complete workflow — falsky.yml</span>
         </div>
-        <pre id="ymlCode" style="font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.7;padding:14px;margin:0;overflow-x:auto"><span style="color:var(--amber)"># .github/workflows/falsky.yml</span>
-<span style="color:var(--text);font-weight:600">name</span>: <span style="color:var(--green)">Falsky Test Analysis</span>
-<span style="color:var(--text);font-weight:600">on</span>:
-  <span style="color:var(--text);font-weight:600">pull_request</span>:
-    <span style="color:var(--text);font-weight:600">branches</span>: [<span style="color:var(--green)">main</span>]
-  <span style="color:var(--text);font-weight:600">push</span>:
-    <span style="color:var(--text);font-weight:600">branches</span>: [<span style="color:var(--green)">main</span>]
+        <pre id="ymlCode"><span style="color:var(--warnB)"># .github/workflows/falsky.yml</span>
+<span style="color:#D7DCE3;font-weight:600">name</span>: <span style="color:var(--okB)">Falsky Test Analysis</span>
+<span style="color:#D7DCE3;font-weight:600">on</span>:
+  <span style="color:#D7DCE3;font-weight:600">pull_request</span>:
+    <span style="color:#D7DCE3;font-weight:600">branches</span>: [<span style="color:var(--okB)">main</span>]
+  <span style="color:#D7DCE3;font-weight:600">push</span>:
+    <span style="color:#D7DCE3;font-weight:600">branches</span>: [<span style="color:var(--okB)">main</span>]
 
-<span style="color:var(--text);font-weight:600">jobs</span>:
-  <span style="color:var(--text);font-weight:600">test-and-analyze</span>:
-    <span style="color:var(--text);font-weight:600">runs-on</span>: <span style="color:var(--green)">ubuntu-latest</span>
-    <span style="color:var(--text);font-weight:600">env</span>:
-      <span style="color:var(--text);font-weight:600">CI</span>: <span style="color:var(--green)">true</span>
-      <span style="color:var(--text);font-weight:600">CI_RUN_NUMBER</span>: <span style="color:var(--dim)">${{ github.run_number }}</span>
+<span style="color:#D7DCE3;font-weight:600">jobs</span>:
+  <span style="color:#D7DCE3;font-weight:600">test-and-analyze</span>:
+    <span style="color:#D7DCE3;font-weight:600">runs-on</span>: <span style="color:var(--okB)">ubuntu-latest</span>
+    <span style="color:#D7DCE3;font-weight:600">env</span>:
+      <span style="color:#D7DCE3;font-weight:600">CI</span>: <span style="color:var(--okB)">true</span>
+      <span style="color:#D7DCE3;font-weight:600">CI_RUN_NUMBER</span>: <span style="color:#5A616B">${{ github.run_number }}</span>
 
-    <span style="color:var(--text);font-weight:600">steps</span>:
-      - <span style="color:var(--text);font-weight:600">uses</span>: <span style="color:var(--green)">actions/checkout@v4</span>
+    <span style="color:#D7DCE3;font-weight:600">steps</span>:
+      - <span style="color:#D7DCE3;font-weight:600">uses</span>: <span style="color:var(--okB)">actions/checkout@v4</span>
 
-      - <span style="color:var(--amber)"># ── Install your project dependencies ──</span>
-        <span style="color:var(--text);font-weight:600">name</span>: <span style="color:var(--green)">Set up Python</span>
-        <span style="color:var(--text);font-weight:600">uses</span>: <span style="color:var(--green)">actions/setup-python@v5</span>
-        <span style="color:var(--text);font-weight:600">with</span>:
-          <span style="color:var(--amber)">python-version</span>: <span style="color:var(--green)">"3.11"</span>  <span style="color:var(--dim)">← CHANGE to your Python version</span>
+      - <span style="color:var(--warnB)"># Install your project dependencies</span>
+        <span style="color:#D7DCE3;font-weight:600">name</span>: <span style="color:var(--okB)">Set up Python</span>
+        <span style="color:#D7DCE3;font-weight:600">uses</span>: <span style="color:var(--okB)">actions/setup-python@v5</span>
+        <span style="color:#D7DCE3;font-weight:600">with</span>:
+          <span style="color:var(--warnB)">python-version</span>: <span style="color:var(--okB)">"3.11"</span>  <span style="color:#5A616B">← CHANGE to your Python version</span>
 
-      - <span style="color:var(--text);font-weight:600">name</span>: <span style="color:var(--green)">Install dependencies</span>
-        <span style="color:var(--text);font-weight:600">run</span>: |
+      - <span style="color:#D7DCE3;font-weight:600">name</span>: <span style="color:var(--okB)">Install dependencies</span>
+        <span style="color:#D7DCE3;font-weight:600">run</span>: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - <span style="color:var(--amber)"># ── RUN YOUR TESTS — change path to match your project ──</span>
-        <span style="color:var(--text);font-weight:600">name</span>: <span style="color:var(--green)">Run pytest suite</span>
-        <span style="color:var(--text);font-weight:600">run</span>: |
-          <span style="color:var(--amber)">pytest tests/</span> <span style="color:var(--dim)">← CHANGE: your test folder/file path</span> \
+      - <span style="color:var(--warnB)"># Run your tests — change path to match your project</span>
+        <span style="color:#D7DCE3;font-weight:600">name</span>: <span style="color:var(--okB)">Run pytest suite</span>
+        <span style="color:#D7DCE3;font-weight:600">run</span>: |
+          <span style="color:var(--warnB)">pytest tests/</span> <span style="color:#5A616B">← CHANGE: your test folder/file path</span> \
             --junitxml=/tmp/test-results.xml \
             -v || true
 
-      - <span style="color:var(--amber)"># ── FALSKY analyzes results and posts to dashboard ──</span>
-        <span style="color:var(--text);font-weight:600">name</span>: <span style="color:var(--green)">Analyze with Falsky</span>
-        <span style="color:var(--text);font-weight:600">uses</span>: <span style="color:var(--green)">./falsky-action</span>
-        <span style="color:var(--text);font-weight:600">with</span>:
-          <span style="color:var(--text);font-weight:600">junit-xml-path</span>: <span style="color:var(--green)">'/tmp/test-results.xml'</span>
-          <span style="color:var(--text);font-weight:600">api-url</span>: <span style="color:var(--green)">'https://poly-core-vercel.vercel.app'</span>
-          <span style="color:var(--text);font-weight:600">api-key</span>: <span style="color:var(--dim)">${{ secrets.FALSKY_API_KEY }}</span>  <span style="color:var(--dim)">← from Step 2</span>
-          <span style="color:var(--text);font-weight:600">repo-name</span>: <span style="color:var(--dim)">${{ github.repository }}</span>  <span style="color:var(--dim)">← auto-detected</span>
-          <span style="color:var(--text);font-weight:600">comment-on-pr</span>: <span style="color:var(--green)">'true'</span>
-          <span style="color:var(--text);font-weight:600">fail-on-flaky</span>: <span style="color:var(--green)">'false'</span>
-          <span style="color:var(--text);font-weight:600">flaky-threshold</span>: <span style="color:var(--green)">'50'</span></pre>
+      - <span style="color:var(--warnB)"># Falsky analyzes results and posts to dashboard</span>
+        <span style="color:#D7DCE3;font-weight:600">name</span>: <span style="color:var(--okB)">Analyze with Falsky</span>
+        <span style="color:#D7DCE3;font-weight:600">uses</span>: <span style="color:var(--okB)">Pritahi/falsky-action@v1</span>
+        <span style="color:#D7DCE3;font-weight:600">with</span>:
+          <span style="color:#D7DCE3;font-weight:600">junit-xml-path</span>: <span style="color:var(--okB)">'/tmp/test-results.xml'</span>
+          <span style="color:#D7DCE3;font-weight:600">api-url</span>: <span style="color:var(--okB)">'https://poly-core-vercel.vercel.app'</span>
+          <span style="color:#D7DCE3;font-weight:600">api-key</span>: <span style="color:#5A616B">${{ secrets.FALSKY_API_KEY }}</span>  <span style="color:#5A616B">← from Step 2</span>
+          <span style="color:#D7DCE3;font-weight:600">repo-name</span>: <span style="color:#5A616B">${{ github.repository }}</span>  <span style="color:#5A616B">← auto-detected</span>
+          <span style="color:#D7DCE3;font-weight:600">comment-on-pr</span>: <span style="color:var(--okB)">'true'</span>
+          <span style="color:#D7DCE3;font-weight:600">fail-on-flaky</span>: <span style="color:var(--okB)">'false'</span>
+          <span style="color:#D7DCE3;font-weight:600">flaky-threshold</span>: <span style="color:var(--okB)">'50'</span></pre>
       </div>
     </div>
   </div>
 
   <!-- ====== Test File Location ====== -->
-  <div class="card" style="margin-bottom:24px;border-left:3px solid #8b5cf6">
+  <div class="card step-card s4">
     <div class="card-header">
-      <span class="card-title" style="font-family:var(--mono);letter-spacing:.1em">TEST FILES — WHERE DO THEY GO?</span>
+      <span class="card-title step-title">TEST FILES — WHERE DO THEY GO?</span>
     </div>
     <div style="padding:4px 0">
-      <p style="font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px">
+      <p style="font-family:var(--sans);font-size:13px;color:var(--mut);line-height:1.6;margin-bottom:16px">
         Your tests live in your own repo. Falsky doesn't decide what tests to run — it runs whatever tests you already have and then analyzes the results. Here's how pytest finds your tests:
       </p>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-        <div style="background:var(--ink3);border:1px solid var(--line);border-radius:var(--radius);padding:14px">
-          <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:#8b5cf6;text-transform:uppercase;margin-bottom:8px">📁 Recommended structure</div>
-          <pre style="font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.7;margin:0">your-project/
+        <div class="var-box">
+          <div class="vb-label" style="color:#8b5cf6">Recommended structure</div>
+          <pre style="font-family:var(--mono);font-size:11px;color:#8A9099;line-height:1.7;margin:0">your-project/
 ├── .github/workflows/
-│   └── <span style="color:var(--green)">falsky.yml</span>        ← workflow
-├── <span style="color:var(--green)">tests/</span>                  ← test folder
+│   └── <span style="color:var(--okB)">falsky.yml</span>        ← workflow
+├── <span style="color:var(--okB)">tests/</span>                  ← test folder
 │   ├── test_homepage.py
 │   ├── test_api.py
 │   └── test_login.py
@@ -244,24 +254,24 @@
 │   └── app.py           ← your code
 └── requirements.txt     ← dependencies</pre>
         </div>
-        <div style="background:var(--ink3);border:1px solid var(--line);border-radius:var(--radius);padding:14px">
-          <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:#8b5cf6;text-transform:uppercase;margin-bottom:8px">🔍 How pytest finds tests</div>
-          <div style="font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.7">
-            <p style="margin-bottom:8px"><strong style="color:var(--text)">File naming:</strong> Files named <code style="color:var(--green)">test_*.py</code> or <code style="color:var(--green)">*_test.py</code></p>
-            <p style="margin-bottom:8px"><strong style="color:var(--text)">Class naming:</strong> Classes starting with <code style="color:var(--green)">Test*</code></p>
-            <p style="margin-bottom:8px"><strong style="color:var(--text)">Method naming:</strong> Methods starting with <code style="color:var(--green)">test_*</code></p>
-            <p style="margin-bottom:0"><strong style="color:var(--text)">In YML:</strong> <code style="color:var(--green)">pytest tests/</code> → runs all test files in tests/ folder</p>
+        <div class="var-box">
+          <div class="vb-label" style="color:#8b5cf6">How pytest finds tests</div>
+          <div style="font-family:var(--mono);font-size:12px;color:#8A9099;line-height:1.7">
+            <p style="margin-bottom:8px"><strong style="color:#D7DCE3">File naming:</strong> Files named <code style="color:var(--okB)">test_*.py</code> or <code style="color:var(--okB)">*_test.py</code></p>
+            <p style="margin-bottom:8px"><strong style="color:#D7DCE3">Class naming:</strong> Classes starting with <code style="color:var(--okB)">Test*</code></p>
+            <p style="margin-bottom:8px"><strong style="color:#D7DCE3">Method naming:</strong> Methods starting with <code style="color:var(--okB)">test_*</code></p>
+            <p style="margin-bottom:0"><strong style="color:#D7DCE3">In YML:</strong> <code style="color:var(--okB)">pytest tests/</code> → runs all test files in tests/ folder</p>
           </div>
         </div>
       </div>
 
       <!-- Node.js alternative -->
-      <div style="background:var(--ink3);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:16px">
-        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--amber);text-transform:uppercase;margin-bottom:8px">NODE.JS / JEST USERS</div>
-        <p style="font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px">
+      <div class="var-box" style="margin-bottom:16px">
+        <div class="vb-label" style="color:var(--warnB)">NODE.JS / JEST USERS</div>
+        <p style="font-family:var(--sans);font-size:13px;color:#8A9099;line-height:1.6;margin-bottom:8px">
           If you're using Jest instead of pytest, replace the Python steps in your YML with these:
         </p>
-        <pre style="font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.7;background:var(--ink);border:1px solid var(--line);padding:14px;border-radius:var(--radius);overflow-x:auto">      - name: Install dependencies
+        <pre style="font-family:var(--mono);font-size:12px;color:#8A9099;line-height:1.7;background:var(--panel);border:1px solid var(--hair);padding:14px;border-radius:var(--radius);overflow-x:auto">      - name: Install dependencies
         run: npm ci
 
       - name: Run Jest with JUnit output
@@ -272,28 +282,28 @@
       </div>
 
       <!-- What Falsky does with results -->
-      <div style="background:var(--ink3);border:1px solid var(--line);border-radius:var(--radius);padding:14px">
-        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--green);text-transform:uppercase;margin-bottom:8px">✅ WHAT HAPPENS AFTER TESTS RUN</div>
+      <div class="var-box">
+        <div class="vb-label" style="color:var(--okB)">WHAT HAPPENS AFTER TESTS RUN</div>
         <div style="display:flex;gap:12px;flex-wrap:wrap">
           <div style="flex:1;min-width:140px;text-align:center;padding:8px">
-            <div style="font-family:var(--mono);font-size:20px;color:var(--green)">①</div>
-            <div style="font-family:var(--mono);font-size:11px;color:var(--muted)">pytest → JUnit XML</div>
+            <div style="font-family:var(--mono);font-size:20px;color:var(--okB)">1</div>
+            <div style="font-family:var(--mono);font-size:11px;color:#8A9099">pytest → JUnit XML</div>
           </div>
           <div style="flex:1;min-width:140px;text-align:center;padding:8px">
-            <div style="font-family:var(--mono);font-size:20px;color:var(--amber)">②</div>
-            <div style="font-family:var(--mono);font-size:11px;color:var(--muted)">Falsky Action → API</div>
+            <div style="font-family:var(--mono);font-size:20px;color:var(--warnB)">2</div>
+            <div style="font-family:var(--mono);font-size:11px;color:#8A9099">Falsky Action → API</div>
           </div>
           <div style="flex:1;min-width:140px;text-align:center;padding:8px">
-            <div style="font-family:var(--mono);font-size:20px;color:#8b5cf6">③</div>
-            <div style="font-family:var(--mono);font-size:11px;color:var(--muted)">Bayesian Trust Score</div>
+            <div style="font-family:var(--mono);font-size:20px;color:#8b5cf6">3</div>
+            <div style="font-family:var(--mono);font-size:11px;color:#8A9099">Bayesian Trust Score</div>
           </div>
           <div style="flex:1;min-width:140px;text-align:center;padding:8px">
-            <div style="font-family:var(--mono);font-size:20px;color:var(--red)">④</div>
-            <div style="font-family:var(--mono);font-size:11px;color:var(--muted)">Flaky Detection</div>
+            <div style="font-family:var(--mono);font-size:20px;color:var(--badB)">4</div>
+            <div style="font-family:var(--mono);font-size:11px;color:#8A9099">Flaky Detection</div>
           </div>
           <div style="flex:1;min-width:140px;text-align:center;padding:8px">
-            <div style="font-family:var(--mono);font-size:20px;color:var(--text)">⑤</div>
-            <div style="font-family:var(--mono);font-size:11px;color:var(--muted)">PR Comment + Dashboard</div>
+            <div style="font-family:var(--mono);font-size:20px;color:#D7DCE3">5</div>
+            <div style="font-family:var(--mono);font-size:11px;color:#8A9099">PR Comment + Dashboard</div>
           </div>
         </div>
       </div>
@@ -301,16 +311,16 @@
   </div>
 
   <!-- Danger Zone -->
-  <div class="card" style="border-color:rgba(255,75,46,.3);margin-bottom:24px">
+  <div class="card" style="border-color:rgba(229,72,77,.3);margin-bottom:24px">
     <div class="card-header">
-      <span class="card-title" style="color:var(--red)">Danger Zone</span>
+      <span class="card-title" style="color:var(--badB)">Danger Zone</span>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0">
       <div>
-        <div style="font-family:var(--mono);font-size:12px;color:var(--text);letter-spacing:.08em">Regenerate API Key</div>
-        <p style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:4px;letter-spacing:.1em">Your old key will stop working immediately. Update all CI workflows.</p>
+        <div style="font-family:var(--mono);font-size:12px;color:var(--ink);letter-spacing:.08em">Regenerate API Key</div>
+        <p style="font-family:var(--mono);font-size:10px;color:#5A616B;margin-top:4px;letter-spacing:.1em">Your old key will stop working immediately. Update all CI workflows.</p>
       </div>
-      <button onclick="regenerateKey()" class="btn btn-sm" style="background:none;border:1px solid var(--red);color:var(--red);cursor:pointer">Regenerate</button>
+      <button onclick="regenerateKey()" class="btn btn-sm" style="background:none;border:1px solid var(--badB);color:var(--badB);cursor:pointer">Regenerate</button>
     </div>
   </div>
 </main>
@@ -327,7 +337,6 @@ function setTheme(t) {
   document.getElementById('btnDark')?.classList.toggle('active', t === 'dark');
   document.getElementById('btnLight')?.classList.toggle('active', t === 'light');
 }
-// Init toggle active state on page load
 setTimeout(() => {
   document.getElementById('btnDark')?.classList.toggle('active', savedTheme === 'dark');
   document.getElementById('btnLight')?.classList.toggle('active', savedTheme === 'light');
@@ -335,7 +344,6 @@ setTimeout(() => {
 
 const API = '';
 
-// Auth check
 (async () => {
   try {
     const res = await fetch(API + '/api/user/me');
@@ -352,10 +360,10 @@ function copyKey() {
   const key = document.getElementById('apiKeyValue').textContent;
   navigator.clipboard.writeText(key).then(() => {
     const btn = document.getElementById('copyBtn');
-    btn.textContent = '✅ Copied!';
-    btn.style.borderColor = 'var(--green)';
-    btn.style.color = 'var(--green)';
-    setTimeout(() => { btn.textContent = '📋 Copy Key'; btn.style.borderColor = ''; btn.style.color = ''; }, 1500);
+    btn.textContent = 'Copied!';
+    btn.style.borderColor = 'var(--okB)';
+    btn.style.color = 'var(--okB)';
+    setTimeout(() => { btn.textContent = 'Copy Key'; btn.style.borderColor = ''; btn.style.color = ''; }, 1500);
   });
 }
 
@@ -363,8 +371,8 @@ function copyDirectLink() {
   const link = document.getElementById('directLink').textContent;
   navigator.clipboard.writeText(link).then(() => {
     const btn = event.target.closest('button');
-    btn.textContent = '✅ Copied!';
-    setTimeout(() => { btn.textContent = '📋 Copy'; }, 1500);
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
   });
 }
 
@@ -404,7 +412,7 @@ jobs:
             -v || true
 
       - name: Analyze with Falsky
-        uses: ./falsky-action
+        uses: Pritahi/falsky-action@v1
         with:
           junit-xml-path: '/tmp/test-results.xml'
           api-url: 'https://poly-core-vercel.vercel.app'
@@ -415,8 +423,8 @@ jobs:
           flaky-threshold: '50'`;
   navigator.clipboard.writeText(raw).then(() => {
     const btn = event.target.closest('button');
-    btn.textContent = '✅ Copied!';
-    setTimeout(() => { btn.textContent = '📋 Copy YML'; }, 1500);
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy YML'; }, 1500);
   });
 }
 

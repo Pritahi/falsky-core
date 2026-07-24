@@ -145,7 +145,7 @@ async function loadRepos() {
         const flaky = tests.filter(t => t.trust_score < 50).length;
         const tc = avgTrust >= 80 ? 'high' : avgTrust >= 50 ? 'mid' : 'low';
         rows += `<tr>
-          <td><a href="./repo.html?repo=${encodeURIComponent(repo.name)}" style="color:#F4F3EE;text-decoration:none;font-weight:600">${repo.name}</a></td>
+          <td><a href="./repo.html?repo=${encodeURIComponent(repo.name)}" style="color:var(--ink);text-decoration:none;font-weight:600">${repo.name}</a></td>
           <td>${tests.length}</td>
           <td><span class="trust-badge ${tc}">${avgTrust}</span></td>
           <td>${flaky > 0 ? '<span style="color:var(--warnB)">'+flaky+'</span>' : '<span style="color:var(--okB)">0</span>'}</td>

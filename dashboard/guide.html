@@ -176,7 +176,7 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <!-- Timing -->
         <div style="background:var(--tile);border:1px solid var(--line);border-radius:var(--radius);padding:14px;display:flex;gap:10px">
-          <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,180,0,.1);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;color:var(--warnB)">⏱</div>
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,180,0,.1);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;color:var(--warnB)">T</div>
           <div>
             <div style="font-family:var(--sans);font-size:13px;color:#D7DCE3;font-weight:600;margin-bottom:2px">Timing <span style="font-family:var(--mono);font-size:10px;color:var(--badB)">−8pts</span></div>
             <p style="font-family:var(--sans);font-size:11px;color:var(--mut);line-height:1.5">High duration variance or timeout sensitivity. Z-score anomaly detection on execution times.</p>
@@ -184,7 +184,7 @@
         </div>
         <!-- Order Dependency -->
         <div style="background:var(--tile);border:1px solid var(--line);border-radius:var(--radius);padding:14px;display:flex;gap:10px">
-          <div style="width:32px;height:32px;border-radius:8px;background:rgba(139,92,246,.1);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;color:#8b5cf6">🔗</div>
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(139,92,246,.1);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;color:#8b5cf6">OD</div>
           <div>
             <div style="font-family:var(--sans);font-size:13px;color:#D7DCE3;font-weight:600;margin-bottom:2px">Order Dependency <span style="font-family:var(--mono);font-size:10px;color:var(--badB)">−12pts</span></div>
             <p style="font-family:var(--sans);font-size:11px;color:var(--mut);line-height:1.5">Outcome changes based on execution order. Detected via runs test for alternating pass/fail patterns.</p>
@@ -192,7 +192,7 @@
         </div>
         <!-- Shared State -->
         <div style="background:var(--tile);border:1px solid var(--line);border-radius:var(--radius);padding:14px;display:flex;gap:10px">
-          <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,75,46,.1);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;color:var(--badB)">🤝</div>
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,75,46,.1);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;color:var(--badB)">SS</div>
           <div>
             <div style="font-family:var(--sans);font-size:13px;color:#D7DCE3;font-weight:600;margin-bottom:2px">Shared State <span style="font-family:var(--mono);font-size:10px;color:var(--badB)">−15pts</span></div>
             <p style="font-family:var(--sans);font-size:11px;color:var(--mut);line-height:1.5">Shares mutable state with other tests. Detected via clustered failure patterns and consistent error messages.</p>
@@ -200,7 +200,7 @@
         </div>
         <!-- Non-deterministic -->
         <div style="background:var(--tile);border:1px solid var(--line);border-radius:var(--radius);padding:14px;display:flex;gap:10px">
-          <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,180,0,.1);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;color:var(--warnB)">🎲</div>
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,180,0,.1);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;color:var(--warnB)">RD</div>
           <div>
             <div style="font-family:var(--sans);font-size:13px;color:#D7DCE3;font-weight:600;margin-bottom:2px">Non-deterministic <span style="font-family:var(--mono);font-size:10px;color:var(--badB)">−20pts</span></div>
             <p style="font-family:var(--sans);font-size:11px;color:var(--mut);line-height:1.5">Unpredictable external data or random values. Detected via high error message diversity ratio.</p>
@@ -208,7 +208,7 @@
         </div>
         <!-- Environment -->
         <div style="background:var(--tile);border:1px solid var(--line);border-radius:var(--radius);padding:14px;display:flex;gap:10px;grid-column:1/-1">
-          <div style="width:32px;height:32px;border-radius:8px;background:rgba(0,255,100,.1);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;color:var(--okB)">🌐</div>
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(0,255,100,.1);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;color:var(--okB)">ENV</div>
           <div>
             <div style="font-family:var(--sans);font-size:13px;color:#D7DCE3;font-weight:600;margin-bottom:2px">Environment-specific <span style="font-family:var(--mono);font-size:10px;color:var(--badB)">−10pts</span></div>
             <p style="font-family:var(--sans);font-size:11px;color:var(--mut);line-height:1.5">Pass rate differs significantly across environments (e.g. passes locally but fails in CI). Detected via environment correlation analysis.</p>
@@ -258,7 +258,7 @@
       <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-top:16px">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--line)">
           <span style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--warnB);text-transform:uppercase">cURL — send JUnit XML</span>
-          <button onclick="copyCode(this)" class="btn btn-ghost btn-sm" style="white-space:nowrap">📋 Copy</button>
+          <button onclick="copyCode(this)" class="btn btn-ghost btn-sm" style="white-space:nowrap">Copy</button>
         </div>
         <pre style="font-family:var(--mono);font-size:12px;color:var(--mut);line-height:1.7;padding:14px;margin:0;overflow-x:auto">curl -X POST https://poly-core-vercel.vercel.app/api/junit \
   -H "Content-Type: application/xml" \
@@ -280,7 +280,7 @@
       <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:12px">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--line)">
           <span style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--okB);text-transform:uppercase">Markdown</span>
-          <button onclick="copyCode(this)" class="btn btn-ghost btn-sm" style="white-space:nowrap">📋 Copy</button>
+          <button onclick="copyCode(this)" class="btn btn-ghost btn-sm" style="white-space:nowrap">Copy</button>
         </div>
         <pre style="font-family:var(--mono);font-size:12px;color:var(--mut);line-height:1.7;padding:14px;margin:0">![Falsky Trust](https://poly-core-vercel.vercel.app/badge/YOUR-ORG/YOUR-REPO)</pre>
       </div>
@@ -328,8 +328,8 @@ function copyCode(btn) {
   const pre = btn.closest('div').nextElementSibling || btn.closest('.code-block')?.querySelector('pre');
   if (!pre) return;
   navigator.clipboard.writeText(pre.textContent).then(() => {
-    btn.textContent = '✅ Copied!';
-    setTimeout(() => { btn.textContent = '📋 Copy'; }, 1500);
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
   });
 }
 
