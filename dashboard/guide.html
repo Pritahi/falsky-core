@@ -107,7 +107,7 @@ env:
 
 jobs:
   test-and-analyze:
-    runs-on: ubuntu-latest  # GitHub's cloud Ubuntu VM — not your local machine
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -126,9 +126,16 @@ jobs:
           flaky-threshold: '50'</pre>
       </div>
 
-      <p style="font-family:var(--mono);font-size:11px;color:#5A616B;margin-top:12px;line-height:1.6">
-        Change <code style="color:var(--warnB)">pytest tests/</code> to your test path and <code style="color:var(--warnB)">"3.11"</code> to your Python version. The <code style="color:var(--okB)">FALSKY_API_KEY</code> secret comes from Step 2. See full details at <a href="./api-keys.html" style="color:var(--warnB);text-decoration:none">Setup & Keys</a>.
-      </p>
+      <!-- Clear explanation box -->
+      <div style="background:rgba(47,191,113,.08);border:1px solid rgba(47,191,113,.2);border-radius:var(--radius);padding:12px 14px;margin-top:12px">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--okB);margin-bottom:6px">HOW THIS YML WORKS</div>
+        <p style="font-family:var(--sans);font-size:12px;color:var(--mut);line-height:1.7;margin:0">
+          <code style="color:var(--okB)">runs-on: ubuntu-latest</code> tells GitHub to run your tests on their cloud servers (Ubuntu Linux VM). You don’t need Ubuntu on your own computer — this is fully managed by GitHub Actions. Every time you push code or open a PR, GitHub spins up a clean VM, runs your tests, and sends the results to Falsky for analysis.
+        </p>
+        <p style="font-family:var(--sans);font-size:12px;color:var(--mut);line-height:1.7;margin-top:8px">
+          <strong style="color:var(--warnB)">What to change:</strong> Replace <code style="color:var(--warnB)">pytest tests/</code> with your actual test path, and <code style="color:var(--warnB)">"3.11"</code> with your Python version. Everything else (api-url, api-key, repo-name) is auto-handled — no changes needed.
+        </p>
+      </div>
     </div>
   </div>
 

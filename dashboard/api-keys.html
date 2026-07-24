@@ -158,7 +158,7 @@
         <div style="display:grid;gap:8px">
           <div style="display:flex;align-items:center;gap:8px">
             <span style="font-family:var(--mono);font-size:11px;color:var(--warnB);background:rgba(255,178,36,.12);padding:2px 6px;border-radius:2px;font-weight:600">TEST PATH</span>
-            <span style="font-family:var(--mono);font-size:12px;color:#8A9099">Change <code style="color:#D7DCE3">pytest tests/test_real.py</code> → your actual test path</span>
+            <span style="font-family:var(--mono);font-size:12px;color:#8A9099">Change <code style="color:#D7DCE3">pytest tests/</code> → your actual test path</span>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
             <span style="font-family:var(--mono);font-size:11px;color:var(--warnB);background:rgba(255,178,36,.12);padding:2px 6px;border-radius:2px;font-weight:600">PYTHON VER</span>
@@ -169,8 +169,8 @@
             <span style="font-family:var(--mono);font-size:12px;color:#8A9099">If using Node → replace <code style="color:#D7DCE3">pip install</code> with <code style="color:#D7DCE3">npm ci && npm test</code></span>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-family:var(--mono);font-size:11px;color:var(--okB);background:rgba(47,191,113,.12);padding:2px 6px;border-radius:2px;font-weight:600">NO CHANGE</span>
-            <span style="font-family:var(--mono);font-size:12px;color:#8A9099"><code style="color:var(--okB)">runs-on</code> = GitHub cloud VM (not localhost), <code style="color:var(--okB)">api-url</code>, <code style="color:var(--okB)">api-key</code>, <code style="color:var(--okB)">repo-name</code> — auto-handled</span>
+            <span style="font-family:var(--mono);font-size:11px;color:var(--okB);background:rgba(47,191,113,.12);padding:2px 6px;border-radius:2px;font-weight:600">AUTO-HANDLED</span>
+            <span style="font-family:var(--mono);font-size:12px;color:#8A9099"><code style="color:var(--okB)">runs-on</code> = GitHub cloud VM (no local setup needed), <code style="color:var(--okB)">api-url</code>, <code style="color:var(--okB)">api-key</code>, <code style="color:var(--okB)">repo-name</code> — auto-handled</span>
           </div>
         </div>
       </div>
@@ -190,7 +190,7 @@
 
 <span style="color:#D7DCE3;font-weight:600">jobs</span>:
   <span style="color:#D7DCE3;font-weight:600">test-and-analyze</span>:
-    <span style="color:#D7DCE3;font-weight:600">runs-on</span>: <span style="color:var(--okB)">ubuntu-latest</span>  <span style="color:#5A616B">← GitHub cloud VM, not your local machine</span>
+    <span style="color:#D7DCE3;font-weight:600">runs-on</span>: <span style="color:var(--okB)">ubuntu-latest</span>
     <span style="color:#D7DCE3;font-weight:600">env</span>:
       <span style="color:#D7DCE3;font-weight:600">CI</span>: <span style="color:var(--okB)">true</span>
       <span style="color:#D7DCE3;font-weight:600">CI_RUN_NUMBER</span>: <span style="color:#5A616B">${{ github.run_number }}</span>
@@ -227,6 +227,17 @@
           <span style="color:#D7DCE3;font-weight:600">comment-on-pr</span>: <span style="color:var(--okB)">'true'</span>
           <span style="color:#D7DCE3;font-weight:600">fail-on-flaky</span>: <span style="color:var(--okB)">'false'</span>
           <span style="color:#D7DCE3;font-weight:600">flaky-threshold</span>: <span style="color:var(--okB)">'50'</span></pre>
+      </div>
+
+      <!-- Clear explanation box -->
+      <div style="background:rgba(47,191,113,.08);border:1px solid rgba(47,191,113,.2);border-radius:var(--radius);padding:12px 14px;margin-top:12px">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--okB);margin-bottom:6px">HOW THIS YML WORKS</div>
+        <p style="font-family:var(--sans);font-size:12px;color:var(--mut);line-height:1.7;margin:0">
+          <code style="color:var(--okB)">runs-on: ubuntu-latest</code> tells GitHub to run your tests on their cloud servers (Ubuntu Linux VM). You don't need Ubuntu on your computer — this is fully managed by GitHub Actions. Every push or PR triggers a clean cloud VM that runs your tests and sends results to Falsky.
+        </p>
+        <p style="font-family:var(--sans);font-size:12px;color:var(--mut);line-height:1.7;margin-top:8px">
+          <strong style="color:var(--warnB)">What to change:</strong> Replace <code style="color:var(--warnB)">pytest tests/</code> with your test path, and <code style="color:var(--warnB)">"3.11"</code> with your Python version. All other values (api-url, api-key, repo-name) are auto-handled.
+        </p>
       </div>
     </div>
   </div>

@@ -108,8 +108,7 @@
       <p style="max-width:400px;margin:12px auto 20px">Add the Falsky Action to your workflow and push. Results will appear here automatically.</p>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
         <a href="./repos.html" class="btn btn-primary">View Setup Guide</a>
-        <a id="githubLink" href="https://github.com" target="_blank" class="btn btn-ghost">Open GitHub</a>
-        <a id="workflowLink" href="#" target="_blank" class="btn btn-ghost">View Latest Workflow</a>
+        <a href="./api-keys.html" class="btn btn-ghost">Get API Key</a>
       </div>
     </div>
   </div>
@@ -273,9 +272,7 @@ async function loadRepo() {
       document.getElementById('analysisContent').style.display = 'none';
       document.getElementById('statsGrid').style.display = 'none';
       document.getElementById('repoSub').textContent = 'Waiting for first run…';
-      // Set GitHub links
-      document.getElementById('githubLink').href = `https://github.com/${repo}`;
-      document.getElementById('workflowLink').href = `https://github.com/${repo}/actions`;
+      // No GitHub link buttons — removed to prevent private repo link leaking
       return;
     }
 
@@ -339,12 +336,12 @@ function renderFlaky() {
     const cat = t.flaky_category;
     const catHtml = cat ? `<span class="cat-pill ${catClasses[cat] || ''}">${catNames[cat] || cat}</span>` : '—';
     return `<tr>
-      <td><a href="./test.html?repo=${encodeURIComponent(getRepo())}&test=${encodeURIComponent(t.test_name)}" style="color:var(--ink);text-decoration:none">${t.test_name}</a></td>
+      <td><a href="./test-detail.html?repo=${encodeURIComponent(getRepo())}&test=${encodeURIComponent(t.test_name)}" style="color:var(--ink);text-decoration:none">${t.test_name}</a></td>
       <td><span class="trust-badge ${trustClass(t.trust_score)}">${Math.round(t.trust_score)}</span></td>
       <td>${catHtml}</td>
       <td>${Math.round(t.pass_rate * 100)}%</td>
       <td>${t.runs}</td>
-      <td><a href="./test.html?repo=${encodeURIComponent(getRepo())}&test=${encodeURIComponent(t.test_name)}" class="btn btn-ghost btn-sm">→</a></td>
+      <td><a href="./test-detail.html?repo=${encodeURIComponent(getRepo())}&test=${encodeURIComponent(t.test_name)}" class="btn btn-ghost btn-sm">→</a></td>
     </tr>`;
   }).join('');
 }
@@ -354,12 +351,12 @@ function renderAll() {
   document.getElementById('allTable').innerHTML = sorted.map(t => {
     const status = t.trust_score >= 80 ? 'STABLE' : t.trust_score >= 50 ? 'FLAKY' : 'UNSTABLE';
     return `<tr>
-      <td><a href="./test.html?repo=${encodeURIComponent(getRepo())}&test=${encodeURIComponent(t.test_name)}" style="color:var(--ink);text-decoration:none">${t.test_name}</a></td>
+      <td><a href="./test-detail.html?repo=${encodeURIComponent(getRepo())}&test=${encodeURIComponent(t.test_name)}" style="color:var(--ink);text-decoration:none">${t.test_name}</a></td>
       <td><span class="trust-badge ${trustClass(t.trust_score)}">${Math.round(t.trust_score)}</span></td>
       <td>${status}</td>
       <td>${Math.round(t.pass_rate * 100)}%</td>
       <td>${t.avg_duration ? t.avg_duration.toFixed(2)+'s' : '—'}</td>
-      <td><a href="./test.html?repo=${encodeURIComponent(getRepo())}&test=${encodeURIComponent(t.test_name)}" class="btn btn-ghost btn-sm">→</a></td>
+      <td><a href="./test-detail.html?repo=${encodeURIComponent(getRepo())}&test=${encodeURIComponent(t.test_name)}" class="btn btn-ghost btn-sm">→</a></td>
     </tr>`;
   }).join('');
 }
@@ -367,7 +364,7 @@ function renderAll() {
 function renderIssues() {
   const unstable = [...allTests].sort((a,b) => a.trust_score - b.trust_score).slice(0,5);
   document.getElementById('unstableList').innerHTML = unstable.map(t =>
-    `<li><span class="trust-badge ${trustClass(t.trust_score)}">${Math.round(t.trust_score)}</span> <a href="./test.html?repo=${encodeURIComponent(getRepo())}&test=${encodeURIComponent(t.test_name)}" style="color:var(--ink)">${t.test_name}</a></li>`
+    `<li><span class="trust-badge ${trustClass(t.trust_score)}">${Math.round(t.trust_score)}</span> <a href="./test-detail.html?repo=${encodeURIComponent(getRepo())}&test=${encodeURIComponent(t.test_name)}" style="color:var(--ink)">${t.test_name}</a></li>`
   ).join('') || '<li style="color:#5A616B">No issues</li>';
 
   document.getElementById('degradedList').innerHTML = '<li style="color:#5A616B">Connect more runs to see trends</li>';
