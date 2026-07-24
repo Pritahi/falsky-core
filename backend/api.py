@@ -1231,6 +1231,12 @@ def serve_guide(request: Request):
         return RedirectResponse(url="/login", status_code=302)
     return _serve_html(os.path.join("dashboard", "guide.html"), "Falsky Guide")
 
+@app.get("/dashboard/test-example.html", response_class=HTMLResponse)
+def serve_test_example(request: Request):
+    if not _check_user_auth(request):
+        return RedirectResponse(url="/login", status_code=302)
+    return _serve_html(os.path.join("dashboard", "test-example.html"), "Test Example (Demo)")
+
 @app.get("/analytics", response_class=HTMLResponse)
 def serve_admin():
     return _serve_html(os.path.join("dashboard", "admin.html"), "Falsky Admin")

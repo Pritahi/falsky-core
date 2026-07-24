@@ -18,12 +18,15 @@ CREATE TABLE IF NOT EXISTS test_results (
     status VARCHAR(50),
     duration REAL,
     trust_score REAL,
+    score_confidence REAL DEFAULT 0,
     flaky_category VARCHAR(50),
+    error_type VARCHAR(50),
     error_message TEXT,
     branch VARCHAR(255) DEFAULT 'main',
     commit_sha VARCHAR(255),
     environment VARCHAR(255),
-    timestamp TIMESTAMP DEFAULT NOW()
+    timestamp TIMESTAMP DEFAULT NOW(),
+    run_timestamp TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS ci_runs (
@@ -35,7 +38,9 @@ CREATE TABLE IF NOT EXISTS ci_runs (
     total_tests INTEGER DEFAULT 0,
     passed INTEGER DEFAULT 0,
     failed INTEGER DEFAULT 0,
+    skipped INTEGER DEFAULT 0,
     avg_trust_score REAL DEFAULT 100,
+    environment VARCHAR(255),
     timestamp TIMESTAMP DEFAULT NOW()
 );
 
@@ -92,7 +97,10 @@ CREATE TABLE IF NOT EXISTS admin_sessions (
 CREATE INDEX IF NOT EXISTS idx_test_results_repo ON test_results(repo_id);
 CREATE INDEX IF NOT EXISTS idx_test_results_name ON test_results(test_name);
 CREATE INDEX IF NOT EXISTS idx_test_results_run ON test_results(run_id);
+CREATE INDEX IF NOT EXISTS idx_test_results_confidence ON test_results(score_confidence);
+CREATE INDEX IF NOT EXISTS idx_test_results_run_timestamp ON test_results(run_timestamp);
 CREATE INDEX IF NOT EXISTS idx_ci_runs_repo ON ci_runs(repo_id);
+CREATE INDEX IF NOT EXISTS idx_ci_runs_environment ON ci_runs(environment);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_activity ON user_activity(user_id);
 CREATE INDEX IF NOT EXISTS idx_admin_sessions_token ON admin_sessions(token);

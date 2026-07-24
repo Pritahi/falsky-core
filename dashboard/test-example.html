@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Falsky — Test Example (Demo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 16'><polyline points='0,8 8,8 12,1 17,15 21,4 25,8 34,8' fill='none' stroke='%23FFB224' stroke-width='2.4'/></svg>">
+<link rel="stylesheet" href="design-system.css">
+<style>
+.demo-banner{background:var(--warn);color:var(--ink);font-family:var(--mono);font-size:10px;letter-spacing:.14em;padding:6px 16px;text-align:center;text-transform:uppercase;font-weight:700}
+.score-big{text-align:center;padding:24px}
+.score-big .value{font-family:var(--disp);font-size:4rem;color:var(--ink)}
+.score-big .label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:#5A616B;text-transform:uppercase;margin-top:4px}
+.breakdown{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.breakdown-item{background:var(--tile);padding:12px;border:1px solid var(--hair);border-radius:var(--radius)}
+.breakdown-item .bl{font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:#5A616B;text-transform:uppercase;margin-bottom:4px}
+.breakdown-item .bv{font-family:var(--mono);font-size:14px;font-weight:600}
+.confidence-bar{height:6px;background:var(--hair);border-radius:3px;overflow:hidden;margin-top:8px}
+.confidence-fill{height:100%;border-radius:3px;transition:width .5s}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- Demo Banner -->
+<div class="demo-banner">⬡ This is a demo page with sample data — no real API calls are made</div>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <a href="./" class="logo"><i></i>Falsky</a>
+  <a href="https://github.com/Pritahi/falsky-core" target="_blank" style="display:block;margin:4px 0 20px;font-family:var(--mono);font-size:9px;color:#8A9099;letter-spacing:.08em;text-decoration:none;opacity:.6">GITHUB →</a>
+  <nav>
+    <a href="./">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      <span>Dashboard</span>
+    </a>
+    <a href="./repos.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+      <span>Repositories</span>
+    </a>
+    <a href="./api-keys.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L9 11"/></svg>
+      <span>API Keys</span>
+    </a>
+    <a href="./settings.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span>Settings</span>
+    </a>
+    <a href="./guide.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+      <span>Guide</span>
+    </a>
+  </nav>
+  <div class="user-section">
+    <div class="user-info">
+      <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'><rect width='28' height='28' rx='14' fill='%23191C22'/><text x='14' y='18' font-family='monospace' font-size='12' fill='%23FFB224' text-anchor='middle'>D</text></svg>" alt="Demo">
+      <div>
+        <div class="name">Demo User</div>
+        <div class="email">demo@falsky.dev</div>
+      </div>
+    </div>
+  </div>
+  <div class="theme-toggle">
+    <button onclick="setTheme('dark')" id="btnDark">DARK</button>
+    <button onclick="setTheme('light')" id="btnLight">LIGHT</button>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="main">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title" style="font-size:1.2rem">DemoTest.test_user_login_flow</h1>
+      <p class="page-sub">demo-org/demo-app</p>
+    </div>
+    <a href="./" class="btn btn-ghost btn-sm">← Back to Dashboard</a>
+  </div>
+
+  <!-- Score + Breakdown -->
+  <div class="chart-row">
+    <div class="card score-big">
+      <div class="value" style="color:var(--bad)">42</div>
+      <div class="label">Trust Score</div>
+      <div style="margin-top:12px">
+        <span class="trust-badge mid">Flaky</span>
+      </div>
+      <div style="margin-top:16px">
+        <div class="label">Flaky Probability</div>
+        <div style="font-family:var(--mono);font-size:18px;font-weight:600;margin-top:4px;color:var(--warnB)">72%</div>
+      </div>
+      <div style="margin-top:16px">
+        <div class="label">Confidence</div>
+        <div class="confidence-bar"><div class="confidence-fill" style="width:65%;background:var(--warnB)"></div></div>
+        <div style="font-family:var(--mono);font-size:10px;color:#5A616B;margin-top:4px">65% confident</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="card-title">Score Breakdown</span>
+      <div class="breakdown">
+        <div class="breakdown-item">
+          <div class="bl">Bayesian Pass Rate</div>
+          <div class="bv" style="color:var(--warnB)">57%</div>
+        </div>
+        <div class="breakdown-item">
+          <div class="bl">Recent Trend</div>
+          <div class="bv" style="color:var(--bad)">-14</div>
+        </div>
+        <div class="breakdown-item">
+          <div class="bl">Duration Stability</div>
+          <div class="bv" style="color:var(--okB)">84%</div>
+        </div>
+        <div class="breakdown-item">
+          <div class="bl">Error Consistency</div>
+          <div class="bv" style="color:var(--warnB)">38%</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:12px;background:var(--tile);border:1px solid var(--hair);border-radius:var(--radius)">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:#5A616B;text-transform:uppercase;margin-bottom:4px">Flaky Category</div>
+        <div style="font-family:var(--mono);font-size:13px"><span class="cat-pill shared">Shared State Contamination</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('history')">Run History</button>
+    <button class="tab-btn" onclick="showTab('errors')">Error Patterns</button>
+  </div>
+
+  <!-- Run History -->
+  <div class="tab-content active" id="tab-history">
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Status</th>
+              <th>Duration</th>
+              <th>Trust Score</th>
+              <th>Environment</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color:#5A616B">Mar 4, 2025 14:32</td>
+              <td><span class="trust-badge low">FAIL failed</span></td>
+              <td>3.214s</td>
+              <td>38</td>
+              <td style="color:#5A616B">CI — linux</td>
+            </tr>
+            <tr>
+              <td style="color:#5A616B">Mar 4, 2025 12:15</td>
+              <td><span class="trust-badge high">PASS passed</span></td>
+              <td>2.871s</td>
+              <td>55</td>
+              <td style="color:#5A616B">CI — linux</td>
+            </tr>
+            <tr>
+              <td style="color:#5A616B">Mar 3, 2025 18:47</td>
+              <td><span class="trust-badge low">FAIL failed</span></td>
+              <td>0.042s</td>
+              <td>34</td>
+              <td style="color:#5A616B">CI — linux</td>
+            </tr>
+            <tr>
+              <td style="color:#5A616B">Mar 3, 2025 09:22</td>
+              <td><span class="trust-badge mid">SKIP skipped</span></td>
+              <td>0.000s</td>
+              <td>—</td>
+              <td style="color:#5A616B">CI — macos</td>
+            </tr>
+            <tr>
+              <td style="color:#5A616B">Mar 2, 2025 21:08</td>
+              <td><span class="trust-badge high">PASS passed</span></td>
+              <td>2.935s</td>
+              <td>62</td>
+              <td style="color:#5A616B">CI — linux</td>
+            </tr>
+            <tr>
+              <td style="color:#5A616B">Mar 2, 2025 16:30</td>
+              <td><span class="trust-badge high">PASS passed</span></td>
+              <td>2.890s</td>
+              <td>68</td>
+              <td style="color:#5A616B">CI — macos</td>
+            </tr>
+            <tr>
+              <td style="color:#5A616B">Mar 1, 2025 13:45</td>
+              <td><span class="trust-badge low">FAIL failed</span></td>
+              <td>3.418s</td>
+              <td>41</td>
+              <td style="color:#5A616B">CI — linux</td>
+            </tr>
+            <tr>
+              <td style="color:#5A616B">Mar 1, 2025 10:12</td>
+              <td><span class="trust-badge mid">SKIP skipped</span></td>
+              <td>0.000s</td>
+              <td>—</td>
+              <td style="color:#5A616B">CI — windows</td>
+            </tr>
+            <tr>
+              <td style="color:#5A616B">Feb 28, 2025 22:55</td>
+              <td><span class="trust-badge high">PASS passed</span></td>
+              <td>2.796s</td>
+              <td>72</td>
+              <td style="color:#5A616B">CI — linux</td>
+            </tr>
+            <tr>
+              <td style="color:#5A616B">Feb 28, 2025 08:30</td>
+              <td><span class="trust-badge low">FAIL failed</span></td>
+              <td>0.018s</td>
+              <td>30</td>
+              <td style="color:#5A616B">CI — linux</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Patterns -->
+  <div class="tab-content" id="tab-errors">
+    <div class="card">
+      <span class="card-title">Unique Error Patterns</span>
+      <div style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--mut)">
+        <div style="padding:10px;background:var(--tile);border:1px solid var(--hair);border-radius:var(--radius);margin-bottom:8px">
+          <div style="color:var(--badB);font-size:11px;margin-bottom:4px">4x (40%)</div>
+          <div style="color:var(--ink);font-size:11px;word-break:break-all">AssertionError: expected status 200 but received 401 — session cookie not set after login POST /auth/login</div>
+        </div>
+        <div style="padding:10px;background:var(--tile);border:1px solid var(--hair);border-radius:var(--radius);margin-bottom:8px">
+          <div style="color:var(--badB);font-size:11px;margin-bottom:4px">2x (20%)</div>
+          <div style="color:var(--ink);font-size:11px;word-break:break-all">TimeoutError: waitForSelector('#dashboard') exceeded 5000ms — element never appeared after navigation from /login</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+</div>
+
+<script>
+// Theme toggle (no API calls — demo page)
+const savedTheme = localStorage.getItem('falsky-theme') || 'dark';
+document.documentElement.className = savedTheme === 'light' ? 'light' : '';
+function setTheme(t) {
+  localStorage.setItem('falsky-theme', t);
+  document.documentElement.className = t === 'light' ? 'light' : '';
+  document.getElementById('btnDark')?.classList.toggle('active', t === 'dark');
+  document.getElementById('btnLight')?.classList.toggle('active', t === 'light');
+}
+setTimeout(() => {
+  document.getElementById('btnDark')?.classList.toggle('active', savedTheme === 'dark');
+  document.getElementById('btnLight')?.classList.toggle('active', savedTheme === 'light');
+}, 0);
+
+function showTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase().includes(tab)));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tab));
+}
+</script>
+</body>
+</html>

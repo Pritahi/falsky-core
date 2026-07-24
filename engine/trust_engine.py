@@ -189,7 +189,7 @@ def calculate_duration_variance(history):
     if len(durations) < 3:
         return 0.0
     mean = sum(durations) / len(durations)
-    variance = sum((d - mean) ** 2 for d in durations) / len(durations)
+    variance = sum((d - mean) ** 2 for d in durations) / max(1, len(durations) - 1)  # Bessel's correction
     std = math.sqrt(variance)
     cv = std / mean if mean > 0 else 0
     return min(cv * 100, 100)
@@ -200,7 +200,7 @@ def calculate_duration_zscores(history):
     if len(durations) < 3:
         return []
     mean = sum(durations) / len(durations)
-    variance = sum((d - mean) ** 2 for d in durations) / len(durations)
+    variance = sum((d - mean) ** 2 for d in durations) / max(1, len(durations) - 1)  # Bessel's correction
     std = math.sqrt(variance)
     if std == 0:
         return [(d, 0.0, False) for d in durations]
@@ -363,7 +363,9 @@ def classify_flaky_category(history, current_result=None):
     elif pattern and pattern.startswith("periodic_"):
         scores["order_dependency"] = 0.6
     if len(errors) >= 2:
-        unique_errors = len(set(errors))
+        # Normalize errors before counting unique — avoids line-number false diversity
+        normalized_errors = set(normalize(e) for e in errors)
+        unique_errors = len(normalized_errors)
         error_ratio = unique_errors / len(errors)
         if error_ratio > 0.5:
             scores["non_deterministic_data"] = min(1.0, error_ratio)
@@ -384,7 +386,7 @@ def classify_flaky_category(history, current_result=None):
 
 def calculate_trust_score(history):
     if not history:
-        return 100.0
+        return 50.0  # Insufficient data — start neutral, not misleading 100
     bayesian_rate = calculate_bayesian_pass_rate(history)
     pass_score = bayesian_rate * 55
     trend = calculate_recent_trend(history)
@@ -394,7 +396,8 @@ def calculate_trust_score(history):
     duration_penalty = min(duration_var, 100) * 0.07 + anomaly_rate * 30
     duration_score = max(0, 10 - duration_penalty)
     error_pattern = calculate_error_pattern(history)
-    error_score = (error_pattern / 100) * 10
+    # Consistent errors = real bug, not bonus. Penalize instead.
+    error_score = max(0, 10 - (error_pattern / 100) * 15)
     score = pass_score + trend_score + duration_score + error_score
     flaky_cat = classify_flaky_category(history, None)
     if flaky_cat:
@@ -405,7 +408,7 @@ def calculate_trust_score(history):
 
 def calculate_score_breakdown(history):
     if not history:
-        return {"pass_rate": {"value": 1.0, "weight": 0.55, "points": 55}, "recent_trend": {"value": 0, "weight": 0.20, "points": 10}, "duration_stability": {"value": 100, "weight": 0.10, "points": 10}, "error_consistency": {"value": 0, "weight": 0.10, "points": 0}, "flaky_penalty": {"category": None, "penalty": 0}, "total": 100.0, "confidence": 0.0, "bayesian_pass_rate": 0.5, "anomaly_rate": 0.0, "error_patterns": [], "sequential_pattern": None}
+        return {"pass_rate": {"value": 0.5, "weight": 0.55, "points": 27.5}, "recent_trend": {"value": 0, "weight": 0.20, "points": 10}, "duration_stability": {"value": 100, "weight": 0.10, "points": 10}, "error_consistency": {"value": 0, "weight": 0.10, "points": 10}, "flaky_penalty": {"category": None, "penalty": 0}, "total": 50.0, "confidence": 0.0, "bayesian_pass_rate": 0.5, "anomaly_rate": 0.0, "error_patterns": [], "sequential_pattern": None}
     bayesian_rate = calculate_bayesian_pass_rate(history)
     trend = calculate_recent_trend(history)
     duration_var = calculate_duration_variance(history)
@@ -415,7 +418,7 @@ def calculate_score_breakdown(history):
     trend_score = max(0, (50 + trend)) / 100 * 20
     duration_penalty = min(duration_var, 100) * 0.07 + anomaly_rate * 30
     duration_score = max(0, 10 - duration_penalty)
-    error_score = (error_pat / 100) * 10
+    error_score = max(0, 10 - (error_pat / 100) * 15)  # Consistent errors = penalty, not bonus
     total = pass_score + trend_score + duration_score + error_score
     flaky_cat = classify_flaky_category(history, None)
     penalty = 0

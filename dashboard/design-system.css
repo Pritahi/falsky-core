@@ -4,7 +4,7 @@
   --panel:#191C22; --tile:#23272F; --tile2:#2B303A; --hair:#262B33;
   --ok:#2FBF71; --okB:#39D98A; --bad:#E5484D; --badB:#FF6B5E; --warn:#F5A524; --warnB:#FFB224;
   --blue:#3B82F6;
-  --disp:"Archivo",sans-serif; --mono:"Space Mono",monospace; --sans:"Archivo",sans-serif;
+  --disp:"Archivo",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji"; --mono:"Space Mono",monospace,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji"; --sans:"Archivo",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji";
   --radius:7px; --radius-lg:12px;
 }
 
@@ -162,4 +162,113 @@ tr:hover td{background:#FAFAF5}
 @media(max-width:480px){
   .stats-grid{grid-template-columns:1fr}
   .table-wrap.mobile-cards td{flex:1 1 100%}
+}
+
+/* ══════════════════════════════════════════
+   LIGHT MODE — explicit overrides for <html class="light">
+   ══════════════════════════════════════════ */
+html.light{
+  --bg:#F2F1EC; --ink:#16181D; --mut:#6B6F76; --line:#DFDED6;
+  --panel:#F2F1EC; --tile:#EDECE6; --tile2:#E5E4DD; --hair:#C8C7C0;
+  --ok:#2FBF71; --okB:#39D98A; --bad:#E5484D; --badB:#FF6B5E; --warn:#F5A524; --warnB:#FFB224;
+  --blue:#3B82F6;
+}
+html.light body{color:#16181D;background:#F2F1EC}
+html.light .sidebar{background:#EDECE6;border-right:1px solid #C8C7C0}
+html.light .sidebar .logo{color:#16181D}
+html.light .sidebar .logo i{background:#16181D}
+html.light .sidebar nav a{color:#6B6F76}
+html.light .sidebar nav a:hover{color:#16181D;background:#E5E4DD}
+html.light .sidebar nav a.active{color:#FFB224;background:#E5E4DD;border-left-color:#FFB224}
+html.light .sidebar .user-section{border-top-color:#C8C7C0}
+html.light .sidebar .user-info .name{color:#16181D}
+html.light .sidebar .user-info .email{color:#6B6F76}
+html.light .sidebar .user-info img{border-color:#C8C7C0}
+html.light .theme-toggle button{background:#E5E4DD;border-color:#C8C7C0;color:#6B6F76}
+html.light .theme-toggle button:hover{color:#FFB224;border-color:#FFB224}
+html.light .theme-toggle button.active{background:#EDECE6;color:#FFB224;border-color:#FFB224}
+
+/* Cards in light mode */
+html.light .card{background:#fff;border-color:#DFDED6}
+html.light .card.dark{background:#EDECE6;border-color:#C8C7C0;color:#16181D}
+
+/* Stat cards in light mode — white with dark text */
+html.light .stat-card{background:#fff;border-color:#DFDED6}
+html.light .stat-card .label{color:#6B6F76}
+html.light .stat-card .value{color:#16181D}
+html.light .stat-card .sub{color:#6B6F76}
+html.light .stat-card.green .value{color:#2FBF71}
+html.light .stat-card.amber .value{color:#FFB224}
+html.light .stat-card.red .value{color:#E5484D}
+
+/* Tables in light mode */
+html.light td{color:#16181D}
+html.light th{color:#6B6F76}
+html.light tr:hover td{background:#F7F6F1}
+
+/* Trust badges in light mode — already fine since they use rgba + named colors */
+
+/* Buttons in light mode */
+html.light .btn{background:#16181D;color:#F2F1EC;border-color:#16181D}
+html.light .btn:hover{box-shadow:0 8px 18px rgba(22,24,29,.22)}
+html.light .btn-ghost{color:#16181D;border-color:#DFDED6}
+html.light .btn-ghost:hover{background:#16181D;color:#F2F1EC}
+
+/* Inputs in light mode */
+html.light .input{background:#fff;border-color:#DFDED6;color:#16181D}
+
+/* Tabs in light mode */
+html.light .tab-btn{color:#6B6F76}
+html.light .tab-btn:hover{color:#16181D}
+html.light .tab-btn.active{color:#FFB224}
+
+/* Toast in light mode */
+html.light .toast{background:#EDECE6;color:#16181D;border-color:#C8C7C0;box-shadow:0 16px 40px rgba(0,0,0,.12)}
+
+/* Empty state */
+html.light .empty h3{color:#16181D}
+
+/* Chart container in light mode */
+html.light .chart-container{background:#EDECE6;border-color:#C8C7C0}
+
+/* Spinner in light mode */
+html.light .spinner{border-color:#C8C7C0;border-top-color:#FFB224}
+
+/* Page sub */
+html.light .page-sub{color:#6B6F76}
+
+/* Inline styles that use hardcoded dark colors */
+/* These are overridden in JS-generated content and guide.html inline styles */
+/* The key fix: repo names in repos.html use style="color:var(--ink)" which works */
+/* But hardcoded colors like #8A9099, #5A616B, #D7DCE3 need attention */
+
+/* Fix hardcoded dark-only colors that appear in guide.html and other pages */
+html.light .card .step-title{color:#16181D!important}
+html.light .card .step-num{color:#FFB224!important}
+html.light .card .var-box{background:#EDECE6!important;border-color:#C8C7C0!important}
+html.light .card .var-box .vb-label{color:#6B6F76!important}
+html.light .card .code-block-inner{background:#EDECE6!important;border-color:#C8C7C0!important}
+html.light .card .code-block-inner pre{color:#6B6F76!important}
+html.light .card .highlight-box{background:#EDECE6!important;border-color:#FFB224!important}
+
+/* Fix guide.html inline color overrides */
+html.light .card p[style*="color:var(--mut)"],
+html.light .card span[style*="color:#8A9099"],
+html.light .card span[style*="color:#5A616B"],
+html.light .card div[style*="color:#8A9099"],
+html.light .card div[style*="color:#5A616B"],
+html.light .card code[style*="color:#8A9099"]{color:#6B6F76!important}
+html.light .card span[style*="color:#D7DCE3"],
+html.light .card div[style*="color:#D7DCE3"]{color:#16181D!important}
+html.light .card strong[style*="color:#D7DCE3"],
+html.light .card strong[style*="color:var(--ink)"]{color:#16181D!important}
+html.light .card code[style*="color:var(--okB)"],
+html.light .card code[style*="color:var(--warnB)"]{color:inherit!important}
+
+/* Mobile cards in light mode */
+html.light .table-wrap.mobile-cards tr{background:#fff;border-color:#DFDED6}
+
+/* Fix emoji rendering — ensure emoji characters use proper font stack */
+html.light, :root{
+  font-family:var(--sans), "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Twemoji Mozilla", sans-serif;
 }

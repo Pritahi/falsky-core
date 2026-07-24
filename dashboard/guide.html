@@ -16,6 +16,7 @@
 <!-- Sidebar -->
 <aside class="sidebar">
   <a href="./" class="logo"><i></i>Falsky</a>
+  <a href="https://github.com/Pritahi/falsky-core" target="_blank" style="display:block;margin:4px 0 20px;font-family:var(--mono);font-size:9px;color:#8A9099;letter-spacing:.08em;text-decoration:none;opacity:.6">GITHUB →</a>
   <nav>
     <a href="./">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
@@ -60,6 +61,75 @@
     <div>
       <h1 class="page-title">Guide</h1>
       <p class="page-sub">How Falsky works — setup, algorithm, API reference</p>
+    </div>
+  </div>
+
+  <!-- ====== SECTION 0: Quick Setup ====== -->
+  <div class="card" style="margin-bottom:24px;border-left:3px solid var(--okB)">
+    <div class="card-header">
+      <span class="card-title" style="font-family:var(--mono);letter-spacing:.1em"><span style="color:var(--okB);font-weight:700">00</span> — QUICK SETUP</span>
+    </div>
+    <div style="padding:4px 0">
+      <p style="font-family:var(--sans);font-size:13px;color:var(--mut);line-height:1.6;margin-bottom:16px">
+        Get started in 3 steps. Your API key is in <a href="./api-keys.html" style="color:var(--warnB);text-decoration:none">Setup & Keys</a>.
+      </p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+        <div style="background:var(--tile);border:1px solid var(--hair);border-radius:var(--radius);padding:14px;text-align:center">
+          <div style="font-family:var(--mono);font-size:18px;color:var(--okB)">1</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--mut);letter-spacing:.08em;margin-top:6px">COPY YOUR<br>API KEY</div>
+          <a href="./api-keys.html" style="display:inline-block;margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--okB);text-decoration:none;border:1px solid rgba(47,191,113,.3);padding:4px 10px;border-radius:4px">Get Key →</a>
+        </div>
+        <div style="background:var(--tile);border:1px solid var(--hair);border-radius:var(--radius);padding:14px;text-align:center">
+          <div style="font-family:var(--mono);font-size:18px;color:var(--warnB)">2</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--mut);letter-spacing:.08em;margin-top:6px">ADD TO GITHUB<br>SECRETS</div>
+          <div style="font-family:var(--mono);font-size:10px;color:#8A9099;margin-top:8px">Name: <code style="color:var(--okB)">FALSKY_API_KEY</code></div>
+        </div>
+        <div style="background:var(--tile);border:1px solid var(--hair);border-radius:var(--radius);padding:14px;text-align:center">
+          <div style="font-family:var(--mono);font-size:18px;color:#8b5cf6">3</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--mut);letter-spacing:.08em;margin-top:6px">ADD YML<br>WORKFLOW</div>
+          <div style="font-family:var(--mono);font-size:10px;color:#8A9099;margin-top:8px">File: <code style="color:var(--okB)">.github/workflows/falsky.yml</code></div>
+        </div>
+      </div>
+
+      <div style="background:var(--panel);border:1px solid var(--hair);border-radius:var(--radius);overflow:hidden;margin-top:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--hair)">
+          <span style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--okB);text-transform:uppercase">Complete workflow YML</span>
+        </div>
+        <pre style="font-family:var(--mono);font-size:12px;color:#8A9099;line-height:1.7;padding:14px;margin:0;overflow-x:auto">name: Falsky CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  CI: true
+  CI_RUN_NUMBER: ${​{ github.run_number }}
+
+jobs:
+  test-and-analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - run: pytest tests/ --junitxml=/tmp/test-results.xml -v || true
+      - uses: Pritahi/falsky-action@v1
+        with:
+          junit-xml-path: '/tmp/test-results.xml'
+          api-url: 'https://falsky-test.vercel.app'
+          api-key: ${​{ secrets.FALSKY_API_KEY }}
+          repo-name: ${​{ github.repository }}
+          comment-on-pr: 'true'
+          fail-on-flaky: 'false'
+          flaky-threshold: '50'</pre>
+      </div>
+
+      <p style="font-family:var(--mono);font-size:11px;color:#5A616B;margin-top:12px;line-height:1.6">
+        Change <code style="color:var(--warnB)">pytest tests/</code> to your test path and <code style="color:var(--warnB)">"3.11"</code> to your Python version. The <code style="color:var(--okB)">FALSKY_API_KEY</code> secret comes from Step 2. See full details at <a href="./api-keys.html" style="color:var(--warnB);text-decoration:none">Setup & Keys</a>.
+      </p>
     </div>
   </div>
 

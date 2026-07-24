@@ -1,47 +1,44 @@
-name: Falsky Test Analysis
+name: Falsky CI
+
 on:
-  pull_request:
-    branches: [ main ]
   push:
-    branches: [ main ]
+    branches:
+      - main
+  pull_request:
+
+env:
+  CI: true
+  CI_RUN_NUMBER: ${{ github.run_number }}
 
 jobs:
   test-and-analyze:
     runs-on: ubuntu-latest
-    env:
-      CI: true
-      CI_RUN_NUMBER: ${{ github.run_number }}
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run real pytest suite
+      - name: Run pytest
         run: |
-          pytest tests/test_real.py \
-            --junitxml=/tmp/test-results.xml \
-            -v || true
+          pytest tests/ --junitxml=/tmp/test-results.xml -v || true
 
-      - name: Analyze with Falsky
-        uses: ./falsky-action
+      - name: Analyze results with Falsky
+        uses: Pritahi/falsky-action@v1
         with:
           junit-xml-path: '/tmp/test-results.xml'
-          api-url: 'https://poly-core-vercel.vercel.app'
+          api-url: 'https://falsky-test.vercel.app'
           api-key: ${{ secrets.FALSKY_API_KEY }}
-          repo-name: '${{ github.repository }}'
+          repo-name: ${{ github.repository }}
           comment-on-pr: 'true'
           fail-on-flaky: 'false'
           flaky-threshold: '50'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
