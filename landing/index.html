@@ -191,8 +191,6 @@ a{color:var(--amber);text-decoration:none}
 .cta-section::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(circle,rgba(255,176,32,.06) 0%,transparent 60%);pointer-events:none}
 .cta-section h2{font-family:var(--disp);font-size:clamp(1.6rem,4vw,2.4rem);letter-spacing:.04em;color:var(--paper);text-transform:uppercase;margin-bottom:16px}
 .cta-section p{font-family:var(--mono);font-size:13px;color:var(--muted);margin-bottom:32px;letter-spacing:.04em}
-.cta-section .cta-pills{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px}
-.cta-section .cta-pills span{padding:6px 14px;background:var(--ink2);border:1px solid var(--line2);border-radius:3px;font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.08em}
 
 /* ── FOOTER ── */
 .footer{padding:32px 40px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em;position:relative;z-index:1}
@@ -241,7 +239,7 @@ a{color:var(--amber);text-decoration:none}
   <a href="#how">How it Works</a>
   <a href="#action">GitHub Action</a>
   <a href="https://github.com/Pritahi/falsky-core" target="_blank">GitHub</a>
-  <a href="/dashboard/auth.html" class="cta-btn">Sign In</a>
+  <a href="/login" class="cta-btn">Sign In</a>
 </div>
 
 <!-- Nav -->
@@ -260,7 +258,7 @@ a{color:var(--amber);text-decoration:none}
       <button id="darkBtn" class="active" title="Dark mode">&#9790;</button>
       <button id="lightBtn" title="Light mode">&#9788;</button>
     </div>
-    <a href="/dashboard/auth.html" class="cta-btn">Sign In &#8594;</a>
+    <a href="/login" class="cta-btn">Sign In &#8594;</a>
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu">
     <span></span><span></span><span></span>
@@ -288,7 +286,7 @@ a{color:var(--amber);text-decoration:none}
   <p class="sub">Detect flaky tests before they break your pipeline. Bayesian-powered trust scores give every test a reliability rating from 0 to 100.</p>
   <p class="mono-sub">Works with pytest, Jest, JUnit, and any framework that outputs JUnit XML. Free for open source.</p>
   <div class="actions">
-    <a href="/dashboard/auth.html" class="btn btn-primary">Get Started Free &#8594;</a>
+    <a href="/login" class="btn btn-primary">Get Started Free &#8594;</a>
     <a href="#demo" class="btn btn-ghost">See Live Demo &#8595;</a>
   </div>
 </section>
@@ -517,13 +515,7 @@ a{color:var(--amber);text-decoration:none}
 <section class="cta-section reveal">
   <h2>Start detecting flaky tests today</h2>
   <p>Free forever for open source. No credit card. No setup fee.</p>
-  <a href="/dashboard/auth.html" class="btn btn-primary">Sign In with GitHub &#8594;</a>
-  <div class="cta-pills">
-    <span>MIT License</span>
-    <span>Self-hostable</span>
-    <span>JUnit XML input</span>
-    <span>Bayesian scoring</span>
-  </div>
+  <a href="/login" class="btn btn-primary">Sign In with GitHub &#8594;</a>
 </section>
 
 <!-- Footer -->
